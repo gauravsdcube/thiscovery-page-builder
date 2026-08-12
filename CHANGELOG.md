@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 — 2026-08-12
+
+- Per-section colour controls (background, text)
+- Hero border colour picker and Show border toggle
+- Background colour presets shown under the background field
+
 ## 1.0.0 — 2026-08-12
 
 First stable release.

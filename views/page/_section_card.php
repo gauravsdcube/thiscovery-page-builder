@@ -100,6 +100,13 @@ $titleHint = match ($type) {
             </div>
         </div>
 
+        <?= $this->render('_color_fields', [
+            'settings' => $settings,
+            'namePrefix' => $namePrefix,
+            'safeIndex' => $safeIndex,
+            'type' => $type,
+        ]) ?>
+
         <?php if ($type === 'hero'): ?>
             <div class="form-group">
                 <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Headline') ?></label>

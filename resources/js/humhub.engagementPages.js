@@ -525,6 +525,69 @@ humhub.module('engagementPages', function (module, require, $) {
             $root.find('[data-ep-page-width]').val(val);
         });
 
+        var normalizeHex = function (raw, fallback) {
+            var v = String(raw || '').trim().toLowerCase();
+            if (!v) {
+                return fallback || '';
+            }
+            if (v.charAt(0) !== '#') {
+                v = '#' + v;
+            }
+            if (/^#[0-9a-f]{3}$/.test(v)) {
+                return '#' + v[1] + v[1] + v[2] + v[2] + v[3] + v[3];
+            }
+            if (/^#[0-9a-f]{6}$/.test(v)) {
+                return v;
+            }
+            return fallback || '';
+        };
+
+        $root.on('input change', '[data-ep-color-picker]', function () {
+            var $field = $(this).closest('[data-ep-color-field]');
+            var hex = normalizeHex($(this).val(), '#000000');
+            $field.find('[data-ep-color-text]').val(hex);
+        });
+
+        $root.on('change blur', '[data-ep-color-text]', function () {
+            var $input = $(this);
+            var $field = $input.closest('[data-ep-color-field]');
+            var fallback = String($field.find('[data-ep-color-picker]').val() || '#000000');
+            var raw = String($input.val() || '').trim();
+            if (!raw) {
+                return;
+            }
+            var hex = normalizeHex(raw, '');
+            if (!hex) {
+                $input.val('');
+                return;
+            }
+            $input.val(hex);
+            $field.find('[data-ep-color-picker]').val(hex);
+        });
+
+        $root.on('click', '[data-ep-color-clear]', function (e) {
+            e.preventDefault();
+            var $field = $(this).closest('[data-ep-color-field]');
+            $field.find('[data-ep-color-text]').val('');
+        });
+
+        $root.on('click', '[data-ep-color-preset]', function (e) {
+            e.preventDefault();
+            var hex = normalizeHex($(this).data('ep-color-preset'), '');
+            if (!hex) {
+                return;
+            }
+            var $wrap = $(this).closest('.ep-color-fields');
+            var $bg = $wrap.find('[name$="[background_color]"]');
+            $bg.val(hex);
+            $bg.closest('[data-ep-color-field]').find('[data-ep-color-picker]').val(hex);
+        });
+
+        $root.on('change', '[data-ep-show-border]', function () {
+            var on = $(this).is(':checked');
+            $(this).closest('.ep-color-fields').find('[data-ep-border-color-wrap]').prop('hidden', !on);
+        });
+
         $root.on('submit', 'form.ep-studio__form', function (e) {
             var $form = $(this);
             syncRichEditors();

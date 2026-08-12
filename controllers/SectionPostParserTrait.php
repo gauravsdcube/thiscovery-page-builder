@@ -71,6 +71,9 @@ trait SectionPostParserTrait
             $settings['moderate_guests'] = !empty($settings['moderate_guests']);
             $settings['show_comments'] = !empty($settings['show_comments']);
         }
+        if ($type === 'hero') {
+            $settings['show_border'] = !empty($settings['show_border']);
+        }
 
         $section = [
             'type' => $type,

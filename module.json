@@ -2,8 +2,14 @@
   "id": "engagement-pages",
   "name": "Thiscovery Page Builder",
   "description": "Build public pages with drag-and-drop sections, guest/member visibility, moderated comments, grid containers, templates, collections, and Thiscovery Forms for NHS ICB portals.",
-  "keywords": ["thiscovery", "page builder", "engagement", "consultation", "nhs"],
-  "version": "1.0.0",
+  "keywords": [
+    "thiscovery",
+    "page builder",
+    "engagement",
+    "consultation",
+    "nhs"
+  ],
+  "version": "1.0.1",
   "humhub": {
     "minVersion": "1.18"
   },

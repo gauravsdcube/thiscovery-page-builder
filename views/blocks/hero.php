@@ -20,8 +20,37 @@ $imageUrl = FileHelper::url($settings['image_guid'] ?? null)
     ?: (($settings['image_url'] ?? '') !== '' ? $settings['image_url'] : null);
 $imageAlt = $settings['image_alt'] ?? '';
 $hasImage = !empty($imageUrl);
+
+$bg = $block->getBackgroundColor();
+$fg = $block->getTextColor();
+$border = $block->getBorderColor();
+$showBorder = $block->getShowBorder();
+
+// Apply colours on the hero element itself (not only the parent wrapper).
+$style = [];
+if ($bg !== '') {
+    $style[] = '--ep-bg:' . $bg;
+    $style[] = 'background-color:' . $bg;
+}
+if ($fg !== '') {
+    $style[] = '--ep-fg:' . $fg;
+    $style[] = 'color:' . $fg;
+}
+if (!$showBorder) {
+    $style[] = 'border:none';
+} elseif ($border !== '') {
+    $style[] = 'border:2px solid ' . $border;
+}
+
+$classes = 'ep-block ep-hero';
+if ($hasImage) {
+    $classes .= ' has-image';
+}
+if (!$showBorder) {
+    $classes .= ' ep-hero--no-border';
+}
 ?>
-<section class="ep-block ep-hero<?= $hasImage ? ' has-image' : '' ?>">
+<section class="<?= Html::encode($classes) ?>"<?php if ($style !== []): ?> style="<?= Html::encode(implode(';', $style)) ?>"<?php endif; ?>>
     <?php if ($hasImage): ?>
         <img class="ep-hero-image"
              src="<?= Html::encode($imageUrl) ?>"
