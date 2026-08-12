@@ -1,0 +1,27 @@
+# Ignore local / runtime artefacts for the HumHub module package
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Composer (module has no vendor; keep root clean if added later)
+/vendor/
+/composer.lock
+
+# Local env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Runtime / caches
+/runtime/
+*.log
+
+# OS / editor
+.phpunit.result.cache
+.php-cs-fixer.cache
