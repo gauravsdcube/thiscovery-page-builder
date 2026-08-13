@@ -145,23 +145,51 @@ abstract class BaseBlock extends BaseObject
     }
 
     /**
-     * Suggested swatches (NHS-oriented + neutrals) for the colour picker UI.
+     * Suggested swatches for the colour picker UI. Prefers live Thiscovery theme colours when that module is enabled.
      *
      * @return string[]
      */
     public static function colorPresets(): array
     {
-        return [
-            '#003078', // NHS dark blue (default hero)
-            '#1d70b8', // NHS blue
-            '#00703c', // NHS green
-            '#d4351c', // NHS red
-            '#f47738', // NHS orange
-            '#0b0c0c', // near-black
-            '#505a5f', // grey
-            '#f3f2f1', // light grey
-            '#ffffff', // white
+        $defaults = [
+            '#003078',
+            '#1d70b8',
+            '#00703c',
+            '#d4351c',
+            '#f47738',
+            '#0b0c0c',
+            '#505a5f',
+            '#f3f2f1',
+            '#ffffff',
         ];
+
+        $module = Yii::$app->getModule('thiscovery-theme');
+        if ($module === null) {
+            return $defaults;
+        }
+
+        $fromTheme = [];
+        foreach ([
+            'themePrimaryColor',
+            'themeAccentColor',
+            'buttonBackgroundColor',
+            'topMenuBackgroundColor',
+            'themeSuccessColor',
+            'themeDangerColor',
+            'themeWarningColor',
+            'themeInfoColor',
+            'textColorMain',
+            'textColorSecondary',
+            'backgroundColorPage',
+            'cardBackgroundColor',
+        ] as $key) {
+            $value = strtolower(trim((string) $module->settings->get($key, '')));
+            if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $value)) {
+                $fromTheme[] = $value;
+            }
+        }
+
+        return array_values(array_unique(array_merge($fromTheme, $defaults)));
     }
 
     public function render(EngagementPage $page): string

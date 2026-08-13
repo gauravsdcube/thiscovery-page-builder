@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 — 2026-08-13
+
+- Fix: Contact cards in grid containers now share equal height, with the email button aligned at the bottom of each card
+- Enh: Public page blocks inherit colours, type, cards, buttons, and accordions from the Thiscovery theme
+- Fix: Section colour pickers override Thiscovery theme colours on that block
+
 ## 1.0.1 — 2026-08-12
 
 - Per-section colour controls (background, text)
