@@ -391,6 +391,23 @@
 .ep-collection-card--space .ep-collection-card__media {
   background: linear-gradient(135deg, var(--ep-t-heading) 0%, var(--ep-t-success) 100%);
 }
+.ep-collection-card--event .ep-collection-card__media {
+  background: linear-gradient(135deg, var(--ep-t-primary) 0%, var(--ep-t-heading) 100%);
+}
+.ep-collection__more {
+  margin: -0.35rem 0 1.5rem;
+}
+.ep-collection__more a {
+  font-weight: 600;
+  text-decoration: none;
+}
+.ep-collection__more a:hover {
+  text-decoration: underline;
+}
+.ep-collection__more i {
+  margin-left: 0.35rem;
+  font-size: 0.85em;
+}
 .ep-collection-card__badge {
   position: absolute;
   top: 10px;
@@ -920,6 +937,24 @@
   display: inline-flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+.ep-subscription-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ep-subscription-filters .ep-label {
+  margin: 0;
+}
+.ep-subscription-table th,
+.ep-subscription-table td {
+  vertical-align: middle;
+}
+.ep-subscription-table__actions {
+  text-align: right;
+  white-space: nowrap;
+  width: 1%;
 }
 
 .ep-accordion__item {

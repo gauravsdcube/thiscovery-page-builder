@@ -137,17 +137,12 @@ $anonymousLabel = Yii::t('EngagementPagesModule.base', 'Anonymous');
                         'readonly' => !$isGuest && $commentForm->author_name !== '',
                     ]) ?>
                 <?php endif; ?>
-                <?php if ($requireEmail || !$isGuest): ?>
+                <?php if ($requireEmail): ?>
                     <?= $form->field($commentForm, 'author_email')->input('email', [
                         'maxlength' => 255,
                         'autocomplete' => 'email',
                         'readonly' => !$isGuest && $commentForm->author_email !== '',
                     ]) ?>
-                <?php elseif ($isGuest): ?>
-                    <?= $form->field($commentForm, 'author_email')->input('email', [
-                        'maxlength' => 255,
-                        'autocomplete' => 'email',
-                    ])->hint(Yii::t('EngagementPagesModule.base', 'Optional')) ?>
                 <?php endif; ?>
                 <?= $form->field($commentForm, 'body')->textarea([
                     'rows' => 4,

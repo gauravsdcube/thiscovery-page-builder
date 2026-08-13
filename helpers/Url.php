@@ -59,6 +59,29 @@ class Url
         return BaseUrl::to(['/engagement-pages/global/moderate-comment', 'id' => $id]);
     }
 
+    public static function toGlobalSubscriptions(?int $pageId = null): string
+    {
+        $params = ['/engagement-pages/global/subscriptions'];
+        if ($pageId) {
+            $params['page_id'] = $pageId;
+        }
+        return BaseUrl::to($params);
+    }
+
+    public static function toGlobalExportSubscriptions(?int $pageId = null): string
+    {
+        $params = ['/engagement-pages/global/export-subscriptions'];
+        if ($pageId) {
+            $params['page_id'] = $pageId;
+        }
+        return BaseUrl::to($params);
+    }
+
+    public static function toGlobalDeleteSubscription(int $id): string
+    {
+        return BaseUrl::to(['/engagement-pages/global/delete-subscription', 'id' => $id]);
+    }
+
     public static function toGlobalView(EngagementPage $page): string
     {
         return BaseUrl::to(['/engagement-pages/global/view', 'id' => $page->id]);

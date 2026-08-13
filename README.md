@@ -1,6 +1,6 @@
 # Thiscovery Page Builder
 
-**Version 1.1.0**  
+**Version 1.2.0**  
 **Copyright (c) 2026 D Cube Consulting. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 
@@ -20,7 +20,7 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 2. Enable **Thiscovery Page Builder** in Administration → Modules
 3. Run pending migrations (HumHub will apply module migrations on enable, or use `php protected/yii migrate/up --migrationPath=@engagement-pages/migrations`)
 
-## Features (v1.0)
+## Features (v1.2)
 
 - **Global page builder** at `/engagement-pages/global/index`
 - Public URLs: `/pages` (directory homepage) and `/pages/<slug>`
@@ -29,12 +29,15 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 - Page templates (save / create from template)
 - Visibility: **public (guests)** or **community members only**
 - **Comments** element with guest CAPTCHA, rate limits, optional anonymous name, show/hide approved comments, admin moderation history
+- **Collections** can list pages, forms, spaces, or upcoming Calendar events
+- **Get updates** subscriptions stored per page, with admin table and CSV export
 - Space stream lockdown when the module is enabled on a space (ops-focused)
 
 ## Admin
 
 - Administration → **Thiscovery Page Builder**
 - Comment moderation: `/engagement-pages/global/comments`
+- Subscriptions (Get updates emails): `/engagement-pages/global/subscriptions`
 
 ## Copyright
 

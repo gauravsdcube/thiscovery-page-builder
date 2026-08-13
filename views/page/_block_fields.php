@@ -262,8 +262,11 @@ if ($type === 'phases'): ?>
                id="ep-comments-email-<?= Html::encode($safeIndex) ?>"
             <?= !isset($settings['require_email']) || !empty($settings['require_email']) ? 'checked' : '' ?>>
         <label class="form-check-label" for="ep-comments-email-<?= Html::encode($safeIndex) ?>">
-            <?= Yii::t('EngagementPagesModule.base', 'Require email from guests') ?>
+            <?= Yii::t('EngagementPagesModule.base', 'Ask for email') ?>
         </label>
+        <div class="ep-hint text-muted">
+            <?= Yii::t('EngagementPagesModule.base', 'If unchecked, the email field is hidden. If checked, guests must enter an email.') ?>
+        </div>
     </div>
     <div class="form-check mb-2">
         <input type="hidden" name="<?= $namePrefix ?>[settings][moderate_guests]" value="0">
@@ -387,6 +390,20 @@ if ($type === 'phases'): ?>
         <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][link_url]"
                value="<?= Html::encode($settings['link_url'] ?? '') ?>">
     </div>
+    <div class="form-check mb-2">
+        <input type="hidden" name="<?= $namePrefix ?>[settings][use_as_card_image]" value="0">
+        <input class="form-check-input" type="checkbox" value="1"
+               name="<?= $namePrefix ?>[settings][use_as_card_image]"
+               id="ep-card-img-<?= Html::encode($safeIndex) ?>"
+               data-ep-card-image
+            <?= !empty($settings['use_as_card_image']) ? 'checked' : '' ?>>
+        <label class="form-check-label" for="ep-card-img-<?= Html::encode($safeIndex) ?>">
+            <?= Yii::t('EngagementPagesModule.base', 'Use as collection card image') ?>
+        </label>
+        <div class="ep-hint text-muted">
+            <?= Yii::t('EngagementPagesModule.base', 'Shown on collection listings and the public directory. If none is selected, the hero image is used.') ?>
+        </div>
+    </div>
 
 <?php elseif ($type === 'collection' || $type === 'directory'): ?>
     <div class="form-group">
@@ -397,7 +414,8 @@ if ($type === 'phases'): ?>
     </div>
     <div class="form-group">
         <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Source') ?></label>
-        <select class="form-control" name="<?= $namePrefix ?>[settings][source]" style="max-width:280px">
+        <select class="form-control" name="<?= $namePrefix ?>[settings][source]" style="max-width:280px"
+                data-ep-collection-source>
             <?php foreach (\humhub\modules\engagementPages\blocks\CollectionBlock::sourceOptions() as $value => $label): ?>
                 <option value="<?= Html::encode($value) ?>" <?= ($settings['source'] ?? 'pages') === $value ? 'selected' : '' ?>>
                     <?= Html::encode($label) ?>
@@ -405,7 +423,7 @@ if ($type === 'phases'): ?>
             <?php endforeach; ?>
         </select>
         <div class="ep-hint text-muted">
-            <?= Yii::t('EngagementPagesModule.base', 'Choose what this collection lists: pages, forms, or spaces. Use Position (above) to centre the cards.') ?>
+            <?= Yii::t('EngagementPagesModule.base', 'Choose what this collection lists. Use Position (above) to centre the cards.') ?>
         </div>
     </div>
     <div class="form-group">
@@ -413,7 +431,7 @@ if ($type === 'phases'): ?>
         <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][empty_message]"
                value="<?= Html::encode($settings['empty_message'] ?? Yii::t('EngagementPagesModule.base', 'Nothing to show yet.')) ?>">
     </div>
-    <div class="form-check mb-2" data-ep-collection-pages-only>
+    <div class="form-check mb-2" data-ep-collection-pages-only<?= ($settings['source'] ?? 'pages') === 'pages' ? '' : ' hidden' ?>>
         <input type="hidden" name="<?= $namePrefix ?>[settings][show_featured_first]" value="0">
         <input class="form-check-input" type="checkbox" value="1"
                name="<?= $namePrefix ?>[settings][show_featured_first]"
@@ -423,7 +441,27 @@ if ($type === 'phases'): ?>
             <?= Yii::t('EngagementPagesModule.base', 'Show featured pages first') ?>
         </label>
     </div>
+    <div data-ep-collection-calendar-only<?= ($settings['source'] ?? 'pages') === 'calendar' ? '' : ' hidden' ?>>
+        <div class="form-group">
+            <label class="ep-label" for="ep-event-limit-<?= Html::encode($safeIndex) ?>">
+                <?= Yii::t('EngagementPagesModule.base', 'Number of upcoming events') ?>
+            </label>
+            <input type="number" class="form-control" style="max-width:120px"
+                   id="ep-event-limit-<?= Html::encode($safeIndex) ?>"
+                   name="<?= $namePrefix ?>[settings][event_limit]"
+                   min="1" max="30"
+                   value="<?= (int) ($settings['event_limit'] ?? 5) ?>">
+        </div>
+        <div class="form-group">
+            <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Calendar link label') ?></label>
+            <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][more_label]"
+                   value="<?= Html::encode($settings['more_label'] ?? Yii::t('EngagementPagesModule.base', 'View calendar')) ?>">
+            <div class="ep-hint text-muted">
+                <?= Yii::t('EngagementPagesModule.base', 'Shown under the events as a link to the full calendar.') ?>
+            </div>
+        </div>
+    </div>
     <p class="ep-hint text-muted">
-        <?= Yii::t('EngagementPagesModule.base', 'Pages: published items with “Show in public directory”. Forms: open global Thiscovery Forms. Spaces: visible spaces.') ?>
+        <?= Yii::t('EngagementPagesModule.base', 'Pages: published items with “Show in public directory”. Forms: open global Thiscovery Forms. Spaces: visible spaces. Calendar: upcoming events (requires the Calendar module).') ?>
     </p>
 <?php endif; ?>

@@ -15,9 +15,11 @@ use humhub\widgets\bootstrap\Button;
 /** @var EngagementPage[] $templates */
 /** @var bool $canCreate */
 /** @var int $pendingComments */
+/** @var int $subscriptionCount */
 
 $templates = $templates ?? [];
 $pendingComments = (int) ($pendingComments ?? 0);
+$subscriptionCount = (int) ($subscriptionCount ?? 0);
 
 $this->title = Yii::t('EngagementPagesModule.base', 'Thiscovery Page Builder');
 $statusOptions = EngagementPage::statusOptions();
@@ -41,6 +43,13 @@ $statusOptions = EngagementPage::statusOptions();
         )
             ->link(Url::toGlobalComments())
             ->icon('comments')
+            ->right() ?>
+        <?= Button::defaultType(
+            Yii::t('EngagementPagesModule.base', 'Subscriptions')
+            . ($subscriptionCount > 0 ? ' (' . $subscriptionCount . ')' : '')
+        )
+            ->link(Url::toGlobalSubscriptions())
+            ->icon('envelope')
             ->right() ?>
     </div>
     <div class="panel-body ep-page-list">

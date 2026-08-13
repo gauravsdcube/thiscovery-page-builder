@@ -32,5 +32,8 @@ return [
         'engagement-pages/global/save-template/<id:\d+>' => 'engagement-pages/global/save-template',
         'engagement-pages/global/comments' => 'engagement-pages/global/comments',
         'engagement-pages/global/moderate-comment/<id:\d+>' => 'engagement-pages/global/moderate-comment',
+        'engagement-pages/global/subscriptions' => 'engagement-pages/global/subscriptions',
+        'engagement-pages/global/export-subscriptions' => 'engagement-pages/global/export-subscriptions',
+        'engagement-pages/global/delete-subscription/<id:\d+>' => 'engagement-pages/global/delete-subscription',
     ],
 ];

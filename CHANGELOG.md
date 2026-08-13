@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 — 2026-08-13
+
+- Enh: Image blocks can be ticked as the collection / directory card image (overrides the hero fallback)
+- Fix: Comments email field is hidden when “Ask for email” is unchecked
+- Enh: Collections can list upcoming Calendar events (limit + link to the full calendar)
+- Enh: Network-level subscription list with CSV export (Get updates form emails)
+
 ## 1.1.0 — 2026-08-13
 
 - Fix: Contact cards in grid containers now share equal height, with the email button aligned at the bottom of each card

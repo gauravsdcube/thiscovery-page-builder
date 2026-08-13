@@ -14,6 +14,7 @@ use humhub\modules\engagementPages\assets\EngagementPagesAsset;
 use humhub\modules\engagementPages\helpers\Url;
 use humhub\modules\engagementPages\models\EngagementPage;
 use humhub\modules\engagementPages\models\PageComment;
+use humhub\modules\engagementPages\models\PageFollow;
 use humhub\modules\engagementPages\permissions\CreateGlobalPage;
 use humhub\modules\engagementPages\permissions\ManageGlobalPage;
 use humhub\modules\engagementPages\services\BlockRegistry;
@@ -51,6 +52,7 @@ class GlobalController extends Controller
                     'delete' => ['POST'],
                     'save-template' => ['POST'],
                     'moderate-comment' => ['POST'],
+                    'delete-subscription' => ['POST'],
                 ],
             ],
         ];
@@ -88,6 +90,7 @@ class GlobalController extends Controller
             'pages' => $pages,
             'templates' => $templates,
             'pendingComments' => PageComment::countPending(),
+            'subscriptionCount' => PageFollow::countGlobal(),
             'canCreate' => Yii::$app->user->can(CreateGlobalPage::class) || Yii::$app->user->isAdmin(),
             'contentContainer' => null,
         ]);
@@ -171,6 +174,93 @@ class GlobalController extends Controller
             return $this->redirect($return);
         }
         return $this->redirect(Url::toGlobalComments($filterStatus ?: 'all', $filterPageId));
+    }
+
+    public function actionSubscriptions($page_id = null)
+    {
+        $this->requireManage();
+        EngagementPagesAsset::register($this->view);
+
+        $pageId = $page_id ? (int) $page_id : null;
+        $follows = PageFollow::findGlobalQuery($pageId)->all();
+
+        return $this->render('subscriptions', [
+            'follows' => $follows,
+            'pageId' => $pageId,
+            'totalCount' => PageFollow::countGlobal($pageId),
+            'pageOptions' => PageFollow::globalPageFilterOptions(),
+        ]);
+    }
+
+    public function actionExportSubscriptions($page_id = null)
+    {
+        $this->requireManage();
+
+        $pageId = $page_id ? (int) $page_id : null;
+        $follows = PageFollow::findGlobalQuery($pageId)->all();
+
+        $handle = fopen('php://temp', 'r+');
+        fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+        fputcsv($handle, [
+            Yii::t('EngagementPagesModule.base', 'Email'),
+            Yii::t('EngagementPagesModule.base', 'Page'),
+            Yii::t('EngagementPagesModule.base', 'Public URL'),
+            Yii::t('EngagementPagesModule.base', 'Subscribed'),
+        ]);
+        foreach ($follows as $follow) {
+            $page = $follow->page;
+            $publicUrl = '';
+            $title = '';
+            if ($page !== null) {
+                $title = (string) $page->title;
+                $publicUrl = Url::toPublic($page, true);
+            }
+            fputcsv($handle, [
+                $follow->email,
+                $title,
+                $publicUrl,
+                (string) ($follow->created_at ?? ''),
+            ]);
+        }
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $filename = 'page-subscriptions-' . date('Y-m-d') . '.csv';
+        if ($pageId && $follows !== []) {
+            $slug = $follows[0]->page->slug ?? null;
+            if ($slug) {
+                $filename = 'page-subscriptions-' . $slug . '-' . date('Y-m-d') . '.csv';
+            }
+        }
+
+        return Yii::$app->response->sendContentAsFile($csv, $filename, [
+            'mimeType' => 'text/csv',
+            'inline' => false,
+        ]);
+    }
+
+    public function actionDeleteSubscription($id)
+    {
+        $this->requireManage();
+        $follow = PageFollow::findOne((int) $id);
+        if ($follow === null) {
+            throw new NotFoundHttpException();
+        }
+        $page = $follow->page;
+        if ($page === null || !$page->isGlobal()) {
+            throw new ForbiddenHttpException();
+        }
+
+        $follow->delete();
+        Yii::$app->session->setFlash('success', Yii::t('EngagementPagesModule.base', 'Subscription removed.'));
+
+        $filterPageId = Yii::$app->request->post('filter_page_id');
+        $filterPageId = ($filterPageId === '' || $filterPageId === null)
+            ? null
+            : (int) $filterPageId;
+
+        return $this->redirect(Url::toGlobalSubscriptions($filterPageId));
     }
 
     protected function requireManage(): void

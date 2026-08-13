@@ -445,11 +445,13 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                 'title' => Yii::t('EngagementPagesModule.base', 'Open for feedback'),
                 'source' => 'pages',
                 'show_featured_first' => true,
+                'event_limit' => 5,
             ],
             'collection' => [
                 'title' => Yii::t('EngagementPagesModule.base', 'Open for feedback'),
                 'source' => 'pages',
                 'show_featured_first' => true,
+                'event_limit' => 5,
             ],
             default => [],
         };

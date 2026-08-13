@@ -497,6 +497,7 @@ humhub.module('engagementPages', function (module, require, $) {
 
             refreshCardTitle($card);
             refreshIndexes();
+            syncCollectionSourceFields($card);
             expandCard($card);
             setTimeout(function () {
                 initRichEditors($card);
@@ -586,6 +587,29 @@ humhub.module('engagementPages', function (module, require, $) {
         $root.on('change', '[data-ep-show-border]', function () {
             var on = $(this).is(':checked');
             $(this).closest('.ep-color-fields').find('[data-ep-border-color-wrap]').prop('hidden', !on);
+        });
+
+        $root.on('change', '[data-ep-card-image]', function () {
+            if (!this.checked) {
+                return;
+            }
+            var $this = $(this);
+            $root.find('[data-ep-card-image]').not($this).prop('checked', false);
+        });
+
+        var syncCollectionSourceFields = function ($scope) {
+            var $card = $scope && $scope.length ? $scope : $root;
+            $card.find('[data-ep-collection-source]').each(function () {
+                var $select = $(this);
+                var source = String($select.val() || 'pages');
+                var $wrap = $select.closest('[data-ep-section], .ep-section-card, form');
+                $wrap.find('[data-ep-collection-pages-only]').prop('hidden', source !== 'pages');
+                $wrap.find('[data-ep-collection-calendar-only]').prop('hidden', source !== 'calendar');
+            });
+        };
+
+        $root.on('change', '[data-ep-collection-source]', function () {
+            syncCollectionSourceFields($(this).closest('[data-ep-section]'));
         });
 
         $root.on('submit', 'form.ep-studio__form', function (e) {
@@ -1034,6 +1058,7 @@ humhub.module('engagementPages', function (module, require, $) {
         $root.find('[data-ep-section]').each(function () {
             refreshCardTitle($(this));
         });
+        syncCollectionSourceFields($root);
         // Only init rich editors that are already visible (settings tab / expanded).
         // Collapsed column cards are remounted when opened in the edit stage.
         setTimeout(function () {
