@@ -9,6 +9,7 @@ namespace humhub\modules\engagementPages\models;
 
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\content\models\Content;
+use humhub\modules\engagementPages\helpers\FileHelper;
 use humhub\modules\engagementPages\helpers\Url;
 use humhub\modules\engagementPages\permissions\CreateGlobalPage;
 use humhub\modules\engagementPages\permissions\CreatePage;
@@ -344,38 +345,49 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     }
 
     /**
-     * Best image for collection cards: hero image, then first image block.
+     * Best image for collection cards: ticked image block, then hero, then first image.
      */
     public function getCardImageUrl(): ?string
     {
-        $sections = $this->getSections();
-        $fallback = null;
-        $walk = function (array $items) use (&$walk, &$fallback) {
+        $chosen = null;
+        $hero = null;
+        $firstImage = null;
+
+        $resolve = static function (array $settings): ?string {
+            $guid = (string) ($settings['image_guid'] ?? '');
+            if ($guid !== '') {
+                $url = FileHelper::url($guid);
+                if ($url) {
+                    return $url;
+                }
+            }
+            $legacy = (string) ($settings['image_url'] ?? '');
+            return $legacy !== '' ? $legacy : null;
+        };
+
+        $walk = function (array $items) use (&$walk, &$chosen, &$hero, &$firstImage, $resolve) {
             foreach ($items as $section) {
                 $type = (string) ($section['type'] ?? '');
                 $settings = (array) ($section['settings'] ?? []);
-                if ($type === 'hero' && !empty($settings['image_guid'])) {
-                    $url = \humhub\modules\engagementPages\helpers\FileHelper::url((string) $settings['image_guid']);
-                    if ($url) {
-                        return $url;
-                    }
+                $url = $resolve($settings);
+
+                if ($type === 'image' && $url && !empty($settings['use_as_card_image']) && $chosen === null) {
+                    $chosen = $url;
                 }
-                if ($type === 'image' && !empty($settings['image_guid']) && $fallback === null) {
-                    $fallback = \humhub\modules\engagementPages\helpers\FileHelper::url((string) $settings['image_guid']);
+                if ($type === 'hero' && $url && $hero === null) {
+                    $hero = $url;
                 }
-                if ($type === 'hero' && !empty($settings['image_url']) && $fallback === null) {
-                    $fallback = (string) $settings['image_url'];
+                if ($type === 'image' && $url && $firstImage === null) {
+                    $firstImage = $url;
                 }
                 if (!empty($section['children']) && is_array($section['children'])) {
-                    $nested = $walk($section['children']);
-                    if ($nested) {
-                        return $nested;
-                    }
+                    $walk($section['children']);
                 }
             }
-            return null;
         };
-        return $walk($sections) ?: $fallback;
+        $walk($this->getSections());
+
+        return $chosen ?: $hero ?: $firstImage;
     }
 
     public function afterSave($insert, $changedAttributes)

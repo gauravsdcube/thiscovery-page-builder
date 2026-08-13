@@ -167,6 +167,72 @@ $renderHeading = static function (string $text) {
         </div>
     <?php endif; ?>
 
+<?php elseif ($source === CollectionBlock::SOURCE_CALENDAR): ?>
+    <?= $renderHeading($title !== '' ? $title : Yii::t('EngagementPagesModule.base', 'Upcoming events')) ?>
+    <?php
+    $eventLimit = CollectionBlock::clampEventLimit($settings['event_limit'] ?? CollectionBlock::EVENT_LIMIT_DEFAULT);
+    $events = CollectionBlock::findUpcomingEvents($eventLimit, 365, $page);
+    $calendarUrl = CollectionBlock::calendarUrl($page);
+    $moreLabel = (string) ($settings['more_label'] ?? Yii::t('EngagementPagesModule.base', 'View calendar'));
+    if ($moreLabel === '') {
+        $moreLabel = Yii::t('EngagementPagesModule.base', 'View calendar');
+    }
+    ?>
+    <?php if ($events === []): ?>
+        <p class="text-muted"><?= Html::encode($emptyMessage) ?></p>
+    <?php else: ?>
+        <div class="ep-directory__grid">
+            <?php foreach ($events as $entry): ?>
+                <?php
+                $eventUrl = method_exists($entry, 'getUrl') ? (string) $entry->getUrl() : '';
+                $eventTitle = method_exists($entry, 'getTitle') ? (string) $entry->getTitle() : '';
+                $eventWhen = CollectionBlock::formatEventTime($entry);
+                $eventLocation = '';
+                if (method_exists($entry, 'getLocation')) {
+                    $eventLocation = trim(strip_tags((string) $entry->getLocation()));
+                }
+                ?>
+                <article class="ep-collection-card no-media ep-collection-card--event">
+                    <a class="ep-collection-card__media" href="<?= Html::encode($eventUrl) ?>" tabindex="-1" aria-hidden="true">
+                        <span class="ep-collection-card__media-fallback" aria-hidden="true">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                    </a>
+                    <div class="ep-collection-card__body">
+                        <div class="ep-collection-card__eyebrow"><?= Yii::t('EngagementPagesModule.base', 'Event') ?></div>
+                        <h3 class="ep-collection-card__title">
+                            <?php if ($eventUrl !== ''): ?>
+                                <a href="<?= Html::encode($eventUrl) ?>"><?= Html::encode($eventTitle) ?></a>
+                            <?php else: ?>
+                                <?= Html::encode($eventTitle) ?>
+                            <?php endif; ?>
+                        </h3>
+                        <?php if ($eventLocation !== ''): ?>
+                            <p class="ep-collection-card__summary"><?= Html::encode($eventLocation) ?></p>
+                        <?php endif; ?>
+                        <div class="ep-collection-card__footer">
+                            <span class="ep-collection-card__meta"><?= Html::encode($eventWhen) ?></span>
+                            <?php if ($eventUrl !== ''): ?>
+                                <a class="ep-collection-card__cta" href="<?= Html::encode($eventUrl) ?>">
+                                    <?= Yii::t('EngagementPagesModule.base', 'View event') ?>
+                                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <?php if ($calendarUrl !== ''): ?>
+        <p class="ep-collection__more">
+            <a href="<?= Html::encode($calendarUrl) ?>">
+                <?= Html::encode($moreLabel) ?>
+                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </p>
+    <?php endif; ?>
+
 <?php else: ?>
     <?= $renderHeading($title) ?>
     <p class="text-muted"><?= Html::encode($emptyMessage) ?></p>

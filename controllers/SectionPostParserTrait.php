@@ -11,6 +11,7 @@
 
 namespace humhub\modules\engagementPages\controllers;
 
+use humhub\modules\engagementPages\blocks\CollectionBlock;
 use humhub\modules\engagementPages\services\BlockRegistry;
 use Yii;
 
@@ -73,6 +74,13 @@ trait SectionPostParserTrait
         }
         if ($type === 'hero') {
             $settings['show_border'] = !empty($settings['show_border']);
+        }
+        if ($type === 'image') {
+            $settings['use_as_card_image'] = !empty($settings['use_as_card_image']);
+        }
+        if ($type === 'collection' || $type === 'directory') {
+            $settings['show_featured_first'] = !empty($settings['show_featured_first']);
+            $settings['event_limit'] = CollectionBlock::clampEventLimit($settings['event_limit'] ?? CollectionBlock::EVENT_LIMIT_DEFAULT);
         }
 
         $section = [

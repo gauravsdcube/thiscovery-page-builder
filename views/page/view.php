@@ -52,6 +52,9 @@ $showRight = in_array($layout, [BlockRegistry::LAYOUT_RIGHT, BlockRegistry::LAYO
                 <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Moderate comments'))
                     ->link(PageUrl::toGlobalComments('all', (int) $page->id))
                     ->sm() ?>
+                <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Subscriptions'))
+                    ->link(PageUrl::toGlobalSubscriptions((int) $page->id))
+                    ->sm() ?>
             <?php endif; ?>
             <?php if (!$isDirectory): ?>
                 <?= Html::beginForm(PageUrl::toDelete($page), 'post', ['class' => 'ep-inline-form']) ?>

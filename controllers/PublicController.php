@@ -163,11 +163,18 @@ class PublicController extends Controller
                 ? PageComment::STATUS_PENDING
                 : PageComment::STATUS_APPROVED;
 
+            $authorEmail = null;
+            if (!$isGuest) {
+                $authorEmail = Yii::$app->user->identity->email ?? null;
+            } elseif (!empty($settings['require_email'])) {
+                $authorEmail = $form->author_email ?: null;
+            }
+
             $comment = new PageComment([
                 'page_id' => $page->id,
                 'body' => $form->body,
                 'author_name' => $form->resolvedAuthorName(),
-                'author_email' => $form->author_email ?: null,
+                'author_email' => $authorEmail ?: null,
                 'user_id' => $isGuest ? null : (int) Yii::$app->user->id,
                 'status' => $status,
                 'ip_hash' => $this->clientIpHash(),

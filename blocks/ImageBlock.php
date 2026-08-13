@@ -31,6 +31,7 @@ class ImageBlock extends BaseBlock
             'alt' => $this->string('alt'),
             'caption' => $this->string('caption'),
             'link_url' => $this->string('link_url'),
+            'use_as_card_image' => !empty($this->settings['use_as_card_image']),
         ];
     }
 }
