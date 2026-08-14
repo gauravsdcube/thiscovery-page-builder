@@ -70,7 +70,7 @@ class GlobalController extends Controller
             throw new ForbiddenHttpException();
         }
 
-        // Make sure the editable /pages homepage exists for admins.
+        // Make sure the editable public homepage exists for admins.
         EngagementPage::ensureDirectoryPage();
 
         $pages = EngagementPage::find()
@@ -304,7 +304,7 @@ class GlobalController extends Controller
         if ($page->isDirectoryHome()) {
             Yii::$app->session->setFlash(
                 'error',
-                Yii::t('EngagementPagesModule.base', 'The /pages homepage cannot be saved as a template.')
+                Yii::t('EngagementPagesModule.base', 'The public homepage cannot be saved as a template.')
             );
             return $this->redirect(Url::toGlobalEdit($page));
         }
@@ -362,7 +362,7 @@ class GlobalController extends Controller
         if ($page->isDirectoryHome()) {
             Yii::$app->session->setFlash(
                 'error',
-                Yii::t('EngagementPagesModule.base', 'The /pages homepage cannot be deleted. Edit it in the page builder instead.')
+                Yii::t('EngagementPagesModule.base', 'The public homepage cannot be deleted. Edit it in the page builder instead.')
             );
             return $this->redirect(Url::toGlobalEdit($page));
         }

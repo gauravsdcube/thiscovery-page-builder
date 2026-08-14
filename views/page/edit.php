@@ -7,11 +7,11 @@
 
 use humhub\helpers\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
-use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\modules\engagementPages\assets\EngagementPagesAsset;
 use humhub\modules\engagementPages\helpers\Url;
 use humhub\modules\engagementPages\models\EngagementPage;
 use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryEditor\widgets\EditorField;
 use humhub\widgets\bootstrap\Button;
 
 /** @var ContentContainerActiveRecord|null $contentContainer */
@@ -26,10 +26,11 @@ EngagementPagesAsset::register($this);
 $isDirectory = $page->isDirectoryHome();
 $isTemplate = $page->isTemplate();
 $templates = $templates ?? [];
+$publicPrefix = EngagementPage::publicPrefix();
 $this->title = $isNew
     ? Yii::t('EngagementPagesModule.base', 'Create page')
     : ($isDirectory
-        ? Yii::t('EngagementPagesModule.base', 'Edit /pages homepage')
+        ? Yii::t('EngagementPagesModule.base', 'Edit homepage')
         : ($isTemplate
             ? Yii::t('EngagementPagesModule.base', 'Edit template')
             : Yii::t('EngagementPagesModule.base', 'Edit page')));
@@ -233,18 +234,26 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
             <div class="form-group">
                 <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'URL slug') ?></label>
                 <?php if ($isDirectory): ?>
-                    <input type="hidden" name="EngagementPage[slug]" value="<?= Html::encode($page->slug ?: EngagementPage::DIRECTORY_SLUG) ?>">
-                    <input type="text" class="form-control" value="/pages" readonly>
-                    <div class="ep-hint text-muted">
-                        <?= Yii::t('EngagementPagesModule.base', 'This is the public engagements homepage. Its public URL is always /pages.') ?>
+                    <div class="input-group">
+                        <span class="input-group-text">/</span>
+                        <input type="text" class="form-control" name="EngagementPage[slug]"
+                               value="<?= Html::encode($page->slug ?: EngagementPage::DEFAULT_PUBLIC_PREFIX) ?>"
+                               required
+                               data-ep-home-slug>
                     </div>
+                    <div class="ep-hint text-muted">
+                        <?= Yii::t('EngagementPagesModule.base', 'Public homepage URL. Other pages are nested under this path, for example /your-slug/another-page.') ?>
+                    </div>
+                    <?php if ($page->hasErrors('slug')): ?>
+                        <div class="help-block help-block-error"><?= Html::encode(implode(' ', $page->getErrors('slug'))) ?></div>
+                    <?php endif; ?>
                 <?php else: ?>
                     <div class="input-group">
-                        <span class="input-group-text">/pages/</span>
+                        <span class="input-group-text">/<?= Html::encode($publicPrefix) ?>/</span>
                         <input type="text" class="form-control" name="EngagementPage[slug]" value="<?= Html::encode($page->slug) ?>" required>
                     </div>
                     <div class="ep-hint text-muted">
-                        <?= Yii::t('EngagementPagesModule.base', 'Custom URL path for this page. Use lowercase letters, numbers, and hyphens. Works for consultations or any general-purpose page.') ?>
+                        <?= Yii::t('EngagementPagesModule.base', 'Custom URL path for this page. Use lowercase letters, numbers, and hyphens.') ?>
                     </div>
                     <?php if ($page->hasErrors('slug')): ?>
                         <div class="help-block help-block-error"><?= Html::encode(implode(' ', $page->getErrors('slug'))) ?></div>
@@ -256,14 +265,16 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                 <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Summary') ?>
                     <span class="ep-optional"><?= Yii::t('EngagementPagesModule.base', 'optional') ?></span>
                 </label>
-                <?= RichTextField::widget([
-                    'id' => 'ep-page-summary',
-                    'name' => 'EngagementPage[summary]',
-                    'value' => (string) $page->summary,
-                    'placeholder' => Yii::t('EngagementPagesModule.base', 'Short summary for directories…'),
-                    'backupInterval' => 0,
-                    'exclude' => ['oembed', 'mention'],
-                ]) ?>
+                <div class="ep-rich-editor" data-ep-rich-editor>
+                    <?= EditorField::widget([
+                        'id' => 'ep-page-summary',
+                        'name' => 'EngagementPage[summary]',
+                        'value' => (string) $page->summary,
+                        'placeholder' => Yii::t('EngagementPagesModule.base', 'Short summary for directories…'),
+                        'height' => 180,
+                        'profile' => 'simple',
+                    ]) ?>
+                </div>
             </div>
 
             <div class="form-group">
@@ -325,7 +336,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                 <input type="hidden" name="EngagementPage[listed]" value="0">
                 <input type="hidden" name="EngagementPage[featured]" value="0">
                 <p class="ep-hint text-muted">
-                    <?= Yii::t('EngagementPagesModule.base', 'Templates are never listed on /pages. Use “Create from template” on the page list.') ?>
+                    <?= Yii::t('EngagementPagesModule.base', 'Templates are never listed on the public homepage. Use “Create from template” on the page list.') ?>
                 </p>
             <?php elseif ($isDirectory): ?>
                 <input type="hidden" name="EngagementPage[listed]" value="0">
@@ -340,7 +351,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                     <input class="form-check-input" type="checkbox" value="1" name="EngagementPage[listed]" id="ep-listed"
                         <?= !empty($page->listed) || $page->isNewRecord ? 'checked' : '' ?>>
                     <label class="form-check-label" for="ep-listed">
-                        <?= Yii::t('EngagementPagesModule.base', 'Show in public directory (/pages)') ?>
+                        <?= Yii::t('EngagementPagesModule.base', 'Show in public directory') ?>
                     </label>
                 </div>
                 <div class="form-check mb-3">

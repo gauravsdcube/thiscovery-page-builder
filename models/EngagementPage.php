@@ -9,7 +9,9 @@ namespace humhub\modules\engagementPages\models;
 
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\content\models\Content;
+use humhub\modules\engagementPages\components\PageUrlRule;
 use humhub\modules\engagementPages\helpers\FileHelper;
+use humhub\modules\engagementPages\helpers\RichHtml;
 use humhub\modules\engagementPages\helpers\Url;
 use humhub\modules\engagementPages\permissions\CreateGlobalPage;
 use humhub\modules\engagementPages\permissions\CreatePage;
@@ -49,8 +51,11 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     public const STATUS_PUBLISHED = 1;
     public const STATUS_ARCHIVED = 2;
 
-    /** Reserved internal slug for the /pages homepage (URL is always /pages). */
-    public const DIRECTORY_SLUG = 'directory';
+    /** Default public URL prefix for the directory homepage. Editable in the UI. */
+    public const DEFAULT_PUBLIC_PREFIX = 'pages';
+
+    /** @deprecated Use DEFAULT_PUBLIC_PREFIX. Kept so existing code still resolves. */
+    public const DIRECTORY_SLUG = self::DEFAULT_PUBLIC_PREFIX;
 
     public const WIDTH_NARROW = 'narrow';
     public const WIDTH_STANDARD = 'standard';
@@ -113,6 +118,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             [['slug'], 'match', 'pattern' => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
                 'message' => Yii::t('EngagementPagesModule.base', 'Slug may only contain lowercase letters, numbers, and hyphens.')],
             [['slug'], 'unique'],
+            [['slug'], 'validateSlugReserved'],
             [['summary', 'sections_json'], 'string'],
             [['category'], 'string', 'max' => 64],
             [['closes_at'], 'safe'],
@@ -148,6 +154,73 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             'closes_at' => Yii::t('EngagementPagesModule.base', 'Closes at'),
         ];
     }
+
+    public function validateSlugReserved($attribute): void
+    {
+        $slug = (string) $this->$attribute;
+        if ($slug === '') {
+            return;
+        }
+
+        if ($this->isDirectoryHome() && in_array($slug, self::reservedPrefixSlugs(), true)) {
+            $this->addError($attribute, Yii::t(
+                'EngagementPagesModule.base',
+                'This URL is reserved by the platform. Choose a different homepage slug.'
+            ));
+            return;
+        }
+
+        if (!$this->isDirectoryHome() && in_array($slug, self::reservedChildSlugs(), true)) {
+            $this->addError($attribute, Yii::t(
+                'EngagementPagesModule.base',
+                'This slug is reserved. Choose a different URL slug.'
+            ));
+        }
+    }
+
+    /**
+     * First URL segment used for all public pages (the directory homepage slug).
+     */
+    public static function publicPrefix(): string
+    {
+        return PageUrlRule::getPrefix();
+    }
+
+    /**
+     * Public path for this page, e.g. /consultations or /consultations/my-page.
+     */
+    public function getPublicPath(): string
+    {
+        $prefix = '/' . self::publicPrefix();
+        if ($this->isDirectoryHome()) {
+            return '/' . ($this->slug ?: self::DEFAULT_PUBLIC_PREFIX);
+        }
+        return $prefix . '/' . $this->slug;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function reservedPrefixSlugs(): array
+    {
+        return [
+            'admin', 'api', 'assets', 'c', 'calendar', 'comment', 'content', 'dashboard',
+            'directory', 'file', 'home', 'index', 'installer', 'legal', 'like', 'login',
+            'logout', 'mail', 'marketplace', 'mention', 'notification', 'oembed', 'p',
+            'page-builder', 'people', 'post', 'register', 'rest', 's', 'search', 'space',
+            'spaces', 'static', 'tasks', 'thiscovery-forms', 'topic', 'tour', 'u',
+            'uploads', 'user', 'wiki', PageUrlRule::ADMIN_PREFIX,
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function reservedChildSlugs(): array
+    {
+        return ['follow', 'comment'];
+    }
+
 
     public function beforeValidate()
     {
@@ -191,8 +264,8 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             if ($this->hasAttribute('is_template')) {
                 $this->is_template = false;
             }
-            if ($this->slug === '' || $this->slug === null) {
-                $this->slug = self::DIRECTORY_SLUG;
+            if ($this->slug === '' || $this->slug === null || $this->slug === 'directory') {
+                $this->slug = self::DEFAULT_PUBLIC_PREFIX;
             }
         }
 
@@ -405,13 +478,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
 
         $this->postProcessRichTextInSections($this->getSections());
 
-        if (!empty($this->summary)) {
-            try {
-                \humhub\modules\content\widgets\richtext\RichText::postProcess((string) $this->summary, $this);
-            } catch (\Throwable $e) {
-                Yii::warning('Engagement Pages summary postProcess failed: ' . $e->getMessage(), 'engagement-pages');
-            }
-        }
+        $this->postProcessIfMarkdown((string) $this->summary);
 
         try {
             $guids = \humhub\modules\engagementPages\helpers\FileHelper::collectGuidsFromSections($this->getSections());
@@ -421,6 +488,10 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             }
         } catch (\Throwable $e) {
             Yii::warning('Engagement Pages file attach failed: ' . $e->getMessage(), 'engagement-pages');
+        }
+
+        if ($this->isDirectoryHome() && ($insert || array_key_exists('slug', $changedAttributes))) {
+            PageUrlRule::flushCache();
         }
     }
 
@@ -524,7 +595,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     }
 
     /**
-     * Ensures a single editable /pages homepage exists (global, published).
+     * Ensures a single editable public homepage exists (global, published).
      */
     public static function ensureDirectoryPage(): self
     {
@@ -535,7 +606,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
 
         $page = new self();
         $page->title = Yii::t('EngagementPagesModule.base', 'Engagements');
-        $page->slug = self::DIRECTORY_SLUG;
+        $page->slug = self::DEFAULT_PUBLIC_PREFIX;
         $page->status = self::STATUS_PUBLISHED;
         $page->layout = BlockRegistry::LAYOUT_MAIN;
         $page->page_width = self::WIDTH_WIDE;
@@ -631,7 +702,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     {
         if ($this->isDirectoryHome()) {
             throw new \InvalidArgumentException(
-                Yii::t('EngagementPagesModule.base', 'The /pages homepage cannot be saved as a template.')
+                Yii::t('EngagementPagesModule.base', 'The public homepage cannot be saved as a template.')
             );
         }
 
@@ -697,7 +768,12 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $base = 'page';
         }
         $base = substr($base, 0, 100);
-        if ($base === self::DIRECTORY_SLUG) {
+        $reserved = array_merge(
+            [self::publicPrefix()],
+            self::reservedChildSlugs(),
+            self::reservedPrefixSlugs()
+        );
+        if (in_array($base, $reserved, true)) {
             $base = 'page';
         }
         $slug = $base;
@@ -818,25 +894,33 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $settings = $section['settings'] ?? [];
             foreach (['body', 'intro', 'subheadline'] as $richKey) {
                 if (!empty($settings[$richKey]) && is_string($settings[$richKey])) {
-                    try {
-                        \humhub\modules\content\widgets\richtext\RichText::postProcess($settings[$richKey], $this);
-                    } catch (\Throwable $e) {
-                        Yii::warning('Engagement Pages richtext postProcess failed: ' . $e->getMessage(), 'engagement-pages');
-                    }
+                    $this->postProcessIfMarkdown($settings[$richKey]);
                 }
             }
             foreach ((array) ($section['settings']['items'] ?? []) as $item) {
                 if (!empty($item['body']) && is_string($item['body'])) {
-                    try {
-                        \humhub\modules\content\widgets\richtext\RichText::postProcess($item['body'], $this);
-                    } catch (\Throwable $e) {
-                        Yii::warning('Engagement Pages accordion postProcess failed: ' . $e->getMessage(), 'engagement-pages');
-                    }
+                    $this->postProcessIfMarkdown($item['body']);
                 }
             }
             if (!empty($section['children']) && is_array($section['children'])) {
                 $this->postProcessRichTextInSections($section['children']);
             }
+        }
+    }
+
+    /**
+     * HumHub RichText::postProcess expects markdown. Skip TinyMCE HTML.
+     */
+    protected function postProcessIfMarkdown(string $text): void
+    {
+        $text = trim($text);
+        if ($text === '' || RichHtml::looksLikeHtml($text)) {
+            return;
+        }
+        try {
+            \humhub\modules\content\widgets\richtext\RichText::postProcess($text, $this);
+        } catch (\Throwable $e) {
+            Yii::warning('Engagement Pages richtext postProcess failed: ' . $e->getMessage(), 'engagement-pages');
         }
     }
 }

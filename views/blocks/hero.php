@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\engagementPages\blocks\HeroBlock;
+use humhub\modules\engagementPages\helpers\RichHtml;
 use humhub\modules\engagementPages\helpers\FileHelper;
 use humhub\modules\engagementPages\models\EngagementPage;
 use humhub\widgets\bootstrap\Button;
@@ -60,7 +60,7 @@ if (!$showBorder) {
         <h1><?= Html::encode($settings['headline'] !== '' ? $settings['headline'] : $page->title) ?></h1>
         <?php if ($settings['subheadline'] !== ''): ?>
             <div class="ep-hero-sub richtext-output">
-                <?= RichText::convert($settings['subheadline'], RichText::FORMAT_HTML) ?>
+                <?= RichHtml::toHtml($settings['subheadline']) ?>
             </div>
         <?php endif; ?>
         <?php if ($settings['cta_label'] !== '' && $settings['cta_url'] !== ''): ?>

@@ -103,7 +103,7 @@ class PageController extends ContentContainerController
         }
         if ($page->isDirectoryHome()) {
             throw new ForbiddenHttpException(
-                Yii::t('EngagementPagesModule.base', 'The /pages homepage cannot be saved as a template.')
+                Yii::t('EngagementPagesModule.base', 'The public homepage cannot be saved as a template.')
             );
         }
 
@@ -163,7 +163,7 @@ class PageController extends ContentContainerController
             throw new ForbiddenHttpException();
         }
         if ($page->isDirectoryHome()) {
-            throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'The /pages homepage cannot be deleted.'));
+            throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'The public homepage cannot be deleted.'));
         }
         $page->hardDelete();
         return $this->redirect(Url::toIndex($this->contentContainer));

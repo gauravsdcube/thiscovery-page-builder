@@ -168,14 +168,39 @@ humhub.module('engagementPages', function (module, require, $) {
             $root.find('[data-ep-empty]').toggleClass('d-none', topLevelCards().length > 0 || $root.find('[data-ep-child]').length > 0);
         };
 
-        var initRichEditors = function ($scope) {
+        var editorApi = function () {
             try {
-                var additions = require('ui.additions');
-                if ($scope && $scope.length) {
-                    additions.applyTo($scope);
-                }
+                return require('thiscoveryEditor');
             } catch (e) {
-                // Rich text assets may not be ready on first paint.
+                return null;
+            }
+        };
+
+        var destroyTinyMce = function ($scope) {
+            var api = editorApi();
+            var $ctx = ($scope && $scope.length) ? $scope : $root;
+            if (api && typeof api.destroyEditors === 'function') {
+                api.destroyEditors($ctx);
+                return;
+            }
+            if (window.ThiscoveryEditor && typeof window.ThiscoveryEditor.destroy === 'function') {
+                $ctx.find('[data-te-editor]').each(function () {
+                    try { window.ThiscoveryEditor.destroy(this); } catch (err) {}
+                });
+            }
+        };
+
+        var initRichEditors = function ($scope) {
+            var api = editorApi();
+            var $ctx = ($scope && $scope.length) ? $scope : $root;
+            if (api && typeof api.initEditors === 'function') {
+                api.initEditors($ctx);
+                return;
+            }
+            if (window.ThiscoveryEditor && typeof window.ThiscoveryEditor.init === 'function') {
+                $ctx.find('[data-te-editor]').each(function () {
+                    try { window.ThiscoveryEditor.init(this); } catch (err) {}
+                });
             }
         };
 
@@ -270,62 +295,22 @@ humhub.module('engagementPages', function (module, require, $) {
         };
 
         var syncRichEditors = function () {
-            $root.find('.ProsemirrorEditor, [data-ui-widget="ui.richtext.prosemirror.RichTextEditor"]').trigger('focusout');
+            var api = editorApi();
+            if (api && typeof api.saveEditors === 'function') {
+                api.saveEditors($root);
+                return;
+            }
+            if (window.ThiscoveryEditor && typeof window.ThiscoveryEditor.saveAll === 'function') {
+                try { window.ThiscoveryEditor.saveAll(); } catch (e) {}
+            }
         };
 
         /**
-         * ProseMirror breaks when cards are dragged between columns.
-         * Remount editors with the current markdown so they are editable again.
+         * Lexical/React roots break when cards are moved in the DOM.
+         * Save HTML back to the textarea, then destroy so the next init is clean.
          */
         var remountRichEditors = function ($scope) {
-            if (!$scope || !$scope.length) {
-                return;
-            }
-            $scope.find('.ProsemirrorEditor').each(function () {
-                var $ed = $(this);
-                var id = $ed.attr('id');
-                if (!id) {
-                    return;
-                }
-                var $input = $('#' + id + '_input');
-                var value = $input.length ? ($input.val() || '') : '';
-
-                try {
-                    var existing = $ed.data('humhub-ui-richtexteditor');
-                    if (existing && existing.editor && typeof existing.editor.serialize === 'function') {
-                        value = existing.editor.serialize();
-                        if ($input.length) {
-                            $input.val(value);
-                        }
-                    }
-                } catch (e) {
-                    // ignore broken instance
-                }
-
-                if (!value) {
-                    value = $.trim($ed.find('[data-ui-richtext]').text() || '');
-                }
-
-                $ed.removeData('humhub-ui-richtexteditor');
-                // Keep upload controls / non-editor chrome; strip ProseMirror DOM.
-                $ed.children().each(function () {
-                    var $child = $(this);
-                    if ($child.is('[data-ui-richtext]') || $child.is('.btn-group') || $child.find('input[type="file"]').length) {
-                        return;
-                    }
-                    $child.remove();
-                });
-
-                var $holder = $ed.find('[data-ui-richtext]');
-                if (!$holder.length) {
-                    $holder = $('<div data-ui-richtext style="display:none"></div>').appendTo($ed);
-                }
-                $holder.text(value);
-
-                if (!$ed.attr('data-ui-widget')) {
-                    $ed.attr('data-ui-widget', 'ui.richtext.prosemirror.RichTextEditor');
-                }
-            });
+            destroyTinyMce($scope);
         };
 
         var refreshCardTitle = function ($card) {
@@ -338,6 +323,7 @@ humhub.module('engagementPages', function (module, require, $) {
 
         var closeEditor = function () {
             syncRichEditors();
+            destroyTinyMce($root.find('[data-ep-section].is-editing'));
 
             // Return any card left in the edit stage (legacy path)
             var $stage = $root.find('[data-ep-edit-stage]');
@@ -516,7 +502,11 @@ humhub.module('engagementPages', function (module, require, $) {
             $root.find('[data-ep-panel="' + tab + '"]').addClass('is-active');
             if (tab === 'settings' || tab === 'builder') {
                 setTimeout(function () {
-                    initRichEditors($root.find('[data-ep-panel="' + tab + '"]'));
+                    var $panel = $root.find('[data-ep-panel="' + tab + '"]');
+                    if (tab === 'settings') {
+                        destroyTinyMce($panel);
+                    }
+                    initRichEditors($panel);
                 }, 30);
             }
         });
@@ -916,6 +906,7 @@ humhub.module('engagementPages', function (module, require, $) {
                 $root.find('[data-ep-edit-stage]').addClass('d-none').attr('aria-hidden', 'true');
                 $root.removeClass('is-editing-section');
             }
+            destroyTinyMce($card);
             $card.remove();
             refreshIndexes();
         });
@@ -925,6 +916,7 @@ humhub.module('engagementPages', function (module, require, $) {
             if (!window.confirm(module.config.clearConfirm || 'Clear all sections?')) {
                 return;
             }
+            destroyTinyMce($root.find('[data-ep-region-list]'));
             $root.find('[data-ep-region-list]').empty();
             refreshIndexes();
         });
@@ -982,7 +974,9 @@ humhub.module('engagementPages', function (module, require, $) {
         $root.on('click', '[data-ep-repeat-remove]', function (e) {
             e.preventDefault();
             var $items = $(this).closest('[data-ep-repeat-items]');
-            $(this).closest('[data-ep-repeat-item]').remove();
+            var $row = $(this).closest('[data-ep-repeat-item]');
+            destroyTinyMce($row);
+            $row.remove();
             if ($items.length && !$items.children('[data-ep-repeat-item]').length) {
                 $items.closest('[data-ep-repeat]').find('[data-ep-repeat-add]').trigger('click');
             }

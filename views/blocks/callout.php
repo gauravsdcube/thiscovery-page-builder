@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\engagementPages\blocks\CalloutBlock;
+use humhub\modules\engagementPages\helpers\RichHtml;
 use humhub\modules\engagementPages\models\EngagementPage;
 
 /** @var CalloutBlock $block */
@@ -25,7 +25,7 @@ $tone = $settings['tone'] ?? 'info';
     <?php endif; ?>
     <?php if (($settings['body'] ?? '') !== ''): ?>
         <div class="ep-callout__body richtext-output">
-            <?= RichText::convert($settings['body'], RichText::FORMAT_HTML) ?>
+            <?= RichHtml::toHtml($settings['body']) ?>
         </div>
     <?php endif; ?>
 </aside>

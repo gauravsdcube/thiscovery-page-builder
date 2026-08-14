@@ -41,7 +41,7 @@ $statusOptions = EngagementPage::statusOptions();
                     <div>
                         <strong><?= Html::encode($page->title) ?></strong>
                         <div class="ep-page-meta">
-                            /pages/<?= Html::encode($page->slug) ?>
+                            <?= Html::encode($page->getPublicPath()) ?>
                             ·
                             <?= Badge::light($statusOptions[$page->status] ?? '')->pill() ?>
                         </div>

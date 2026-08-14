@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\engagementPages\blocks\SurveyCtaBlock;
+use humhub\modules\engagementPages\helpers\RichHtml;
 use humhub\modules\engagementPages\models\EngagementPage;
 use humhub\widgets\bootstrap\Button;
 
@@ -24,7 +24,7 @@ $label = $settings['button_label'] !== ''
 <section class="ep-block ep-survey-cta">
     <?php if ($settings['intro'] !== ''): ?>
         <div class="ep-survey-intro richtext-output">
-            <?= RichText::convert($settings['intro'], RichText::FORMAT_HTML) ?>
+            <?= RichHtml::toHtml($settings['intro']) ?>
         </div>
     <?php endif; ?>
 

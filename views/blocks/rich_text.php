@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\engagementPages\blocks\RichTextBlock;
+use humhub\modules\engagementPages\helpers\RichHtml;
 use humhub\modules\engagementPages\models\EngagementPage;
 
 /** @var RichTextBlock $block */
@@ -20,7 +20,7 @@ use humhub\modules\engagementPages\models\EngagementPage;
     <?php endif; ?>
     <?php if ($settings['body'] !== ''): ?>
         <div class="ep-rich-text-body richtext-output">
-            <?= RichText::convert($settings['body'], RichText::FORMAT_HTML) ?>
+            <?= RichHtml::toHtml($settings['body']) ?>
         </div>
     <?php endif; ?>
 </section>

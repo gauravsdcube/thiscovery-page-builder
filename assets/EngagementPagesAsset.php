@@ -23,6 +23,7 @@ class EngagementPagesAsset extends AssetBundle
 
     public $depends = [
         'humhub\assets\CoreApiAsset',
+        'humhub\modules\thiscoveryEditor\assets\EditorAsset',
     ];
 
     public $publishOptions = [
