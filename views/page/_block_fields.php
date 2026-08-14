@@ -17,7 +17,7 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\content\widgets\richtext\RichTextField;
+use humhub\modules\thiscoveryEditor\widgets\EditorField;
 
 $page = $page ?? null;
 
@@ -349,12 +349,12 @@ if ($type === 'phases'): ?>
     <div class="form-group">
         <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Body') ?></label>
         <div class="ep-rich-editor" data-ep-rich-editor>
-            <?= RichTextField::widget([
+            <?= EditorField::widget([
                 'id' => 'ep-callout-body-' . $safeIndex,
                 'name' => $namePrefix . '[settings][body]',
                 'value' => (string) ($settings['body'] ?? ''),
-                'backupInterval' => 0,
-                'exclude' => ['oembed', 'mention'],
+                'height' => 220,
+                'profile' => 'simple',
             ]) ?>
         </div>
     </div>

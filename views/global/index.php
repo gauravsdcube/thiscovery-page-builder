@@ -68,10 +68,10 @@ $statusOptions = EngagementPage::statusOptions();
                     <div>
                         <strong><?= Html::encode($page->title) ?></strong>
                         <?php if ($isDirectory): ?>
-                            <?= Badge::info(Yii::t('EngagementPagesModule.base', '/pages homepage'))->pill() ?>
+                            <?= Badge::info(Yii::t('EngagementPagesModule.base', 'Homepage'))->pill() ?>
                         <?php endif; ?>
                         <div class="ep-page-meta">
-                            <?= $isDirectory ? '/pages' : ('/pages/' . Html::encode($page->slug)) ?>
+                            <?= Html::encode($page->getPublicPath()) ?>
                             ·
                             <?= Badge::light($statusOptions[$page->status] ?? '')->pill() ?>
                         </div>
@@ -81,7 +81,7 @@ $statusOptions = EngagementPage::statusOptions();
                             ->link(Url::toGlobalView($page))
                             ->sm() ?>
                         <?php if ($page->canManage()): ?>
-                            <?= Button::primary(Yii::t('EngagementPagesModule.base', $isDirectory ? 'Edit /pages homepage' : 'Edit page'))
+                            <?= Button::primary(Yii::t('EngagementPagesModule.base', $isDirectory ? 'Edit homepage' : 'Edit page'))
                                 ->link(Url::toGlobalEdit($page))
                                 ->sm() ?>
                         <?php endif; ?>

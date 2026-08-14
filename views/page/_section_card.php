@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryEditor\widgets\EditorField;
 
 /** @var int|string $index */
 /** @var array $section */
@@ -22,6 +22,7 @@ use humhub\modules\engagementPages\services\BlockRegistry;
 $collapsed = $collapsed ?? true;
 $isChild = $isChild ?? false;
 $page = $page ?? null;
+$formOptions = $formOptions ?? [];
 $type = $section['type'] ?? 'rich_text';
 $settings = $section['settings'] ?? [];
 $region = $section['region'] ?? BlockRegistry::REGION_MAIN;
@@ -116,13 +117,13 @@ $titleHint = match ($type) {
             <div class="form-group">
                 <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Subheadline') ?></label>
                 <div class="ep-rich-editor" data-ep-rich-editor>
-                    <?= RichTextField::widget([
+                    <?= EditorField::widget([
                         'id' => 'ep-hero-sub-' . $safeIndex,
                         'name' => $namePrefix . '[settings][subheadline]',
                         'value' => (string) ($settings['subheadline'] ?? ''),
                         'placeholder' => Yii::t('EngagementPagesModule.base', 'Supporting text under the headline…'),
-                        'backupInterval' => 0,
-                        'exclude' => ['oembed', 'mention'],
+                        'height' => 180,
+                        'profile' => 'simple',
                     ]) ?>
                 </div>
             </div>
@@ -174,16 +175,17 @@ $titleHint = match ($type) {
                 <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Body') ?></label>
                 <div class="ep-field-note">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    <div><?= Yii::t('EngagementPagesModule.base', 'Use the formatting toolbar for headings, lists, links, and emphasis.') ?></div>
+                    <div><?= Yii::t('EngagementPagesModule.base', 'Use the editor for headings, lists, links, and Thiscovery blocks (callout, accordion, survey).') ?></div>
                 </div>
                 <div class="ep-rich-editor" data-ep-rich-editor>
-                    <?= RichTextField::widget([
+                    <?= EditorField::widget([
                         'id' => 'ep-rich-body-' . $safeIndex,
                         'name' => $namePrefix . '[settings][body]',
                         'value' => (string) ($settings['body'] ?? ''),
                         'placeholder' => Yii::t('EngagementPagesModule.base', 'Write consultation copy…'),
-                        'backupInterval' => 0,
-                        'exclude' => ['oembed', 'mention'],
+                        'height' => 320,
+                        'profile' => 'page',
+                        'forms' => $formOptions,
                     ]) ?>
                 </div>
             </div>
@@ -208,13 +210,13 @@ $titleHint = match ($type) {
             <div class="form-group">
                 <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Intro text') ?></label>
                 <div class="ep-rich-editor" data-ep-rich-editor>
-                    <?= RichTextField::widget([
+                    <?= EditorField::widget([
                         'id' => 'ep-survey-intro-' . $safeIndex,
                         'name' => $namePrefix . '[settings][intro]',
                         'value' => (string) ($settings['intro'] ?? ''),
                         'placeholder' => Yii::t('EngagementPagesModule.base', 'Explain why people should take the survey…'),
-                        'backupInterval' => 0,
-                        'exclude' => ['oembed', 'mention'],
+                        'height' => 180,
+                        'profile' => 'simple',
                     ]) ?>
                 </div>
             </div>

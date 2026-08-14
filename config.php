@@ -6,6 +6,7 @@
  */
 
 use humhub\modules\admin\widgets\AdminMenu;
+use humhub\modules\engagementPages\components\PageUrlRule;
 use humhub\modules\engagementPages\Events;
 use humhub\modules\engagementPages\Module;
 use humhub\modules\space\controllers\SpaceController;
@@ -22,11 +23,8 @@ return [
         ['class' => SpaceController::class, 'event' => Controller::EVENT_BEFORE_ACTION, 'callback' => [Events::class, 'onSpaceControllerBeforeAction']],
     ],
     'urlManagerRules' => [
-        'pages' => 'engagement-pages/public/index',
-        'pages/<slug:[a-z0-9\-]+>/follow' => 'engagement-pages/public/follow',
-        'pages/<slug:[a-z0-9\-]+>/comment' => 'engagement-pages/public/comment',
-        'pages/<slug:[a-z0-9\-]+>' => 'engagement-pages/public/view',
-        'engage/<slug:[a-z0-9\-]+>' => 'engagement-pages/public/view', // legacy alias
+        ['class' => PageUrlRule::class],
+        // Fallback module-id routes (bookmarks / Yii default routing still work).
         'engagement-pages/global/view/<id:\d+>' => 'engagement-pages/global/view',
         'engagement-pages/global/edit/<id:\d+>' => 'engagement-pages/global/edit',
         'engagement-pages/global/save-template/<id:\d+>' => 'engagement-pages/global/save-template',

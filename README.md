@@ -1,6 +1,6 @@
 # Thiscovery Page Builder
 
-**Version 1.2.0**  
+**Version 1.3.0**  
 **Copyright (c) 2026 D Cube Consulting. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 
@@ -12,6 +12,7 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 
 - HumHub **1.18+**
 - PHP 8.1+
+- [Thiscovery Editor](https://dcubeconsulting.co.uk) module (`thiscovery-editor`) for rich text
 - Optional: [Thiscovery Forms](https://github.com/gauravsdcube) module for Survey CTA blocks
 
 ## Install
@@ -20,10 +21,10 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 2. Enable **Thiscovery Page Builder** in Administration → Modules
 3. Run pending migrations (HumHub will apply module migrations on enable, or use `php protected/yii migrate/up --migrationPath=@engagement-pages/migrations`)
 
-## Features (v1.2)
+## Features (v1.3)
 
-- **Global page builder** at `/engagement-pages/global/index`
-- Public URLs: `/pages` (directory homepage) and `/pages/<slug>`
+- **Global page builder** at `/page-builder`
+- Public URLs: `/{homepage-slug}` and `/{homepage-slug}/{page-slug}` (homepage slug is editable in Settings)
 - Drag-and-drop sections: hero, rich text, survey CTA, downloads, grid containers, phases, events, team, contact, updates, comments, accordion, callout, image, collections
 - Page width and column layouts
 - Page templates (save / create from template)
@@ -36,8 +37,8 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 ## Admin
 
 - Administration → **Thiscovery Page Builder**
-- Comment moderation: `/engagement-pages/global/comments`
-- Subscriptions (Get updates emails): `/engagement-pages/global/subscriptions`
+- Comment moderation: `/page-builder/comments`
+- Subscriptions (Get updates emails): `/page-builder/subscriptions`
 
 ## Copyright
 

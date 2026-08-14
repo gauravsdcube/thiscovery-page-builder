@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.1 (Unreleased)
+
+- Enh: Page builder rich text uses Thiscovery Editor (Lexical) instead of TinyMCE (headings, tables, images, media, source) instead of the HumHub markup editor
+- Existing HumHub markdown content still renders until the page is saved again
+
+## 1.3.0 — 2026-08-14
+
+- Enh: Homepage URL slug is editable in the page builder (public pages use `/{slug}` and `/{slug}/{page}`)
+- Enh: Admin builder, comments, and subscriptions use `/page-builder` instead of `/engagement-pages/...`
+- Fix: Legacy `/pages` and `/engage/<slug>` URLs still resolve
+
 ## 1.2.0 — 2026-08-13
 
 - Enh: Image blocks can be ticked as the collection / directory card image (overrides the hero fallback)

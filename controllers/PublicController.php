@@ -21,7 +21,7 @@ use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
- * Guest-friendly public URLs: /pages and /pages/<slug>
+ * Guest-friendly public URLs: /{homepage-slug} and /{homepage-slug}/{page-slug}
  */
 class PublicController extends Controller
 {

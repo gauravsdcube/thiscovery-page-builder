@@ -6,7 +6,7 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\content\widgets\richtext\RichTextField;
+use humhub\modules\thiscoveryEditor\widgets\EditorField;
 
 /** @var string $namePrefix */
 /** @var array $item */
@@ -21,12 +21,12 @@ use humhub\modules\content\widgets\richtext\RichTextField;
     <div class="form-group">
         <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Body') ?></label>
         <div class="ep-rich-editor" data-ep-rich-editor>
-            <?= RichTextField::widget([
+            <?= EditorField::widget([
                 'id' => 'ep-acc-body-' . $safeIndex,
                 'name' => $namePrefix . '[body]',
                 'value' => (string) ($item['body'] ?? ''),
-                'backupInterval' => 0,
-                'exclude' => ['oembed', 'mention'],
+                'height' => 220,
+                'profile' => 'simple',
             ]) ?>
         </div>
     </div>

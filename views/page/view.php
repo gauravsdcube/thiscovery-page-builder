@@ -45,7 +45,7 @@ $showRight = in_array($layout, [BlockRegistry::LAYOUT_RIGHT, BlockRegistry::LAYO
             <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Thiscovery Page Builder'))
                 ->link(PageUrl::toIndex($contentContainer))
                 ->sm() ?>
-            <?= Button::primary(Yii::t('EngagementPagesModule.base', $isDirectory ? 'Edit /pages homepage' : 'Edit page'))
+            <?= Button::primary(Yii::t('EngagementPagesModule.base', $isDirectory ? 'Edit homepage' : 'Edit page'))
                 ->link(PageUrl::toEdit($page))
                 ->sm() ?>
             <?php if (!$isDirectory && $page->isGlobal()): ?>
@@ -68,7 +68,7 @@ $showRight = in_array($layout, [BlockRegistry::LAYOUT_RIGHT, BlockRegistry::LAYO
             <span class="ep-public-link">
                 <?= Yii::t('EngagementPagesModule.base', 'Public link') ?>:
                 <a href="<?= Html::encode(PageUrl::toPublic($page)) ?>">
-                    <?= $isDirectory ? '/pages' : ('/pages/' . Html::encode($page->slug)) ?>
+                    <?= Html::encode($page->getPublicPath()) ?>
                 </a>
             </span>
         </div>

@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\engagementPages\blocks\AccordionBlock;
+use humhub\modules\engagementPages\helpers\RichHtml;
 use humhub\modules\engagementPages\models\EngagementPage;
 
 /** @var AccordionBlock $block */
@@ -34,7 +34,7 @@ $uid = 'ep-acc-' . (int) $page->id . '-' . substr(md5(json_encode($items)), 0, 8
                 <summary class="ep-accordion__summary"><?= Html::encode($heading) ?></summary>
                 <div class="ep-accordion__body richtext-output">
                     <?php if (($item['body'] ?? '') !== ''): ?>
-                        <?= RichText::convert($item['body'], RichText::FORMAT_HTML) ?>
+                        <?= RichHtml::toHtml($item['body'] ?? '') ?>
                     <?php endif; ?>
                 </div>
             </details>

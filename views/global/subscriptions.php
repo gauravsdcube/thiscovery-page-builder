@@ -82,7 +82,7 @@ $this->title = Yii::t('EngagementPagesModule.base', 'Subscriptions');
                                             <?= Html::encode($page->title) ?>
                                         </a>
                                         <div class="text-muted" style="font-size:12px;">
-                                            <?= $page->isDirectoryHome() ? '/pages' : ('/pages/' . Html::encode($page->slug)) ?>
+                                            <?= Html::encode($page->getPublicPath()) ?>
                                         </div>
                                     <?php else: ?>
                                         <span class="text-muted"><?= Yii::t('EngagementPagesModule.base', 'Deleted page') ?></span>
