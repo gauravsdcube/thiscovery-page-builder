@@ -79,6 +79,7 @@ $renderHeading = static function (string $text) {
                 ->joinWith('content')
                 ->andWhere(['content.contentcontainer_id' => null])
                 ->andWhere(['custom_form.status' => CustomForm::STATUS_OPEN])
+                ->andWhere(['custom_form.is_template' => 0])
                 ->orderBy(['custom_form.title' => SORT_ASC])
                 ->all();
         } catch (\Throwable $e) {

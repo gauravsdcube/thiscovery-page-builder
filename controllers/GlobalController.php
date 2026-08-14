@@ -399,6 +399,7 @@ class GlobalController extends Controller
             'isNew' => $isNew,
             'blockLabels' => BlockRegistry::labels(),
             'formOptions' => $this->formOptions(),
+            'pollOptions' => $this->pollOptions(),
             'templates' => EngagementPage::findTemplates(null),
         ]);
     }
@@ -409,18 +410,16 @@ class GlobalController extends Controller
         if (!class_exists(CustomForm::class)) {
             return $options;
         }
+        return $options + CustomForm::pickerOptions(null, null, true);
+    }
 
-        $forms = CustomForm::find()
-            ->joinWith('content')
-            ->andWhere(['content.contentcontainer_id' => null])
-            ->orderBy(['custom_form.title' => SORT_ASC])
-            ->all();
-
-        foreach ($forms as $form) {
-            $options[$form->id] = $form->title;
+    protected function pollOptions(): array
+    {
+        $options = ['' => Yii::t('EngagementPagesModule.base', 'Select a poll…')];
+        if (!class_exists(CustomForm::class)) {
+            return $options;
         }
-
-        return $options;
+        return $options + CustomForm::pickerOptions(null, CustomForm::KIND_POLL, true);
     }
 
     protected function findPage($id): EngagementPage

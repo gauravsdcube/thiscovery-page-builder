@@ -194,6 +194,7 @@ class PageController extends ContentContainerController
             'isNew' => $isNew,
             'blockLabels' => BlockRegistry::labels(),
             'formOptions' => $this->formOptions(),
+            'pollOptions' => $this->pollOptions(),
             'templates' => EngagementPage::findTemplates((int) $this->contentContainer->contentcontainer_id),
         ]);
     }
@@ -204,26 +205,16 @@ class PageController extends ContentContainerController
         if (!class_exists(CustomForm::class)) {
             return $options;
         }
+        return $options + CustomForm::pickerOptions($this->contentContainer, null, true);
+    }
 
-        // Prefer listing global forms first so public surveys do not require Space membership.
-        $globalForms = CustomForm::find()
-            ->joinWith('content')
-            ->andWhere(['content.contentcontainer_id' => null])
-            ->orderBy(['custom_form.title' => SORT_ASC])
-            ->all();
-        foreach ($globalForms as $form) {
-            $options[$form->id] = Yii::t('EngagementPagesModule.base', 'Global') . ': ' . $form->title;
+    protected function pollOptions(): array
+    {
+        $options = ['' => Yii::t('EngagementPagesModule.base', 'Select a poll…')];
+        if (!class_exists(CustomForm::class)) {
+            return $options;
         }
-
-        $spaceForms = CustomForm::find()
-            ->contentContainer($this->contentContainer)
-            ->orderBy(['custom_form.title' => SORT_ASC])
-            ->all();
-        foreach ($spaceForms as $form) {
-            $options[$form->id] = $form->title;
-        }
-
-        return $options;
+        return $options + CustomForm::pickerOptions($this->contentContainer, CustomForm::KIND_POLL, true);
     }
 
     protected function findPage($id): EngagementPage

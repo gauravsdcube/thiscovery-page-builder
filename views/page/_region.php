@@ -11,12 +11,14 @@ use humhub\helpers\Html;
 /** @var string $label */
 /** @var array $items */
 /** @var array $formOptions */
+/** @var array $pollOptions */
 /** @var array $blockLabels */
 /** @var bool $hidden */
 /** @var \humhub\modules\engagementPages\models\EngagementPage|null $page */
 
 $hidden = !empty($hidden);
 $page = $page ?? null;
+$pollOptions = $pollOptions ?? [];
 ?>
 <div class="ep-region<?= $hidden ? ' is-hidden' : '' ?>"
      data-ep-region="<?= Html::encode($region) ?>"
@@ -31,6 +33,7 @@ $page = $page ?? null;
                 'index' => $region . '-' . $i,
                 'section' => array_merge($section, ['region' => $region]),
                 'formOptions' => $formOptions,
+                'pollOptions' => $pollOptions ?? [],
                 'blockLabels' => $blockLabels,
                 'collapsed' => true,
                 'isChild' => false,

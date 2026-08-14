@@ -226,6 +226,21 @@
   .ep-page-columns--both {
     grid-template-columns: 1fr;
   }
+
+  /* Main column first on small screens, then side columns */
+  .ep-page-col--main {
+    order: 1;
+  }
+  .ep-page-col--left,
+  .ep-page-col--right {
+    order: 2;
+  }
+  .ep-page-columns--both .ep-page-col--left {
+    order: 2;
+  }
+  .ep-page-columns--both .ep-page-col--right {
+    order: 3;
+  }
 }
 
 .ep-page-nav {
@@ -1260,6 +1275,43 @@
 @media (max-width: 640px) {
   .engagement-pages-public-shell {
     padding: 16px 12px 32px;
+  }
+
+  /* Hero with image: show image as a banner, text below (avoids heavy crop/overlay) */
+  .ep-hero {
+    min-height: 0;
+  }
+
+  .ep-hero.has-image {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ep-hero.has-image .ep-hero-image {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+  }
+
+  .ep-hero.has-image::after {
+    display: none;
+  }
+
+  .ep-hero.has-image .ep-hero-body {
+    position: relative;
+    z-index: 1;
+    min-height: 0;
+    justify-content: flex-start;
+    padding: 20px 16px;
+    background: var(--ep-bg, #003078);
   }
 
   .ep-hero-body {

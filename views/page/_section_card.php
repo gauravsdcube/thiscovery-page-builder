@@ -12,6 +12,7 @@ use humhub\modules\thiscoveryEditor\widgets\EditorField;
 /** @var int|string $index */
 /** @var array $section */
 /** @var array $formOptions */
+/** @var array $pollOptions */
 /** @var array $blockLabels */
 /** @var bool $collapsed */
 /** @var bool $isChild */
@@ -25,6 +26,7 @@ $page = $page ?? null;
 $formOptions = $formOptions ?? [];
 $type = $section['type'] ?? 'rich_text';
 $settings = $section['settings'] ?? [];
+$pollOptions = $pollOptions ?? [];
 $region = $section['region'] ?? BlockRegistry::REGION_MAIN;
 $column = (int) ($column ?? ($section['column'] ?? 0));
 $label = $blockLabels[$type] ?? $type;
@@ -35,6 +37,7 @@ $titleHint = match ($type) {
     'hero' => $settings['headline'] ?? '',
     'rich_text' => $settings['title'] ?? '',
     'survey_cta' => $settings['button_label'] ?? '',
+    'poll_embed' => '',
     'downloads', 'container', 'phases', 'events', 'team', 'contact', 'updates', 'comments', 'accordion', 'callout' => $settings['title'] ?? '',
     'image' => $settings['alt'] ?? ($settings['caption'] ?? ''),
     'directory' => $settings['title'] ?? '',
@@ -221,6 +224,21 @@ $titleHint = match ($type) {
                 </div>
             </div>
 
+        <?php elseif ($type === 'poll_embed'): ?>
+            <div class="form-group">
+                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Quick poll') ?></label>
+                <select class="form-control" name="<?= $namePrefix ?>[settings][form_id]">
+                    <?php foreach ($pollOptions as $id => $title): ?>
+                        <option value="<?= Html::encode((string) $id) ?>" <?= (string) ($settings['form_id'] ?? '') === (string) $id ? 'selected' : '' ?>>
+                            <?= Html::encode($title) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="ep-hint text-muted">
+                    <?= Yii::t('EngagementPagesModule.base', 'Shows the poll on the page so people can vote without leaving.') ?>
+                </div>
+            </div>
+
         <?php elseif ($type === 'downloads'): ?>
             <div class="form-group">
                 <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Title') ?></label>
@@ -290,6 +308,7 @@ $titleHint = match ($type) {
                 'namePrefix' => $namePrefix,
                 'safeIndex' => $safeIndex,
                 'formOptions' => $formOptions,
+                'pollOptions' => $pollOptions ?? [],
                 'page' => $page,
             ]) ?>
         <?php endif; ?>
@@ -326,6 +345,7 @@ $titleHint = match ($type) {
                                     'index' => $index . '-c' . $col . '-' . $ci,
                                     'section' => $child,
                                     'formOptions' => $formOptions,
+                                    'pollOptions' => $pollOptions ?? [],
                                     'blockLabels' => $blockLabels,
                                     'collapsed' => true,
                                     'isChild' => true,

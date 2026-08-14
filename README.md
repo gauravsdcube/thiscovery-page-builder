@@ -1,6 +1,6 @@
 # Thiscovery Page Builder
 
-**Version 1.3.0**  
+**Version 1.3.2**  
 **Copyright (c) 2026 D Cube Consulting. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 
@@ -12,8 +12,8 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 
 - HumHub **1.18+**
 - PHP 8.1+
-- [Thiscovery Editor](https://dcubeconsulting.co.uk) module (`thiscovery-editor`) for rich text
-- Optional: [Thiscovery Forms](https://github.com/gauravsdcube) module for Survey CTA blocks
+- [Thiscovery Editor](https://github.com/gauravsdcube/thiscovery-editor) module (`thiscovery-editor`) for rich text
+- Optional: [Thiscovery Forms](https://github.com/gauravsdcube) module for Survey CTA and Quick poll blocks
 
 ## Install
 
@@ -25,7 +25,7 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 
 - **Global page builder** at `/page-builder`
 - Public URLs: `/{homepage-slug}` and `/{homepage-slug}/{page-slug}` (homepage slug is editable in Settings)
-- Drag-and-drop sections: hero, rich text, survey CTA, downloads, grid containers, phases, events, team, contact, updates, comments, accordion, callout, image, collections
+- Drag-and-drop sections: hero, rich text, survey CTA, quick poll, downloads, grid containers, phases, events, team, contact, updates, comments, accordion, callout, image, collections
 - Page width and column layouts
 - Page templates (save / create from template)
 - Visibility: **public (guests)** or **community members only**

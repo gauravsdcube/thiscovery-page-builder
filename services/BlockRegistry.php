@@ -18,6 +18,7 @@ use humhub\modules\engagementPages\blocks\EventsBlock;
 use humhub\modules\engagementPages\blocks\HeroBlock;
 use humhub\modules\engagementPages\blocks\ImageBlock;
 use humhub\modules\engagementPages\blocks\PhasesBlock;
+use humhub\modules\engagementPages\blocks\PollEmbedBlock;
 use humhub\modules\engagementPages\blocks\RichTextBlock;
 use humhub\modules\engagementPages\blocks\SurveyCtaBlock;
 use humhub\modules\engagementPages\blocks\TeamBlock;
@@ -42,6 +43,7 @@ class BlockRegistry
             HeroBlock::TYPE => HeroBlock::class,
             RichTextBlock::TYPE => RichTextBlock::class,
             SurveyCtaBlock::TYPE => SurveyCtaBlock::class,
+            PollEmbedBlock::TYPE => PollEmbedBlock::class,
             DownloadsBlock::TYPE => DownloadsBlock::class,
             ContainerBlock::TYPE => ContainerBlock::class,
             PhasesBlock::TYPE => PhasesBlock::class,
@@ -82,6 +84,7 @@ class BlockRegistry
             ['type' => CalloutBlock::TYPE, 'icon' => 'fa-info-circle', 'group' => 'content'],
             ['type' => DownloadsBlock::TYPE, 'icon' => 'fa-download', 'group' => 'content'],
             ['type' => SurveyCtaBlock::TYPE, 'icon' => 'fa-wpforms', 'group' => 'engagement'],
+            ['type' => PollEmbedBlock::TYPE, 'icon' => 'fa-bar-chart', 'group' => 'engagement'],
             ['type' => PhasesBlock::TYPE, 'icon' => 'fa-road', 'group' => 'engagement'],
             ['type' => EventsBlock::TYPE, 'icon' => 'fa-calendar', 'group' => 'engagement'],
             ['type' => TeamBlock::TYPE, 'icon' => 'fa-users', 'group' => 'engagement'],

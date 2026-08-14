@@ -19,6 +19,7 @@ use humhub\widgets\bootstrap\Button;
 /** @var bool $isNew */
 /** @var array $blockLabels */
 /** @var array $formOptions */
+/** @var array $pollOptions */
 /** @var EngagementPage[]|null $templates */
 
 EngagementPagesAsset::register($this);
@@ -26,6 +27,7 @@ EngagementPagesAsset::register($this);
 $isDirectory = $page->isDirectoryHome();
 $isTemplate = $page->isTemplate();
 $templates = $templates ?? [];
+$pollOptions = $pollOptions ?? [];
 $publicPrefix = EngagementPage::publicPrefix();
 $this->title = $isNew
     ? Yii::t('EngagementPagesModule.base', 'Create page')
@@ -180,6 +182,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                         'label' => $regionLabels[BlockRegistry::REGION_FULL],
                         'items' => $grouped[BlockRegistry::REGION_FULL] ?? [],
                         'formOptions' => $formOptions,
+                        'pollOptions' => $pollOptions ?? [],
                         'blockLabels' => $blockLabels,
                         'hidden' => false,
                         'page' => $page,
@@ -191,6 +194,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                             'label' => $regionLabels[BlockRegistry::REGION_LEFT],
                             'items' => $grouped[BlockRegistry::REGION_LEFT] ?? [],
                             'formOptions' => $formOptions,
+                        'pollOptions' => $pollOptions ?? [],
                             'blockLabels' => $blockLabels,
                             'hidden' => !in_array($layout, [BlockRegistry::LAYOUT_LEFT, BlockRegistry::LAYOUT_BOTH], true),
                             'page' => $page,
@@ -200,6 +204,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                             'label' => $regionLabels[BlockRegistry::REGION_MAIN],
                             'items' => $grouped[BlockRegistry::REGION_MAIN] ?? [],
                             'formOptions' => $formOptions,
+                        'pollOptions' => $pollOptions ?? [],
                             'blockLabels' => $blockLabels,
                             'hidden' => false,
                             'page' => $page,
@@ -209,6 +214,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                             'label' => $regionLabels[BlockRegistry::REGION_RIGHT],
                             'items' => $grouped[BlockRegistry::REGION_RIGHT] ?? [],
                             'formOptions' => $formOptions,
+                        'pollOptions' => $pollOptions ?? [],
                             'blockLabels' => $blockLabels,
                             'hidden' => !in_array($layout, [BlockRegistry::LAYOUT_RIGHT, BlockRegistry::LAYOUT_BOTH], true),
                             'page' => $page,
@@ -421,6 +427,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
             'index' => '__INDEX__',
             'section' => ['type' => 'rich_text', 'region' => 'main', 'settings' => []],
             'formOptions' => $formOptions,
+            'pollOptions' => $pollOptions ?? [],
             'blockLabels' => $blockLabels,
             'collapsed' => false,
             'isChild' => false,
@@ -478,6 +485,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                     'children' => $type === 'container' ? [] : null,
                 ],
                 'formOptions' => $formOptions,
+                'pollOptions' => $pollOptions ?? [],
                 'blockLabels' => $blockLabels,
                 'collapsed' => false,
                 'isChild' => false,

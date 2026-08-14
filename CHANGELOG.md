@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.2 — 2026-08-14
+
+- Enh: Quick poll block embeds a Thiscovery Forms poll so visitors can vote on the page
+
 ## 1.3.1 (Unreleased)
 
 - Enh: Page builder rich text uses Thiscovery Editor (Lexical) instead of TinyMCE (headings, tables, images, media, source) instead of the HumHub markup editor
