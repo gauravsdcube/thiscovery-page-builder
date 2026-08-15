@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\CollectionBlock;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\CollectionBlock;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\modules\space\models\Space;
 use humhub\modules\thiscoveryForms\models\CustomForm;
 
@@ -17,7 +17,7 @@ use humhub\modules\thiscoveryForms\models\CustomForm;
 
 $source = (string) ($settings['source'] ?? CollectionBlock::SOURCE_PAGES);
 $title = (string) ($settings['title'] ?? '');
-$emptyMessage = (string) ($settings['empty_message'] ?? Yii::t('EngagementPagesModule.base', 'Nothing to show yet.'));
+$emptyMessage = (string) ($settings['empty_message'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Nothing to show yet.'));
 $showFeaturedFirst = !empty($settings['show_featured_first']);
 
 $renderHeading = static function (string $text) {
@@ -43,10 +43,10 @@ $renderHeading = static function (string $text) {
         <p class="text-muted"><?= Html::encode($emptyMessage) ?></p>
     <?php else: ?>
         <?php if ($featured !== []): ?>
-            <?= $renderHeading($title !== '' ? $title : Yii::t('EngagementPagesModule.base', 'Open for feedback')) ?>
+            <?= $renderHeading($title !== '' ? $title : Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback')) ?>
             <div class="ep-directory__grid">
                 <?php foreach ($featured as $listedPage): ?>
-                    <?= $this->render('@engagement-pages/views/public/_directory_card', [
+                    <?= $this->render('@thiscovery-page-builder/views/public/_directory_card', [
                         'page' => $listedPage,
                         'featured' => true,
                     ]) ?>
@@ -56,11 +56,11 @@ $renderHeading = static function (string $text) {
 
         <?php if ($rest !== []): ?>
             <?= $renderHeading($featured !== []
-                ? Yii::t('EngagementPagesModule.base', 'More engagements')
-                : ($title !== '' ? $title : Yii::t('EngagementPagesModule.base', 'Open for feedback'))) ?>
+                ? Yii::t('ThiscoveryPageBuilderModule.base', 'More engagements')
+                : ($title !== '' ? $title : Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback'))) ?>
             <div class="ep-directory__grid">
                 <?php foreach ($rest as $listedPage): ?>
-                    <?= $this->render('@engagement-pages/views/public/_directory_card', [
+                    <?= $this->render('@thiscovery-page-builder/views/public/_directory_card', [
                         'page' => $listedPage,
                         'featured' => false,
                     ]) ?>
@@ -70,7 +70,7 @@ $renderHeading = static function (string $text) {
     <?php endif; ?>
 
 <?php elseif ($source === CollectionBlock::SOURCE_FORMS): ?>
-    <?= $renderHeading($title !== '' ? $title : Yii::t('EngagementPagesModule.base', 'Surveys')) ?>
+    <?= $renderHeading($title !== '' ? $title : Yii::t('ThiscoveryPageBuilderModule.base', 'Surveys')) ?>
     <?php
     $forms = [];
     if (class_exists(CustomForm::class)) {
@@ -100,14 +100,14 @@ $renderHeading = static function (string $text) {
                         </span>
                     </a>
                     <div class="ep-collection-card__body">
-                        <div class="ep-collection-card__eyebrow"><?= Yii::t('EngagementPagesModule.base', 'Form') ?></div>
+                        <div class="ep-collection-card__eyebrow"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Form') ?></div>
                         <h3 class="ep-collection-card__title">
                             <a href="<?= Html::encode($formUrl) ?>"><?= Html::encode($form->title) ?></a>
                         </h3>
                         <div class="ep-collection-card__footer">
-                            <span class="ep-collection-card__meta"><?= Yii::t('EngagementPagesModule.base', 'Open') ?></span>
+                            <span class="ep-collection-card__meta"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open') ?></span>
                             <a class="ep-collection-card__cta" href="<?= Html::encode($formUrl) ?>">
-                                <?= Yii::t('EngagementPagesModule.base', 'Open form') ?>
+                                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open form') ?>
                                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
                             </a>
                         </div>
@@ -118,7 +118,7 @@ $renderHeading = static function (string $text) {
     <?php endif; ?>
 
 <?php elseif ($source === CollectionBlock::SOURCE_SPACES): ?>
-    <?= $renderHeading($title !== '' ? $title : Yii::t('EngagementPagesModule.base', 'Communities')) ?>
+    <?= $renderHeading($title !== '' ? $title : Yii::t('ThiscoveryPageBuilderModule.base', 'Communities')) ?>
     <?php
     $spaces = Space::find()
         ->where(['visibility' => [Space::VISIBILITY_REGISTERED_ONLY, Space::VISIBILITY_ALL]])
@@ -148,7 +148,7 @@ $renderHeading = static function (string $text) {
                         <?php endif; ?>
                     </a>
                     <div class="ep-collection-card__body">
-                        <div class="ep-collection-card__eyebrow"><?= Yii::t('EngagementPagesModule.base', 'Space') ?></div>
+                        <div class="ep-collection-card__eyebrow"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Space') ?></div>
                         <h3 class="ep-collection-card__title">
                             <a href="<?= Html::encode($spaceUrl) ?>"><?= Html::encode($space->name) ?></a>
                         </h3>
@@ -158,7 +158,7 @@ $renderHeading = static function (string $text) {
                         <div class="ep-collection-card__footer">
                             <span class="ep-collection-card__meta">&nbsp;</span>
                             <a class="ep-collection-card__cta" href="<?= Html::encode($spaceUrl) ?>">
-                                <?= Yii::t('EngagementPagesModule.base', 'View space') ?>
+                                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'View space') ?>
                                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
                             </a>
                         </div>
@@ -169,14 +169,14 @@ $renderHeading = static function (string $text) {
     <?php endif; ?>
 
 <?php elseif ($source === CollectionBlock::SOURCE_CALENDAR): ?>
-    <?= $renderHeading($title !== '' ? $title : Yii::t('EngagementPagesModule.base', 'Upcoming events')) ?>
+    <?= $renderHeading($title !== '' ? $title : Yii::t('ThiscoveryPageBuilderModule.base', 'Upcoming events')) ?>
     <?php
     $eventLimit = CollectionBlock::clampEventLimit($settings['event_limit'] ?? CollectionBlock::EVENT_LIMIT_DEFAULT);
     $events = CollectionBlock::findUpcomingEvents($eventLimit, 365, $page);
     $calendarUrl = CollectionBlock::calendarUrl($page);
-    $moreLabel = (string) ($settings['more_label'] ?? Yii::t('EngagementPagesModule.base', 'View calendar'));
+    $moreLabel = (string) ($settings['more_label'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'View calendar'));
     if ($moreLabel === '') {
-        $moreLabel = Yii::t('EngagementPagesModule.base', 'View calendar');
+        $moreLabel = Yii::t('ThiscoveryPageBuilderModule.base', 'View calendar');
     }
     ?>
     <?php if ($events === []): ?>
@@ -200,7 +200,7 @@ $renderHeading = static function (string $text) {
                         </span>
                     </a>
                     <div class="ep-collection-card__body">
-                        <div class="ep-collection-card__eyebrow"><?= Yii::t('EngagementPagesModule.base', 'Event') ?></div>
+                        <div class="ep-collection-card__eyebrow"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Event') ?></div>
                         <h3 class="ep-collection-card__title">
                             <?php if ($eventUrl !== ''): ?>
                                 <a href="<?= Html::encode($eventUrl) ?>"><?= Html::encode($eventTitle) ?></a>
@@ -215,7 +215,7 @@ $renderHeading = static function (string $text) {
                             <span class="ep-collection-card__meta"><?= Html::encode($eventWhen) ?></span>
                             <?php if ($eventUrl !== ''): ?>
                                 <a class="ep-collection-card__cta" href="<?= Html::encode($eventUrl) ?>">
-                                    <?= Yii::t('EngagementPagesModule.base', 'View event') ?>
+                                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'View event') ?>
                                     <i class="fa fa-arrow-right" aria-hidden="true"></i>
                                 </a>
                             <?php endif; ?>

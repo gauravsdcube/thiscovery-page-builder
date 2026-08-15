@@ -5,8 +5,10 @@
  */
 
 /* Inherit Thiscovery theme tokens (fallbacks apply if that theme is inactive). */
+.thiscovery-page-builder-public-shell,
 .engagement-pages-public-shell,
 .engagement-page,
+.thiscovery-page-builder-admin-wrap,
 .engagement-pages-admin-wrap,
 .ep-align:not([data-ep-colored="1"]) {
   --ep-t-font: var(--yg-font-family, inherit);
@@ -42,18 +44,18 @@
 .engagement-page h4,
 .engagement-page h5,
 .engagement-page h6,
-.engagement-pages-public-shell h1,
-.engagement-pages-public-shell h2,
-.engagement-pages-public-shell h3,
-.engagement-pages-public-shell h4,
-.engagement-pages-public-shell h5,
-.engagement-pages-public-shell h6 {
+.thiscovery-page-builder-public-shell h1,
+.thiscovery-page-builder-public-shell h2,
+.thiscovery-page-builder-public-shell h3,
+.thiscovery-page-builder-public-shell h4,
+.thiscovery-page-builder-public-shell h5,
+.thiscovery-page-builder-public-shell h6 {
   font-family: var(--ep-t-heading-font);
   color: var(--ep-t-heading);
 }
 
 .engagement-page a:not(.btn),
-.engagement-pages-public-shell a:not(.btn) {
+.thiscovery-page-builder-public-shell a:not(.btn) {
   color: var(--ep-t-link);
 }
 
@@ -78,18 +80,18 @@
 
 /* Public + admin engagement page layout */
 
-.engagement-pages-public-shell {
+.thiscovery-page-builder-public-shell {
   width: 100%;
   margin: 0 auto;
   padding: 28px clamp(20px, 4vw, 48px) 56px;
   box-sizing: border-box;
 }
 
-.engagement-pages-public-shell[data-ep-width="wide"] {
+.thiscovery-page-builder-public-shell[data-ep-width="wide"] {
   max-width: var(--yg-container-max-width, 1440px) !important;
 }
 
-.engagement-pages-public-shell[data-ep-width="full"] {
+.thiscovery-page-builder-public-shell[data-ep-width="full"] {
   max-width: none !important;
   padding-left: clamp(24px, 5vw, 72px);
   padding-right: clamp(24px, 5vw, 72px);
@@ -103,16 +105,16 @@
   margin: 0;
 }
 
-.engagement-pages-admin-wrap {
+.thiscovery-page-builder-admin-wrap {
   padding-top: 12px;
 }
 
 /* Admin preview: honour page width on the article itself */
-.engagement-pages-admin-wrap .engagement-page[data-ep-width="narrow"] { max-width: 720px !important; margin-left: auto; margin-right: auto; }
-.engagement-pages-admin-wrap .engagement-page[data-ep-width="standard"] { max-width: 960px !important; margin-left: auto; margin-right: auto; }
-.engagement-pages-admin-wrap .engagement-page[data-ep-width="comfortable"] { max-width: 1100px !important; margin-left: auto; margin-right: auto; }
-.engagement-pages-admin-wrap .engagement-page[data-ep-width="wide"] { max-width: var(--yg-container-max-width, 1440px) !important; margin-left: auto; margin-right: auto; }
-.engagement-pages-admin-wrap .engagement-page[data-ep-width="full"] { max-width: none !important; }
+.thiscovery-page-builder-admin-wrap .engagement-page[data-ep-width="narrow"] { max-width: 720px !important; margin-left: auto; margin-right: auto; }
+.thiscovery-page-builder-admin-wrap .engagement-page[data-ep-width="standard"] { max-width: 960px !important; margin-left: auto; margin-right: auto; }
+.thiscovery-page-builder-admin-wrap .engagement-page[data-ep-width="comfortable"] { max-width: 1100px !important; margin-left: auto; margin-right: auto; }
+.thiscovery-page-builder-admin-wrap .engagement-page[data-ep-width="wide"] { max-width: var(--yg-container-max-width, 1440px) !important; margin-left: auto; margin-right: auto; }
+.thiscovery-page-builder-admin-wrap .engagement-page[data-ep-width="full"] { max-width: none !important; }
 
 .engagement-page-body {
   display: flex;
@@ -1273,7 +1275,7 @@
 }
 
 @media (max-width: 640px) {
-  .engagement-pages-public-shell {
+  .thiscovery-page-builder-public-shell {
     padding: 16px 12px 32px;
   }
 

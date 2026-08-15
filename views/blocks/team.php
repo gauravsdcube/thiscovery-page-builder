@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\TeamBlock;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\TeamBlock;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var TeamBlock $block */
 /** @var EngagementPage $page */

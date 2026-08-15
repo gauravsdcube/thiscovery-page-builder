@@ -5,10 +5,10 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
-use humhub\modules\engagementPages\models\EngagementPage;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use Yii;
 
 class ContainerBlock extends BaseBlock
@@ -28,16 +28,16 @@ class ContainerBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Grid container');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Grid container');
     }
 
     public static function columnOptions(): array
     {
         return [
-            1 => Yii::t('EngagementPagesModule.base', '1 column'),
-            2 => Yii::t('EngagementPagesModule.base', '2 columns'),
-            3 => Yii::t('EngagementPagesModule.base', '3 columns'),
-            4 => Yii::t('EngagementPagesModule.base', '4 columns'),
+            1 => Yii::t('ThiscoveryPageBuilderModule.base', '1 column'),
+            2 => Yii::t('ThiscoveryPageBuilderModule.base', '2 columns'),
+            3 => Yii::t('ThiscoveryPageBuilderModule.base', '3 columns'),
+            4 => Yii::t('ThiscoveryPageBuilderModule.base', '4 columns'),
         ];
     }
 
@@ -56,7 +56,7 @@ class ContainerBlock extends BaseBlock
     public function normalizeSettings(): array
     {
         return [
-            'title' => $this->string('title', Yii::t('EngagementPagesModule.base', 'Container')),
+            'title' => $this->string('title', Yii::t('ThiscoveryPageBuilderModule.base', 'Container')),
             'show_title' => !isset($this->settings['show_title']) || (bool) $this->settings['show_title'],
             'columns' => self::clampColumns($this->settings['columns'] ?? 1),
         ];
@@ -70,7 +70,7 @@ class ContainerBlock extends BaseBlock
     public function render(EngagementPage $page): string
     {
         $html = Yii::$app->view->render(
-            '@engagement-pages/views/blocks/container',
+            '@thiscovery-page-builder/views/blocks/container',
             [
                 'block' => $this,
                 'page' => $page,

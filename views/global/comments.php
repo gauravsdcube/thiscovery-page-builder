@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\models\PageComment;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\models\PageComment;
 use humhub\widgets\bootstrap\Badge;
 use humhub\widgets\bootstrap\Button;
 
@@ -20,10 +20,10 @@ use humhub\widgets\bootstrap\Button;
 /** @var int $allCount */
 /** @var array $statusOptions */
 
-$this->title = Yii::t('EngagementPagesModule.base', 'Page comments');
+$this->title = Yii::t('ThiscoveryPageBuilderModule.base', 'Page comments');
 
 $filterLabels = [
-    'all' => Yii::t('EngagementPagesModule.base', 'All') . ' (' . (int) $allCount . ')',
+    'all' => Yii::t('ThiscoveryPageBuilderModule.base', 'All') . ' (' . (int) $allCount . ')',
     'pending' => ($statusOptions[PageComment::STATUS_PENDING] ?? 'Pending') . ' (' . (int) $pendingCount . ')',
     'approved' => ($statusOptions[PageComment::STATUS_APPROVED] ?? 'Approved') . ' (' . (int) $approvedCount . ')',
     'rejected' => ($statusOptions[PageComment::STATUS_REJECTED] ?? 'Rejected') . ' (' . (int) $rejectedCount . ')',
@@ -34,16 +34,16 @@ $filterLabels = [
     <div class="panel-heading">
         <strong><?= Html::encode($this->title) ?></strong>
         <?php if ($pendingCount > 0): ?>
-            <?= Badge::warning($pendingCount . ' ' . Yii::t('EngagementPagesModule.base', 'pending'))->pill() ?>
+            <?= Badge::warning($pendingCount . ' ' . Yii::t('ThiscoveryPageBuilderModule.base', 'pending'))->pill() ?>
         <?php endif; ?>
-        <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Back to pages'))
+        <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Back to pages'))
             ->link(Url::toGlobalIndex())
             ->sm()
             ->right() ?>
     </div>
     <div class="panel-body">
         <p class="text-muted ep-comment-history-hint">
-            <?= Yii::t('EngagementPagesModule.base', 'Approved and rejected comments stay in this history. Use Delete only when you need to remove a comment permanently.') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Approved and rejected comments stay in this history. Use Delete only when you need to remove a comment permanently.') ?>
         </p>
         <div class="ep-comment-filters mb-3">
             <?php foreach (['all', 'pending', 'approved', 'rejected'] as $key): ?>
@@ -55,7 +55,7 @@ $filterLabels = [
         </div>
 
         <?php if ($comments === []): ?>
-            <p class="text-muted"><?= Yii::t('EngagementPagesModule.base', 'No comments in this filter.') ?></p>
+            <p class="text-muted"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'No comments in this filter.') ?></p>
         <?php else: ?>
             <?php foreach ($comments as $comment): ?>
                 <?php
@@ -75,7 +75,7 @@ $filterLabels = [
                         <?= $badge ?>
                         <?php if ($page): ?>
                             <span class="ep-mod-comment__page">
-                                <?= Yii::t('EngagementPagesModule.base', 'on') ?>
+                                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'on') ?>
                                 <a href="<?= Html::encode(Url::toGlobalEdit($page)) ?>">
                                     <?= Html::encode($page->title) ?>
                                 </a>
@@ -90,12 +90,12 @@ $filterLabels = [
                             <?php
                             $moderatorName = $comment->moderator->displayName ?? null;
                             if ($comment->moderated_at && $moderatorName) {
-                                echo Html::encode(Yii::t('EngagementPagesModule.base', 'Moderated by {name} on {date}', [
+                                echo Html::encode(Yii::t('ThiscoveryPageBuilderModule.base', 'Moderated by {name} on {date}', [
                                     'name' => $moderatorName,
                                     'date' => Yii::$app->formatter->asDatetime($comment->moderated_at, 'medium'),
                                 ]));
                             } elseif ($comment->moderated_at) {
-                                echo Html::encode(Yii::t('EngagementPagesModule.base', 'Moderated on {date}', [
+                                echo Html::encode(Yii::t('ThiscoveryPageBuilderModule.base', 'Moderated on {date}', [
                                     'date' => Yii::$app->formatter->asDatetime($comment->moderated_at, 'medium'),
                                 ]));
                             }
@@ -113,17 +113,17 @@ $filterLabels = [
                             <?= Html::hiddenInput('return_url', Url::toGlobalComments($status, $pageId)) ?>
                             <?php if (!$comment->isApproved()): ?>
                                 <button type="submit" name="moderate_action" value="approve" class="btn btn-sm btn-primary">
-                                    <?= Yii::t('EngagementPagesModule.base', 'Approve') ?>
+                                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Approve') ?>
                                 </button>
                             <?php endif; ?>
                             <?php if (!$comment->isRejected()): ?>
                                 <button type="submit" name="moderate_action" value="reject" class="btn btn-sm btn-light">
-                                    <?= Yii::t('EngagementPagesModule.base', 'Reject') ?>
+                                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reject') ?>
                                 </button>
                             <?php endif; ?>
                             <button type="submit" name="moderate_action" value="delete" class="btn btn-sm btn-danger"
-                                    onclick="return confirm(<?= Html::encode(json_encode(Yii::t('EngagementPagesModule.base', 'Permanently delete this comment from history?'))) ?>);">
-                                <?= Yii::t('EngagementPagesModule.base', 'Delete') ?>
+                                    onclick="return confirm(<?= Html::encode(json_encode(Yii::t('ThiscoveryPageBuilderModule.base', 'Permanently delete this comment from history?'))) ?>);">
+                                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Delete') ?>
                             </button>
                         <?= Html::endForm() ?>
                     </div>

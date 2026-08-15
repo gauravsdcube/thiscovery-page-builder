@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace humhub\modules\engagementPages\helpers;
+namespace humhub\modules\thiscoveryPageBuilder\helpers;
 
 use humhub\modules\thiscoveryEditor\helpers\EditorHtml;
 

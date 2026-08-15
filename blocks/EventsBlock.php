@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use Yii;
 
@@ -20,7 +20,7 @@ class EventsBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Events');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Events');
     }
 
     public function normalizeSettings(): array
@@ -40,12 +40,12 @@ class EventsBlock extends BaseBlock
                 'time' => trim((string) ($item['time'] ?? '')),
                 'location' => trim((string) ($item['location'] ?? '')),
                 'url' => trim((string) ($item['url'] ?? '')),
-                'cta_label' => trim((string) ($item['cta_label'] ?? Yii::t('EngagementPagesModule.base', 'Register'))),
+                'cta_label' => trim((string) ($item['cta_label'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Register'))),
             ];
         }
 
         return [
-            'title' => $this->string('title', Yii::t('EngagementPagesModule.base', 'Upcoming events')),
+            'title' => $this->string('title', Yii::t('ThiscoveryPageBuilderModule.base', 'Upcoming events')),
             'items' => $items,
         ];
     }

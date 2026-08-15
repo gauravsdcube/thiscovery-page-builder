@@ -9,10 +9,10 @@
  * Shared section POST parsing for global and space page editors.
  */
 
-namespace humhub\modules\engagementPages\controllers;
+namespace humhub\modules\thiscoveryPageBuilder\controllers;
 
-use humhub\modules\engagementPages\blocks\CollectionBlock;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\blocks\CollectionBlock;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use Yii;
 
 trait SectionPostParserTrait
@@ -58,7 +58,7 @@ trait SectionPostParserTrait
 
         if ($type === 'container') {
             $settings['show_title'] = !empty($settings['show_title']);
-            $settings['columns'] = \humhub\modules\engagementPages\blocks\ContainerBlock::clampColumns(
+            $settings['columns'] = \humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock::clampColumns(
                 $settings['columns'] ?? 1
             );
         }
@@ -122,7 +122,7 @@ trait SectionPostParserTrait
                 'type' => 'team',
                 'region' => BlockRegistry::REGION_LEFT,
                 'settings' => [
-                    'title' => Yii::t('EngagementPagesModule.base', 'Meet the team'),
+                    'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Meet the team'),
                     'people' => [
                         ['name' => '', 'role' => '', 'email' => '', 'phone' => '', 'bio' => ''],
                     ],
@@ -133,11 +133,11 @@ trait SectionPostParserTrait
                 'type' => 'phases',
                 'region' => BlockRegistry::REGION_MAIN,
                 'settings' => [
-                    'title' => Yii::t('EngagementPagesModule.base', 'Project phases'),
+                    'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Project phases'),
                     'items' => [
-                        ['label' => Yii::t('EngagementPagesModule.base', 'Inform'), 'description' => '', 'status' => 'done'],
-                        ['label' => Yii::t('EngagementPagesModule.base', 'Have your say'), 'description' => '', 'status' => 'current'],
-                        ['label' => Yii::t('EngagementPagesModule.base', 'What happens next'), 'description' => '', 'status' => 'upcoming'],
+                        ['label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Inform'), 'description' => '', 'status' => 'done'],
+                        ['label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Have your say'), 'description' => '', 'status' => 'current'],
+                        ['label' => Yii::t('ThiscoveryPageBuilderModule.base', 'What happens next'), 'description' => '', 'status' => 'upcoming'],
                     ],
                 ],
             ],

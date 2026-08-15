@@ -15,7 +15,7 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\BaseBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\BaseBlock;
 
 $bg = BaseBlock::sanitizeColor($settings['background_color'] ?? '');
 $fg = BaseBlock::sanitizeColor($settings['text_color'] ?? '');
@@ -28,38 +28,38 @@ $presets = BaseBlock::colorPresets();
 $isHero = ($type === 'hero');
 ?>
 <div class="ep-color-fields">
-    <div class="ep-color-fields__title"><?= Yii::t('EngagementPagesModule.base', 'Colours') ?></div>
+    <div class="ep-color-fields__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Colours') ?></div>
     <p class="ep-hint text-muted mb-2">
-        <?= Yii::t('EngagementPagesModule.base', 'Leave blank to use the default theme colours for this section.') ?>
+        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Leave blank to use the default theme colours for this section.') ?>
     </p>
     <div class="row g-3">
         <div class="col-md-6 form-group mb-2">
             <label class="ep-label" for="ep-bg-<?= Html::encode($safeIndex) ?>">
-                <?= Yii::t('EngagementPagesModule.base', 'Background colour') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Background colour') ?>
             </label>
             <div class="ep-color-input" data-ep-color-field>
                 <input type="color"
                        class="ep-color-input__picker"
                        value="<?= Html::encode($bgPicker) ?>"
                        data-ep-color-picker
-                       aria-label="<?= Yii::t('EngagementPagesModule.base', 'Pick background colour') ?>">
+                       aria-label="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Pick background colour') ?>">
                 <input type="text"
                        class="form-control ep-color-input__text"
                        id="ep-bg-<?= Html::encode($safeIndex) ?>"
                        name="<?= $namePrefix ?>[settings][background_color]"
                        value="<?= Html::encode($bg) ?>"
-                       placeholder="<?= $type === 'hero' ? '#003078' : Yii::t('EngagementPagesModule.base', 'Default') ?>"
+                       placeholder="<?= $type === 'hero' ? '#003078' : Yii::t('ThiscoveryPageBuilderModule.base', 'Default') ?>"
                        maxlength="7"
                        pattern="#?[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?"
                        data-ep-color-text
                        autocomplete="off"
                        spellcheck="false">
                 <button type="button" class="btn btn-sm btn-light" data-ep-color-clear
-                        title="<?= Yii::t('EngagementPagesModule.base', 'Reset to default') ?>">
-                    <?= Yii::t('EngagementPagesModule.base', 'Reset') ?>
+                        title="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reset to default') ?>">
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reset') ?>
                 </button>
             </div>
-            <div class="ep-color-presets" role="list" aria-label="<?= Yii::t('EngagementPagesModule.base', 'Background colour presets') ?>">
+            <div class="ep-color-presets" role="list" aria-label="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Background colour presets') ?>">
                 <?php foreach ($presets as $preset): ?>
                     <button type="button"
                             class="ep-color-presets__swatch"
@@ -73,28 +73,28 @@ $isHero = ($type === 'hero');
         </div>
         <div class="col-md-6 form-group mb-2">
             <label class="ep-label" for="ep-fg-<?= Html::encode($safeIndex) ?>">
-                <?= Yii::t('EngagementPagesModule.base', 'Text colour') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Text colour') ?>
             </label>
             <div class="ep-color-input" data-ep-color-field>
                 <input type="color"
                        class="ep-color-input__picker"
                        value="<?= Html::encode($fgPicker) ?>"
                        data-ep-color-picker
-                       aria-label="<?= Yii::t('EngagementPagesModule.base', 'Pick text colour') ?>">
+                       aria-label="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Pick text colour') ?>">
                 <input type="text"
                        class="form-control ep-color-input__text"
                        id="ep-fg-<?= Html::encode($safeIndex) ?>"
                        name="<?= $namePrefix ?>[settings][text_color]"
                        value="<?= Html::encode($fg) ?>"
-                       placeholder="<?= $type === 'hero' ? '#ffffff' : Yii::t('EngagementPagesModule.base', 'Default') ?>"
+                       placeholder="<?= $type === 'hero' ? '#ffffff' : Yii::t('ThiscoveryPageBuilderModule.base', 'Default') ?>"
                        maxlength="7"
                        pattern="#?[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?"
                        data-ep-color-text
                        autocomplete="off"
                        spellcheck="false">
                 <button type="button" class="btn btn-sm btn-light" data-ep-color-clear
-                        title="<?= Yii::t('EngagementPagesModule.base', 'Reset to default') ?>">
-                    <?= Yii::t('EngagementPagesModule.base', 'Reset') ?>
+                        title="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reset to default') ?>">
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reset') ?>
                 </button>
             </div>
         </div>
@@ -108,20 +108,20 @@ $isHero = ($type === 'hero');
                            data-ep-show-border
                         <?= $showBorder ? 'checked' : '' ?>>
                     <label class="form-check-label" for="ep-show-border-<?= Html::encode($safeIndex) ?>">
-                        <?= Yii::t('EngagementPagesModule.base', 'Show border') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Show border') ?>
                     </label>
                 </div>
             </div>
             <div class="col-md-6 form-group mb-2" data-ep-border-color-wrap<?= $showBorder ? '' : ' hidden' ?>>
                 <label class="ep-label" for="ep-border-<?= Html::encode($safeIndex) ?>">
-                    <?= Yii::t('EngagementPagesModule.base', 'Border colour') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Border colour') ?>
                 </label>
                 <div class="ep-color-input" data-ep-color-field>
                     <input type="color"
                            class="ep-color-input__picker"
                            value="<?= Html::encode($borderPicker) ?>"
                            data-ep-color-picker
-                           aria-label="<?= Yii::t('EngagementPagesModule.base', 'Pick border colour') ?>">
+                           aria-label="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Pick border colour') ?>">
                     <input type="text"
                            class="form-control ep-color-input__text"
                            id="ep-border-<?= Html::encode($safeIndex) ?>"
@@ -134,8 +134,8 @@ $isHero = ($type === 'hero');
                            autocomplete="off"
                            spellcheck="false">
                     <button type="button" class="btn btn-sm btn-light" data-ep-color-clear
-                            title="<?= Yii::t('EngagementPagesModule.base', 'Reset to default') ?>">
-                        <?= Yii::t('EngagementPagesModule.base', 'Reset') ?>
+                            title="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reset to default') ?>">
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reset') ?>
                     </button>
                 </div>
             </div>

@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\helpers;
+namespace humhub\modules\thiscoveryPageBuilder\helpers;
 
 use humhub\modules\file\models\File;
 

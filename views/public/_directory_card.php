@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var EngagementPage $page */
 /** @var bool $featured */
@@ -27,7 +27,7 @@ $featured = !empty($featured);
             </span>
         <?php endif; ?>
         <?php if ($featured): ?>
-            <span class="ep-collection-card__badge"><?= Yii::t('EngagementPagesModule.base', 'Featured') ?></span>
+            <span class="ep-collection-card__badge"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Featured') ?></span>
         <?php endif; ?>
     </a>
     <div class="ep-collection-card__body">
@@ -43,14 +43,14 @@ $featured = !empty($featured);
         <div class="ep-collection-card__footer">
             <span class="ep-collection-card__meta">
                 <?php if ($page->closes_at): ?>
-                    <?= Yii::t('EngagementPagesModule.base', 'Closes') ?>:
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Closes') ?>:
                     <?= Html::encode(Yii::$app->formatter->asDate($page->closes_at, 'medium')) ?>
                 <?php else: ?>
-                    <?= Yii::t('EngagementPagesModule.base', 'Open') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open') ?>
                 <?php endif; ?>
             </span>
             <a class="ep-collection-card__cta" href="<?= Html::encode($url) ?>">
-                <?= Yii::t('EngagementPagesModule.base', 'View') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'View') ?>
                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
             </a>
         </div>

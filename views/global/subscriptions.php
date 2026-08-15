@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\models\PageFollow;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\models\PageFollow;
 use humhub\widgets\bootstrap\Button;
 
 /** @var PageFollow[] $follows */
@@ -15,21 +15,21 @@ use humhub\widgets\bootstrap\Button;
 /** @var int $totalCount */
 /** @var array<int, string> $pageOptions */
 
-$this->title = Yii::t('EngagementPagesModule.base', 'Subscriptions');
+$this->title = Yii::t('ThiscoveryPageBuilderModule.base', 'Subscriptions');
 ?>
 
 <div class="panel panel-default">
     <div class="panel-heading">
         <strong><?= Html::encode($this->title) ?></strong>
         <span class="text-muted" style="margin-left:8px;font-weight:normal;">
-            <?= Yii::t('EngagementPagesModule.base', '{n,plural,=1{# email} other{# emails}}', ['n' => (int) $totalCount]) ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', '{n,plural,=1{# email} other{# emails}}', ['n' => (int) $totalCount]) ?>
         </span>
-        <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Back to pages'))
+        <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Back to pages'))
             ->link(Url::toGlobalIndex())
             ->sm()
             ->right() ?>
         <?php if ($follows !== []): ?>
-            <?= Button::primary(Yii::t('EngagementPagesModule.base', 'Export CSV'))
+            <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', 'Export CSV'))
                 ->link(Url::toGlobalExportSubscriptions($pageId))
                 ->icon('download')
                 ->sm()
@@ -38,15 +38,15 @@ $this->title = Yii::t('EngagementPagesModule.base', 'Subscriptions');
     </div>
     <div class="panel-body">
         <p class="text-muted ep-comment-history-hint">
-            <?= Yii::t('EngagementPagesModule.base', 'Emails collected from the Get updates form on network-level public pages. Export downloads the current filter as a CSV file.') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Emails collected from the Get updates form on network-level public pages. Export downloads the current filter as a CSV file.') ?>
         </p>
 
         <?php if ($pageOptions !== []): ?>
             <form method="get" action="<?= Html::encode(Url::toGlobalSubscriptions()) ?>" class="ep-subscription-filters mb-3">
-                <label class="ep-label" for="ep-sub-page"><?= Yii::t('EngagementPagesModule.base', 'Page') ?></label>
+                <label class="ep-label" for="ep-sub-page"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page') ?></label>
                 <select class="form-control" id="ep-sub-page" name="page_id" style="max-width:320px;display:inline-block;margin-right:8px;"
                         onchange="this.form.submit()">
-                    <option value=""><?= Yii::t('EngagementPagesModule.base', 'All pages') ?></option>
+                    <option value=""><?= Yii::t('ThiscoveryPageBuilderModule.base', 'All pages') ?></option>
                     <?php foreach ($pageOptions as $id => $title): ?>
                         <option value="<?= (int) $id ?>" <?= (int) $pageId === (int) $id ? 'selected' : '' ?>>
                             <?= Html::encode($title) ?>
@@ -57,15 +57,15 @@ $this->title = Yii::t('EngagementPagesModule.base', 'Subscriptions');
         <?php endif; ?>
 
         <?php if ($follows === []): ?>
-            <p class="text-muted"><?= Yii::t('EngagementPagesModule.base', 'No subscriptions yet.') ?></p>
+            <p class="text-muted"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'No subscriptions yet.') ?></p>
         <?php else: ?>
             <div class="table-responsive">
                 <table class="table table-hover ep-subscription-table">
                     <thead>
                         <tr>
-                            <th><?= Yii::t('EngagementPagesModule.base', 'Email') ?></th>
-                            <th><?= Yii::t('EngagementPagesModule.base', 'Page') ?></th>
-                            <th><?= Yii::t('EngagementPagesModule.base', 'Subscribed') ?></th>
+                            <th><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Email') ?></th>
+                            <th><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page') ?></th>
+                            <th><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Subscribed') ?></th>
                             <th class="ep-subscription-table__actions"></th>
                         </tr>
                     </thead>
@@ -85,7 +85,7 @@ $this->title = Yii::t('EngagementPagesModule.base', 'Subscriptions');
                                             <?= Html::encode($page->getPublicPath()) ?>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-muted"><?= Yii::t('EngagementPagesModule.base', 'Deleted page') ?></span>
+                                        <span class="text-muted"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Deleted page') ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -98,8 +98,8 @@ $this->title = Yii::t('EngagementPagesModule.base', 'Subscriptions');
                                         <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
                                         <?= Html::hiddenInput('filter_page_id', $pageId !== null ? (string) $pageId : '') ?>
                                         <button type="submit" class="btn btn-sm btn-danger"
-                                                onclick="return confirm(<?= Html::encode(json_encode(Yii::t('EngagementPagesModule.base', 'Remove this email from the subscription list?'))) ?>);">
-                                            <?= Yii::t('EngagementPagesModule.base', 'Delete') ?>
+                                                onclick="return confirm(<?= Html::encode(json_encode(Yii::t('ThiscoveryPageBuilderModule.base', 'Remove this email from the subscription list?'))) ?>);">
+                                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Delete') ?>
                                         </button>
                                     <?= Html::endForm() ?>
                                 </td>

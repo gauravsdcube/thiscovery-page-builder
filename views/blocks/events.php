@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\EventsBlock;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\EventsBlock;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var EventsBlock $block */
 /** @var EngagementPage $page */
@@ -42,7 +42,7 @@ if ($items === []) {
                     <?php endif; ?>
                     <?php if (($item['url'] ?? '') !== ''): ?>
                         <a class="btn btn-default btn-sm" href="<?= Html::encode($item['url']) ?>" target="_blank" rel="noopener">
-                            <?= Html::encode($item['cta_label'] ?: Yii::t('EngagementPagesModule.base', 'Register')) ?>
+                            <?= Html::encode($item['cta_label'] ?: Yii::t('ThiscoveryPageBuilderModule.base', 'Register')) ?>
                         </a>
                     <?php endif; ?>
                 </div>

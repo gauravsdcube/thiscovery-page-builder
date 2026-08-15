@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use humhub\modules\thiscoveryForms\helpers\Url as FormUrl;
 use humhub\modules\thiscoveryForms\models\CustomForm;
@@ -22,7 +22,7 @@ class SurveyCtaBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Survey CTA');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Survey CTA');
     }
 
     public function normalizeSettings(): array
@@ -31,7 +31,7 @@ class SurveyCtaBlock extends BaseBlock
             'form_id' => $this->intOrNull('form_id'),
             'button_label' => $this->string(
                 'button_label',
-                Yii::t('EngagementPagesModule.base', 'Take the survey')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Take the survey')
             ),
             'intro' => $this->string('intro'),
         ];

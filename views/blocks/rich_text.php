@@ -6,9 +6,9 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\RichTextBlock;
-use humhub\modules\engagementPages\helpers\RichHtml;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\RichTextBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\RichHtml;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var RichTextBlock $block */
 /** @var EngagementPage $page */

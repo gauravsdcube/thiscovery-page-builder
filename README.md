@@ -1,6 +1,6 @@
 # Thiscovery Page Builder
 
-**Version 1.3.2**  
+**Version 1.4.0**  
 **Copyright (c) 2026 D Cube Consulting. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 
@@ -17,9 +17,9 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 
 ## Install
 
-1. Copy this module into `protected/modules/engagement-pages`
+1. Copy this module into `protected/modules/thiscovery-page-builder`
 2. Enable **Thiscovery Page Builder** in Administration → Modules
-3. Run pending migrations (HumHub will apply module migrations on enable, or use `php protected/yii migrate/up --migrationPath=@engagement-pages/migrations`)
+3. Run pending migrations (HumHub will apply module migrations on enable, or use `php protected/yii migrate/up --migrationPath=@thiscovery-page-builder/migrations`)
 
 ## Features (v1.3)
 

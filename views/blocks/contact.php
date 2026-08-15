@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\ContactBlock;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\ContactBlock;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var ContactBlock $block */
 /** @var EngagementPage $page */
@@ -46,7 +46,7 @@ if (!$hasDetails && ($settings['title'] ?? '') === '') {
         <dl class="ep-contact__details">
             <?php if (($settings['email'] ?? '') !== ''): ?>
                 <div class="ep-contact__row">
-                    <dt><?= Yii::t('EngagementPagesModule.base', 'Email') ?></dt>
+                    <dt><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Email') ?></dt>
                     <dd>
                         <?php if (!empty($settings['show_email_link'])): ?>
                             <a href="mailto:<?= Html::encode($settings['email']) ?>"><?= Html::encode($settings['email']) ?></a>
@@ -59,7 +59,7 @@ if (!$hasDetails && ($settings['title'] ?? '') === '') {
 
             <?php if (($settings['phone'] ?? '') !== ''): ?>
                 <div class="ep-contact__row">
-                    <dt><?= Yii::t('EngagementPagesModule.base', 'Phone') ?></dt>
+                    <dt><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Phone') ?></dt>
                     <dd>
                         <a href="tel:<?= Html::encode(preg_replace('/\s+/', '', $settings['phone'])) ?>">
                             <?= Html::encode($settings['phone']) ?>
@@ -70,14 +70,14 @@ if (!$hasDetails && ($settings['title'] ?? '') === '') {
 
             <?php if (($settings['address'] ?? '') !== ''): ?>
                 <div class="ep-contact__row">
-                    <dt><?= Yii::t('EngagementPagesModule.base', 'Address') ?></dt>
+                    <dt><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Address') ?></dt>
                     <dd><?= nl2br(Html::encode($settings['address'])) ?></dd>
                 </div>
             <?php endif; ?>
 
             <?php if (($settings['website'] ?? '') !== ''): ?>
                 <div class="ep-contact__row">
-                    <dt><?= Yii::t('EngagementPagesModule.base', 'Website') ?></dt>
+                    <dt><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Website') ?></dt>
                     <dd>
                         <a href="<?= Html::encode($settings['website']) ?>" target="_blank" rel="noopener">
                             <?= Html::encode($settings['website_label'] ?: $settings['website']) ?>
@@ -94,7 +94,7 @@ if (!$hasDetails && ($settings['title'] ?? '') === '') {
         <?php if (($settings['email'] ?? '') !== '' && !empty($settings['show_email_link'])): ?>
             <a class="btn btn-primary btn-sm ep-contact__cta"
                href="mailto:<?= Html::encode($settings['email']) ?>">
-                <?= Yii::t('EngagementPagesModule.base', 'Send email') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Send email') ?>
             </a>
         <?php endif; ?>
     </div>

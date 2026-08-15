@@ -6,7 +6,7 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use humhub\modules\thiscoveryEditor\widgets\EditorField;
 
 /** @var int|string $index */
@@ -17,7 +17,7 @@ use humhub\modules\thiscoveryEditor\widgets\EditorField;
 /** @var bool $collapsed */
 /** @var bool $isChild */
 /** @var string|null $namePrefix */
-/** @var \humhub\modules\engagementPages\models\EngagementPage|null $page */
+/** @var \humhub\modules\thiscoveryPageBuilder\models\EngagementPage|null $page */
 /** @var int|null $column */
 
 $collapsed = $collapsed ?? true;
@@ -57,7 +57,7 @@ $titleHint = match ($type) {
     <?php endif; ?>
 
     <div class="ep-section-card__header" data-ep-toggle-card>
-        <div class="ep-section-card__handle" data-ep-drag-handle title="<?= Yii::t('EngagementPagesModule.base', 'Drag to reorder') ?>">
+        <div class="ep-section-card__handle" data-ep-drag-handle title="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Drag to reorder') ?>">
             <i class="fa fa-bars"></i>
         </div>
         <div class="ep-section-card__title">
@@ -70,10 +70,10 @@ $titleHint = match ($type) {
             </span>
         </div>
         <div class="ep-section-card__actions">
-            <button type="button" class="btn btn-sm btn-light" data-ep-toggle-card-btn title="<?= Yii::t('EngagementPagesModule.base', 'Edit section') ?>">
+            <button type="button" class="btn btn-sm btn-light" data-ep-toggle-card-btn title="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Edit section') ?>">
                 <i class="fa fa-pencil"></i>
             </button>
-            <button type="button" class="btn btn-sm btn-light" data-ep-remove-section title="<?= Yii::t('EngagementPagesModule.base', 'Remove') ?>">
+            <button type="button" class="btn btn-sm btn-light" data-ep-remove-section title="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Remove') ?>">
                 <i class="fa fa-trash"></i>
             </button>
         </div>
@@ -81,15 +81,15 @@ $titleHint = match ($type) {
 
     <div class="ep-section-card__body">
         <div class="form-group ep-align-field">
-            <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Position') ?></label>
+            <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Position') ?></label>
             <select class="form-control" name="<?= $namePrefix ?>[settings][align]" style="max-width:280px"
                     data-ep-block-align>
                 <?php
                 $alignValue = $settings['align']
                     ?? (($type === 'collection' || $type === 'directory')
-                        ? \humhub\modules\engagementPages\blocks\BaseBlock::ALIGN_CENTER
-                        : \humhub\modules\engagementPages\blocks\BaseBlock::ALIGN_START);
-                foreach (\humhub\modules\engagementPages\blocks\BaseBlock::alignOptions() as $value => $alignLabel):
+                        ? \humhub\modules\thiscoveryPageBuilder\blocks\BaseBlock::ALIGN_CENTER
+                        : \humhub\modules\thiscoveryPageBuilder\blocks\BaseBlock::ALIGN_START);
+                foreach (\humhub\modules\thiscoveryPageBuilder\blocks\BaseBlock::alignOptions() as $value => $alignLabel):
                 ?>
                     <option value="<?= Html::encode($value) ?>" <?= $alignValue === $value ? 'selected' : '' ?>>
                         <?= Html::encode($alignLabel) ?>
@@ -98,7 +98,7 @@ $titleHint = match ($type) {
             </select>
             <div class="ep-hint text-muted">
                 <?= Yii::t(
-                    'EngagementPagesModule.base',
+                    'ThiscoveryPageBuilderModule.base',
                     'Full width keeps content on the page edges. Centre / Right shift card grids and compact sections within the page width.'
                 ) ?>
             </div>
@@ -113,56 +113,56 @@ $titleHint = match ($type) {
 
         <?php if ($type === 'hero'): ?>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Headline') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Headline') ?></label>
                 <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][headline]"
                        value="<?= Html::encode($settings['headline'] ?? '') ?>" data-ep-card-title-source>
             </div>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Subheadline') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Subheadline') ?></label>
                 <div class="ep-rich-editor" data-ep-rich-editor>
                     <?= EditorField::widget([
                         'id' => 'ep-hero-sub-' . $safeIndex,
                         'name' => $namePrefix . '[settings][subheadline]',
                         'value' => (string) ($settings['subheadline'] ?? ''),
-                        'placeholder' => Yii::t('EngagementPagesModule.base', 'Supporting text under the headline…'),
+                        'placeholder' => Yii::t('ThiscoveryPageBuilderModule.base', 'Supporting text under the headline…'),
                         'height' => 180,
                         'profile' => 'simple',
                     ]) ?>
                 </div>
             </div>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Hero image') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Hero image') ?></label>
                 <?= $this->render('_upload_field', [
                     'inputName' => $namePrefix . '[settings][image_guid]',
                     'guid' => $settings['image_guid'] ?? '',
                     'widgetId' => 'ep-hero-img-' . $safeIndex,
                     'imagesOnly' => true,
-                    'buttonLabel' => Yii::t('EngagementPagesModule.base', 'Upload image'),
+                    'buttonLabel' => Yii::t('ThiscoveryPageBuilderModule.base', 'Upload image'),
                     'page' => $page,
                 ]) ?>
                 <?php if (empty($settings['image_guid']) && !empty($settings['image_url'])): ?>
                     <p class="ep-hint text-muted">
-                        <?= Yii::t('EngagementPagesModule.base', 'Previously used image URL (replace by uploading a file):') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Previously used image URL (replace by uploading a file):') ?>
                         <?= Html::encode($settings['image_url']) ?>
                     </p>
                     <input type="hidden" name="<?= $namePrefix ?>[settings][image_url]" value="<?= Html::encode($settings['image_url']) ?>">
                 <?php endif; ?>
             </div>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Image alt text') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Image alt text') ?></label>
                 <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][image_alt]"
                        value="<?= Html::encode($settings['image_alt'] ?? '') ?>"
-                       placeholder="<?= Yii::t('EngagementPagesModule.base', 'Describe the image for screen readers') ?>">
-                <div class="ep-hint text-muted"><?= Yii::t('EngagementPagesModule.base', 'Required for accessibility when an image is used.') ?></div>
+                       placeholder="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Describe the image for screen readers') ?>">
+                <div class="ep-hint text-muted"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Required for accessibility when an image is used.') ?></div>
             </div>
             <div class="row g-3">
                 <div class="col-md-6 form-group">
-                    <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Button label') ?></label>
+                    <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Button label') ?></label>
                     <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][cta_label]"
                            value="<?= Html::encode($settings['cta_label'] ?? '') ?>">
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Button URL') ?></label>
+                    <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Button URL') ?></label>
                     <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][cta_url]"
                            value="<?= Html::encode($settings['cta_url'] ?? '') ?>">
                 </div>
@@ -170,22 +170,22 @@ $titleHint = match ($type) {
 
         <?php elseif ($type === 'rich_text'): ?>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Title') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?></label>
                 <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][title]"
                        value="<?= Html::encode($settings['title'] ?? '') ?>" data-ep-card-title-source>
             </div>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Body') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Body') ?></label>
                 <div class="ep-field-note">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    <div><?= Yii::t('EngagementPagesModule.base', 'Use the editor for headings, lists, links, and Thiscovery blocks (callout, accordion, survey).') ?></div>
+                    <div><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Use the editor for headings, lists, links, and Thiscovery blocks (callout, accordion, survey).') ?></div>
                 </div>
                 <div class="ep-rich-editor" data-ep-rich-editor>
                     <?= EditorField::widget([
                         'id' => 'ep-rich-body-' . $safeIndex,
                         'name' => $namePrefix . '[settings][body]',
                         'value' => (string) ($settings['body'] ?? ''),
-                        'placeholder' => Yii::t('EngagementPagesModule.base', 'Write consultation copy…'),
+                        'placeholder' => Yii::t('ThiscoveryPageBuilderModule.base', 'Write consultation copy…'),
                         'height' => 320,
                         'profile' => 'page',
                         'forms' => $formOptions,
@@ -195,7 +195,7 @@ $titleHint = match ($type) {
 
         <?php elseif ($type === 'survey_cta'): ?>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Thiscovery Form') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Thiscovery Form') ?></label>
                 <select class="form-control" name="<?= $namePrefix ?>[settings][form_id]">
                     <?php foreach ($formOptions as $id => $title): ?>
                         <option value="<?= Html::encode((string) $id) ?>" <?= (string) ($settings['form_id'] ?? '') === (string) $id ? 'selected' : '' ?>>
@@ -205,19 +205,19 @@ $titleHint = match ($type) {
                 </select>
             </div>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Button label') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Button label') ?></label>
                 <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][button_label]"
-                       value="<?= Html::encode($settings['button_label'] ?? Yii::t('EngagementPagesModule.base', 'Take the survey')) ?>"
+                       value="<?= Html::encode($settings['button_label'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Take the survey')) ?>"
                        data-ep-card-title-source>
             </div>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Intro text') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Intro text') ?></label>
                 <div class="ep-rich-editor" data-ep-rich-editor>
                     <?= EditorField::widget([
                         'id' => 'ep-survey-intro-' . $safeIndex,
                         'name' => $namePrefix . '[settings][intro]',
                         'value' => (string) ($settings['intro'] ?? ''),
-                        'placeholder' => Yii::t('EngagementPagesModule.base', 'Explain why people should take the survey…'),
+                        'placeholder' => Yii::t('ThiscoveryPageBuilderModule.base', 'Explain why people should take the survey…'),
                         'height' => 180,
                         'profile' => 'simple',
                     ]) ?>
@@ -226,7 +226,7 @@ $titleHint = match ($type) {
 
         <?php elseif ($type === 'poll_embed'): ?>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Quick poll') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Quick poll') ?></label>
                 <select class="form-control" name="<?= $namePrefix ?>[settings][form_id]">
                     <?php foreach ($pollOptions as $id => $title): ?>
                         <option value="<?= Html::encode((string) $id) ?>" <?= (string) ($settings['form_id'] ?? '') === (string) $id ? 'selected' : '' ?>>
@@ -235,15 +235,15 @@ $titleHint = match ($type) {
                     <?php endforeach; ?>
                 </select>
                 <div class="ep-hint text-muted">
-                    <?= Yii::t('EngagementPagesModule.base', 'Shows the poll on the page so people can vote without leaving.') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Shows the poll on the page so people can vote without leaving.') ?>
                 </div>
             </div>
 
         <?php elseif ($type === 'downloads'): ?>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Title') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?></label>
                 <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][title]"
-                       value="<?= Html::encode($settings['title'] ?? Yii::t('EngagementPagesModule.base', 'Documents')) ?>"
+                       value="<?= Html::encode($settings['title'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Documents')) ?>"
                        data-ep-card-title-source>
             </div>
             <div class="ep-download-items" data-ep-download-items>
@@ -264,23 +264,23 @@ $titleHint = match ($type) {
                 ?>
             </div>
             <button type="button" class="btn btn-sm btn-light" data-ep-add-download>
-                <i class="fa fa-plus"></i> <?= Yii::t('EngagementPagesModule.base', 'Add document') ?>
+                <i class="fa fa-plus"></i> <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Add document') ?>
             </button>
 
         <?php elseif ($type === 'container'): ?>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Container title') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Container title') ?></label>
                 <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][title]"
-                       value="<?= Html::encode($settings['title'] ?? Yii::t('EngagementPagesModule.base', 'Container')) ?>"
+                       value="<?= Html::encode($settings['title'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Container')) ?>"
                        data-ep-card-title-source>
             </div>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Columns') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Columns') ?></label>
                 <select class="form-control" name="<?= $namePrefix ?>[settings][columns]"
                         data-ep-container-columns style="max-width:220px">
                     <?php
-                    $cols = \humhub\modules\engagementPages\blocks\ContainerBlock::clampColumns($settings['columns'] ?? 1);
-                    foreach (\humhub\modules\engagementPages\blocks\ContainerBlock::columnOptions() as $value => $colLabel):
+                    $cols = \humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock::clampColumns($settings['columns'] ?? 1);
+                    foreach (\humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock::columnOptions() as $value => $colLabel):
                     ?>
                         <option value="<?= (int) $value ?>" <?= $cols === (int) $value ? 'selected' : '' ?>>
                             <?= Html::encode($colLabel) ?>
@@ -288,7 +288,7 @@ $titleHint = match ($type) {
                     <?php endforeach; ?>
                 </select>
                 <div class="ep-hint text-muted">
-                    <?= Yii::t('EngagementPagesModule.base', 'Drop elements into each column. On small screens columns stack.') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Drop elements into each column. On small screens columns stack.') ?>
                 </div>
             </div>
             <div class="form-check mb-3">
@@ -298,7 +298,7 @@ $titleHint = match ($type) {
                        id="ep-show-title-<?= Html::encode($safeIndex) ?>"
                     <?= !isset($settings['show_title']) || !empty($settings['show_title']) ? 'checked' : '' ?>>
                 <label class="form-check-label" for="ep-show-title-<?= Html::encode($safeIndex) ?>">
-                    <?= Yii::t('EngagementPagesModule.base', 'Show title on public page') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Show title on public page') ?>
                 </label>
             </div>
         <?php else: ?>
@@ -316,7 +316,7 @@ $titleHint = match ($type) {
 
     <?php if ($type === 'container' && !$isChild): ?>
         <?php
-        $cols = \humhub\modules\engagementPages\blocks\ContainerBlock::clampColumns($settings['columns'] ?? 1);
+        $cols = \humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock::clampColumns($settings['columns'] ?? 1);
         $childrenByCol = array_fill(0, $cols, []);
         foreach (array_values((array) ($section['children'] ?? [])) as $child) {
             $c = (int) ($child['column'] ?? 0);
@@ -328,13 +328,13 @@ $titleHint = match ($type) {
         ?>
         <div class="ep-container-zone" data-ep-container-zone data-ep-cols="<?= (int) $cols ?>">
             <div class="ep-container-zone__label">
-                <?= Yii::t('EngagementPagesModule.base', 'Drop elements into columns') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Drop elements into columns') ?>
             </div>
             <div class="ep-container-zone__grid" data-ep-container-grid data-cols="<?= (int) $cols ?>">
                 <?php for ($col = 0; $col < $cols; $col++): ?>
                     <div class="ep-container-col" data-ep-container-col="<?= (int) $col ?>">
                         <div class="ep-container-col__label">
-                            <?= Yii::t('EngagementPagesModule.base', 'Column {n}', ['n' => $col + 1]) ?>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Column {n}', ['n' => $col + 1]) ?>
                         </div>
                         <div class="ep-container-children"
                              data-ep-container-children

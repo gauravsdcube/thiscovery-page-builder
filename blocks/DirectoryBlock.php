@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 /**
  * @deprecated Use CollectionBlock. Kept so old class references do not break.

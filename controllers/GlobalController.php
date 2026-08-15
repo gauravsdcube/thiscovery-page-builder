@@ -5,19 +5,19 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\controllers;
+namespace humhub\modules\thiscoveryPageBuilder\controllers;
 
 use humhub\components\Controller;
 use humhub\components\access\ControllerAccess;
 use humhub\modules\content\models\Content;
-use humhub\modules\engagementPages\assets\EngagementPagesAsset;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\models\EngagementPage;
-use humhub\modules\engagementPages\models\PageComment;
-use humhub\modules\engagementPages\models\PageFollow;
-use humhub\modules\engagementPages\permissions\CreateGlobalPage;
-use humhub\modules\engagementPages\permissions\ManageGlobalPage;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\assets\ThiscoveryPageBuilderAsset;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\models\PageComment;
+use humhub\modules\thiscoveryPageBuilder\models\PageFollow;
+use humhub\modules\thiscoveryPageBuilder\permissions\CreateGlobalPage;
+use humhub\modules\thiscoveryPageBuilder\permissions\ManageGlobalPage;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use humhub\modules\thiscoveryForms\models\CustomForm;
 use Yii;
 use yii\filters\VerbFilter;
@@ -32,7 +32,7 @@ class GlobalController extends Controller
 {
     use SectionPostParserTrait;
 
-    public $subLayout = '@engagement-pages/views/layouts/admin';
+    public $subLayout = '@thiscovery-page-builder/views/layouts/admin';
 
     protected $access = ControllerAccess::class;
 
@@ -60,7 +60,7 @@ class GlobalController extends Controller
 
     public function actionIndex()
     {
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
 
         $canManage = Yii::$app->user->can(ManageGlobalPage::class)
             || Yii::$app->user->can(CreateGlobalPage::class)
@@ -99,7 +99,7 @@ class GlobalController extends Controller
     public function actionComments($page_id = null, $status = 'all')
     {
         $this->requireManage();
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
 
         $statusMap = [
             'pending' => PageComment::STATUS_PENDING,
@@ -155,18 +155,18 @@ class GlobalController extends Controller
 
         if ($action === 'approve') {
             $comment->approve($moderatorId);
-            Yii::$app->session->setFlash('success', Yii::t('EngagementPagesModule.base', 'Comment approved.'));
+            Yii::$app->session->setFlash('success', Yii::t('ThiscoveryPageBuilderModule.base', 'Comment approved.'));
             // Stay on history (All) so moderated comments remain visible.
             return $this->redirect(Url::toGlobalComments('all', $filterPageId));
         }
         if ($action === 'reject') {
             $comment->reject($moderatorId);
-            Yii::$app->session->setFlash('success', Yii::t('EngagementPagesModule.base', 'Comment rejected.'));
+            Yii::$app->session->setFlash('success', Yii::t('ThiscoveryPageBuilderModule.base', 'Comment rejected.'));
             return $this->redirect(Url::toGlobalComments('all', $filterPageId));
         }
         if ($action === 'delete') {
             $comment->delete();
-            Yii::$app->session->setFlash('success', Yii::t('EngagementPagesModule.base', 'Comment deleted.'));
+            Yii::$app->session->setFlash('success', Yii::t('ThiscoveryPageBuilderModule.base', 'Comment deleted.'));
         }
 
         $return = Yii::$app->request->post('return_url');
@@ -179,7 +179,7 @@ class GlobalController extends Controller
     public function actionSubscriptions($page_id = null)
     {
         $this->requireManage();
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
 
         $pageId = $page_id ? (int) $page_id : null;
         $follows = PageFollow::findGlobalQuery($pageId)->all();
@@ -202,10 +202,10 @@ class GlobalController extends Controller
         $handle = fopen('php://temp', 'r+');
         fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
         fputcsv($handle, [
-            Yii::t('EngagementPagesModule.base', 'Email'),
-            Yii::t('EngagementPagesModule.base', 'Page'),
-            Yii::t('EngagementPagesModule.base', 'Public URL'),
-            Yii::t('EngagementPagesModule.base', 'Subscribed'),
+            Yii::t('ThiscoveryPageBuilderModule.base', 'Email'),
+            Yii::t('ThiscoveryPageBuilderModule.base', 'Page'),
+            Yii::t('ThiscoveryPageBuilderModule.base', 'Public URL'),
+            Yii::t('ThiscoveryPageBuilderModule.base', 'Subscribed'),
         ]);
         foreach ($follows as $follow) {
             $page = $follow->page;
@@ -253,7 +253,7 @@ class GlobalController extends Controller
         }
 
         $follow->delete();
-        Yii::$app->session->setFlash('success', Yii::t('EngagementPagesModule.base', 'Subscription removed.'));
+        Yii::$app->session->setFlash('success', Yii::t('ThiscoveryPageBuilderModule.base', 'Subscription removed.'));
 
         $filterPageId = Yii::$app->request->post('filter_page_id');
         $filterPageId = ($filterPageId === '' || $filterPageId === null)
@@ -304,7 +304,7 @@ class GlobalController extends Controller
         if ($page->isDirectoryHome()) {
             Yii::$app->session->setFlash(
                 'error',
-                Yii::t('EngagementPagesModule.base', 'The public homepage cannot be saved as a template.')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'The public homepage cannot be saved as a template.')
             );
             return $this->redirect(Url::toGlobalEdit($page));
         }
@@ -314,7 +314,7 @@ class GlobalController extends Controller
             $tpl = $page->saveAsTemplate($title !== '' ? $title : null);
             Yii::$app->session->setFlash(
                 'success',
-                Yii::t('EngagementPagesModule.base', 'Template “{title}” saved. You can create new pages from it.', [
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Template “{title}” saved. You can create new pages from it.', [
                     'title' => $tpl->title,
                 ])
             );
@@ -337,14 +337,14 @@ class GlobalController extends Controller
 
     public function actionView($id)
     {
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
 
         $page = $this->findPage($id);
         if (!$page->isPublished() && !$page->canManage()) {
-            throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'This page is not published.'));
+            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'This page is not published.'));
         }
 
-        return $this->render('@engagement-pages/views/page/view', [
+        return $this->render('@thiscovery-page-builder/views/page/view', [
             'contentContainer' => null,
             'page' => $page,
             'canManage' => $page->canManage(),
@@ -362,7 +362,7 @@ class GlobalController extends Controller
         if ($page->isDirectoryHome()) {
             Yii::$app->session->setFlash(
                 'error',
-                Yii::t('EngagementPagesModule.base', 'The public homepage cannot be deleted. Edit it in the page builder instead.')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'The public homepage cannot be deleted. Edit it in the page builder instead.')
             );
             return $this->redirect(Url::toGlobalEdit($page));
         }
@@ -372,7 +372,7 @@ class GlobalController extends Controller
 
     protected function handleEdit(EngagementPage $page, bool $isNew)
     {
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
         $request = Yii::$app->request;
 
         if ($request->isPost) {
@@ -393,7 +393,7 @@ class GlobalController extends Controller
             }
         }
 
-        return $this->render('@engagement-pages/views/page/edit', [
+        return $this->render('@thiscovery-page-builder/views/page/edit', [
             'contentContainer' => null,
             'page' => $page,
             'isNew' => $isNew,
@@ -406,7 +406,7 @@ class GlobalController extends Controller
 
     protected function formOptions(): array
     {
-        $options = ['' => Yii::t('EngagementPagesModule.base', 'Select a form…')];
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a form…')];
         if (!class_exists(CustomForm::class)) {
             return $options;
         }
@@ -415,7 +415,7 @@ class GlobalController extends Controller
 
     protected function pollOptions(): array
     {
-        $options = ['' => Yii::t('EngagementPagesModule.base', 'Select a poll…')];
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a poll…')];
         if (!class_exists(CustomForm::class)) {
             return $options;
         }
@@ -427,7 +427,7 @@ class GlobalController extends Controller
         $page = EngagementPage::findOne((int) $id);
 
         if ($page === null || !$page->isGlobal()) {
-            throw new NotFoundHttpException(Yii::t('EngagementPagesModule.base', 'Page not found.'));
+            throw new NotFoundHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'Page not found.'));
         }
 
         // Repair orphaned records (page row without content) so edit/view keep working.

@@ -7,8 +7,8 @@
 
 use humhub\helpers\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\widgets\bootstrap\Badge;
 use humhub\widgets\bootstrap\Button;
 
@@ -18,7 +18,7 @@ use humhub\widgets\bootstrap\Button;
 /** @var bool $canCreate */
 
 $templates = $templates ?? [];
-$this->title = Yii::t('EngagementPagesModule.base', 'Thiscovery Page Builder');
+$this->title = Yii::t('ThiscoveryPageBuilderModule.base', 'Thiscovery Page Builder');
 $statusOptions = EngagementPage::statusOptions();
 ?>
 
@@ -26,7 +26,7 @@ $statusOptions = EngagementPage::statusOptions();
     <div class="panel-heading">
         <strong><?= Html::encode($this->title) ?></strong>
         <?php if ($canCreate): ?>
-            <?= Button::primary(Yii::t('EngagementPagesModule.base', 'Create page'))
+            <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', 'Create page'))
                 ->link(Url::toCreate($contentContainer))
                 ->icon('plus')
                 ->right() ?>
@@ -34,7 +34,7 @@ $statusOptions = EngagementPage::statusOptions();
     </div>
     <div class="panel-body ep-page-list">
         <?php if (empty($pages)): ?>
-            <p class="text-muted"><?= Yii::t('EngagementPagesModule.base', 'No pages yet.') ?></p>
+            <p class="text-muted"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'No pages yet.') ?></p>
         <?php else: ?>
             <?php foreach ($pages as $page): ?>
                 <div class="ep-page-card">
@@ -47,11 +47,11 @@ $statusOptions = EngagementPage::statusOptions();
                         </div>
                     </div>
                     <div>
-                        <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'View'))
+                        <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'View'))
                             ->link(Url::toViewInSpace($page))
                             ->sm() ?>
                         <?php if ($page->canManage()): ?>
-                            <?= Button::primary(Yii::t('EngagementPagesModule.base', 'Edit page'))
+                            <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', 'Edit page'))
                                 ->link(Url::toEdit($page))
                                 ->sm() ?>
                         <?php endif; ?>
@@ -64,28 +64,28 @@ $statusOptions = EngagementPage::statusOptions();
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <strong><?= Yii::t('EngagementPagesModule.base', 'Page templates') ?></strong>
+        <strong><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page templates') ?></strong>
     </div>
     <div class="panel-body ep-page-list">
         <?php if (empty($templates)): ?>
             <p class="text-muted">
-                <?= Yii::t('EngagementPagesModule.base', 'No templates yet. Open a page in the builder and choose “Save as template”.') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'No templates yet. Open a page in the builder and choose “Save as template”.') ?>
             </p>
         <?php else: ?>
             <?php foreach ($templates as $template): ?>
                 <div class="ep-page-card ep-page-card--template">
                     <div>
                         <strong><?= Html::encode($template->title) ?></strong>
-                        <?= Badge::warning(Yii::t('EngagementPagesModule.base', 'Template'))->pill() ?>
+                        <?= Badge::warning(Yii::t('ThiscoveryPageBuilderModule.base', 'Template'))->pill() ?>
                     </div>
                     <div class="ep-page-actions">
                         <?php if ($canCreate): ?>
-                            <?= Button::primary(Yii::t('EngagementPagesModule.base', 'Create from template'))
+                            <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', 'Create from template'))
                                 ->link(Url::toCreate($contentContainer, (int) $template->id))
                                 ->sm() ?>
                         <?php endif; ?>
                         <?php if ($template->canManage()): ?>
-                            <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Edit template'))
+                            <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Edit template'))
                                 ->link(Url::toEdit($template))
                                 ->sm() ?>
                         <?php endif; ?>

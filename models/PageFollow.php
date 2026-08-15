@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\models;
+namespace humhub\modules\thiscoveryPageBuilder\models;
 
 use Yii;
 use yii\db\ActiveQuery;
@@ -45,9 +45,9 @@ class PageFollow extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'email' => Yii::t('EngagementPagesModule.base', 'Email'),
-            'created_at' => Yii::t('EngagementPagesModule.base', 'Subscribed'),
-            'page_id' => Yii::t('EngagementPagesModule.base', 'Page'),
+            'email' => Yii::t('ThiscoveryPageBuilderModule.base', 'Email'),
+            'created_at' => Yii::t('ThiscoveryPageBuilderModule.base', 'Subscribed'),
+            'page_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Page'),
         ];
     }
 

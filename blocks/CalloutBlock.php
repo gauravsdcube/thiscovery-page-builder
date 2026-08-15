@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use Yii;
 
@@ -20,7 +20,7 @@ class CalloutBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Callout');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Callout');
     }
 
     public function normalizeSettings(): array

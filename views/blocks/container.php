@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\ContainerBlock;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var ContainerBlock $block */
 /** @var EngagementPage $page */
@@ -28,7 +28,7 @@ $byColumn = $block->childrenByColumn();
             <div class="ep-container__col">
                 <?php foreach ($colChildren as $child): ?>
                     <?php
-                    /** @var \humhub\modules\engagementPages\blocks\BaseBlock|null $childBlock */
+                    /** @var \humhub\modules\thiscoveryPageBuilder\blocks\BaseBlock|null $childBlock */
                     $childBlock = $child['block'] ?? null;
                     if ($childBlock) {
                         echo $childBlock->render($page);

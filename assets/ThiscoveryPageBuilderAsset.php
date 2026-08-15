@@ -5,20 +5,20 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\assets;
+namespace humhub\modules\thiscoveryPageBuilder\assets;
 
 use yii\web\AssetBundle;
 
-class EngagementPagesAsset extends AssetBundle
+class ThiscoveryPageBuilderAsset extends AssetBundle
 {
-    public $sourcePath = '@engagement-pages/resources';
+    public $sourcePath = '@thiscovery-page-builder/resources';
 
     public $css = [
-        'css/engagement-pages.css',
+        'css/thiscovery-page-builder.css',
     ];
 
     public $js = [
-        'js/humhub.engagementPages.js',
+        'js/humhub.thiscoveryPageBuilder.js',
     ];
 
     public $depends = [

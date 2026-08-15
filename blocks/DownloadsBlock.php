@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use Yii;
 
@@ -20,7 +20,7 @@ class DownloadsBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Downloads');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Downloads');
     }
 
     public function normalizeSettings(): array
@@ -70,7 +70,7 @@ class DownloadsBlock extends BaseBlock
         return [
             'title' => $this->string(
                 'title',
-                Yii::t('EngagementPagesModule.base', 'Documents')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Documents')
             ),
             'items' => $items,
         ];

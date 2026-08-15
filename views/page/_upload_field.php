@@ -13,7 +13,7 @@
  * @var string $widgetId unique DOM id prefix
  * @var bool $imagesOnly
  * @var string|null $buttonLabel
- * @var \humhub\modules\engagementPages\models\EngagementPage|null $page
+ * @var \humhub\modules\thiscoveryPageBuilder\models\EngagementPage|null $page
  */
 
 use humhub\helpers\Html;
@@ -23,7 +23,7 @@ use humhub\modules\file\widgets\UploadButton;
 use humhub\modules\file\widgets\UploadProgress;
 
 $imagesOnly = $imagesOnly ?? false;
-$buttonLabel = $buttonLabel ?? Yii::t('EngagementPagesModule.base', 'Upload');
+$buttonLabel = $buttonLabel ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Upload');
 $guid = trim((string) ($guid ?? ''));
 $page = $page ?? null;
 $file = ($guid !== '') ? File::findOne(['guid' => $guid]) : null;

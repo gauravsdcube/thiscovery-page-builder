@@ -5,10 +5,10 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\commands;
+namespace humhub\modules\thiscoveryPageBuilder\commands;
 
-use humhub\modules\engagementPages\models\EngagementPage;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -18,7 +18,7 @@ class SmokeController extends Controller
 {
     public function actionIndex()
     {
-        $m = Yii::$app->getModule('engagement-pages');
+        $m = Yii::$app->getModule('thiscovery-page-builder');
         $this->stdout('module=' . ($m ? get_class($m) : 'null') . "\n", Console::FG_GREEN);
         $this->stdout('table=' . (Yii::$app->db->getTableSchema('engagement_page') ? 'yes' : 'no') . "\n");
         $this->stdout('types=' . implode(',', array_keys(BlockRegistry::types())) . "\n");

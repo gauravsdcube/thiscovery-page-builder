@@ -6,9 +6,9 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\SurveyCtaBlock;
-use humhub\modules\engagementPages\helpers\RichHtml;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\SurveyCtaBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\RichHtml;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\widgets\bootstrap\Button;
 
 /** @var SurveyCtaBlock $block */
@@ -19,7 +19,7 @@ $form = $block->getForm();
 $formUrl = $block->getFormUrl();
 $label = $settings['button_label'] !== ''
     ? $settings['button_label']
-    : Yii::t('EngagementPagesModule.base', 'Take the survey');
+    : Yii::t('ThiscoveryPageBuilderModule.base', 'Take the survey');
 ?>
 <section class="ep-block ep-survey-cta">
     <?php if ($settings['intro'] !== ''): ?>
@@ -35,7 +35,7 @@ $label = $settings['button_label'] !== ''
         <?php endif; ?>
     <?php else: ?>
         <p class="text-muted">
-            <?= Yii::t('EngagementPagesModule.base', $settings['form_id'] ? 'Form unavailable' : 'No form selected') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', $settings['form_id'] ? 'Form unavailable' : 'No form selected') ?>
         </p>
     <?php endif; ?>
 </section>

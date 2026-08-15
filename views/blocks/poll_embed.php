@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\PollEmbedBlock;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\PollEmbedBlock;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\modules\thiscoveryForms\widgets\PollEmbed;
 
 /** @var PollEmbedBlock $block */
@@ -21,7 +21,7 @@ $form = $block->getForm();
         <?= PollEmbed::widget(['form' => $form, 'compact' => false]) ?>
     <?php else: ?>
         <p class="text-muted">
-            <?= Yii::t('EngagementPagesModule.base', $settings['form_id'] ? 'Form unavailable' : 'No poll selected') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', $settings['form_id'] ? 'Form unavailable' : 'No poll selected') ?>
         </p>
     <?php endif; ?>
 </section>

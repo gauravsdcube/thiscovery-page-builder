@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use Yii;
 
@@ -20,7 +20,7 @@ class HeroBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Hero');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Hero');
     }
 
     public function normalizeSettings(): array

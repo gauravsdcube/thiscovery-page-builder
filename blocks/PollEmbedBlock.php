@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use humhub\modules\thiscoveryForms\models\CustomForm;
 use Yii;
@@ -21,7 +21,7 @@ class PollEmbedBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Quick poll');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Quick poll');
     }
 
     public function normalizeSettings(): array

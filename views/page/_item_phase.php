@@ -14,17 +14,17 @@ use humhub\helpers\Html;
 <div class="ep-repeat-item" data-ep-repeat-item>
     <div class="row g-2">
         <div class="col-md-6 form-group">
-            <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Phase label') ?></label>
+            <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Phase label') ?></label>
             <input type="text" class="form-control" name="<?= $namePrefix ?>[label]"
                    value="<?= Html::encode($item['label'] ?? '') ?>">
         </div>
         <div class="col-md-6 form-group">
-            <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Status') ?></label>
+            <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Status') ?></label>
             <select class="form-control" name="<?= $namePrefix ?>[status]">
                 <?php foreach ([
-                    'done' => Yii::t('EngagementPagesModule.base', 'Completed'),
-                    'current' => Yii::t('EngagementPagesModule.base', 'Current'),
-                    'upcoming' => Yii::t('EngagementPagesModule.base', 'Upcoming'),
+                    'done' => Yii::t('ThiscoveryPageBuilderModule.base', 'Completed'),
+                    'current' => Yii::t('ThiscoveryPageBuilderModule.base', 'Current'),
+                    'upcoming' => Yii::t('ThiscoveryPageBuilderModule.base', 'Upcoming'),
                 ] as $value => $label): ?>
                     <option value="<?= Html::encode($value) ?>" <?= ($item['status'] ?? 'upcoming') === $value ? 'selected' : '' ?>>
                         <?= Html::encode($label) ?>
@@ -34,12 +34,12 @@ use humhub\helpers\Html;
         </div>
     </div>
     <div class="form-group">
-        <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Description') ?></label>
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Description') ?></label>
         <input type="text" class="form-control" name="<?= $namePrefix ?>[description]"
                value="<?= Html::encode($item['description'] ?? '') ?>">
     </div>
     <button type="button" class="btn btn-light btn-sm" data-ep-repeat-remove>
-        <i class="fa fa-times"></i> <?= Yii::t('EngagementPagesModule.base', 'Remove') ?>
+        <i class="fa fa-times"></i> <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Remove') ?>
     </button>
     <hr>
 </div>

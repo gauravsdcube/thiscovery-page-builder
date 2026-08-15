@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\permissions;
+namespace humhub\modules\thiscoveryPageBuilder\permissions;
 
 use humhub\libs\BasePermission;
 use humhub\modules\space\models\Space;
@@ -26,17 +26,17 @@ class ManagePages extends BasePermission
         Space::USERGROUP_GUEST,
     ];
 
-    protected $moduleId = 'engagement-pages';
+    protected $moduleId = 'thiscovery-page-builder';
 
     public function getTitle()
     {
-        return Yii::t('EngagementPagesModule.base', 'Manage engagement pages');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Manage engagement pages');
     }
 
     public function getDescription()
     {
         return Yii::t(
-            'EngagementPagesModule.base',
+            'ThiscoveryPageBuilderModule.base',
             'Allows editing and deleting engagement project pages in this space.'
         );
     }

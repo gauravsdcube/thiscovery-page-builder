@@ -7,10 +7,10 @@
 
 use humhub\helpers\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
-use humhub\modules\engagementPages\assets\EngagementPagesAsset;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\models\EngagementPage;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\assets\ThiscoveryPageBuilderAsset;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use humhub\modules\thiscoveryEditor\widgets\EditorField;
 use humhub\widgets\bootstrap\Button;
 
@@ -22,7 +22,7 @@ use humhub\widgets\bootstrap\Button;
 /** @var array $pollOptions */
 /** @var EngagementPage[]|null $templates */
 
-EngagementPagesAsset::register($this);
+ThiscoveryPageBuilderAsset::register($this);
 
 $isDirectory = $page->isDirectoryHome();
 $isTemplate = $page->isTemplate();
@@ -30,12 +30,12 @@ $templates = $templates ?? [];
 $pollOptions = $pollOptions ?? [];
 $publicPrefix = EngagementPage::publicPrefix();
 $this->title = $isNew
-    ? Yii::t('EngagementPagesModule.base', 'Create page')
+    ? Yii::t('ThiscoveryPageBuilderModule.base', 'Create page')
     : ($isDirectory
-        ? Yii::t('EngagementPagesModule.base', 'Edit homepage')
+        ? Yii::t('ThiscoveryPageBuilderModule.base', 'Edit homepage')
         : ($isTemplate
-            ? Yii::t('EngagementPagesModule.base', 'Edit template')
-            : Yii::t('EngagementPagesModule.base', 'Edit page')));
+            ? Yii::t('ThiscoveryPageBuilderModule.base', 'Edit template')
+            : Yii::t('ThiscoveryPageBuilderModule.base', 'Edit page')));
 
 $sections = $page->getSections();
 $grouped = BlockRegistry::groupByRegion($sections);
@@ -45,23 +45,23 @@ $palette = BlockRegistry::palette();
 $layoutOptions = BlockRegistry::layoutOptions();
 
 $regionLabels = [
-    BlockRegistry::REGION_FULL => Yii::t('EngagementPagesModule.base', 'Full width'),
-    BlockRegistry::REGION_LEFT => Yii::t('EngagementPagesModule.base', 'Left column'),
-    BlockRegistry::REGION_MAIN => Yii::t('EngagementPagesModule.base', 'Main column'),
-    BlockRegistry::REGION_RIGHT => Yii::t('EngagementPagesModule.base', 'Right column'),
+    BlockRegistry::REGION_FULL => Yii::t('ThiscoveryPageBuilderModule.base', 'Full width'),
+    BlockRegistry::REGION_LEFT => Yii::t('ThiscoveryPageBuilderModule.base', 'Left column'),
+    BlockRegistry::REGION_MAIN => Yii::t('ThiscoveryPageBuilderModule.base', 'Main column'),
+    BlockRegistry::REGION_RIGHT => Yii::t('ThiscoveryPageBuilderModule.base', 'Right column'),
 ];
 
-$this->registerJsConfig('engagementPages', [
-    'untitled' => Yii::t('EngagementPagesModule.base', 'Untitled section'),
+$this->registerJsConfig('thiscoveryPageBuilder', [
+    'untitled' => Yii::t('ThiscoveryPageBuilderModule.base', 'Untitled section'),
     'types' => $blockLabels,
-    'clearConfirm' => Yii::t('EngagementPagesModule.base', 'Remove all sections from this page?'),
-    'copied' => Yii::t('EngagementPagesModule.base', 'Copied!'),
-    'noContainerInContainer' => Yii::t('EngagementPagesModule.base', 'Containers cannot be nested. Drop the container into a column instead.'),
-    'columnLabel' => Yii::t('EngagementPagesModule.base', 'Column {n}'),
-    'needTitle' => Yii::t('EngagementPagesModule.base', 'Please enter a page title before saving.'),
-    'needSlug' => Yii::t('EngagementPagesModule.base', 'Please enter a URL slug before saving.'),
+    'clearConfirm' => Yii::t('ThiscoveryPageBuilderModule.base', 'Remove all sections from this page?'),
+    'copied' => Yii::t('ThiscoveryPageBuilderModule.base', 'Copied!'),
+    'noContainerInContainer' => Yii::t('ThiscoveryPageBuilderModule.base', 'Containers cannot be nested. Drop the container into a column instead.'),
+    'columnLabel' => Yii::t('ThiscoveryPageBuilderModule.base', 'Column {n}'),
+    'needTitle' => Yii::t('ThiscoveryPageBuilderModule.base', 'Please enter a page title before saving.'),
+    'needSlug' => Yii::t('ThiscoveryPageBuilderModule.base', 'Please enter a URL slug before saving.'),
 ]);
-$this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");', \yii\web\View::POS_READY);
+$this->registerJs('humhub.require("thiscoveryPageBuilder").initBuilder("#ep-builder");', \yii\web\View::POS_READY);
 ?>
 
 <div class="ep-studio panel panel-default" id="ep-builder" data-ep-layout="<?= Html::encode($layout) ?>">
@@ -70,7 +70,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
 
     <?php if ($page->hasErrors()): ?>
         <div class="alert alert-danger ep-studio__errors" role="alert" data-ep-form-errors>
-            <strong><?= Yii::t('EngagementPagesModule.base', 'Could not save the page.') ?></strong>
+            <strong><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Could not save the page.') ?></strong>
             <ul class="mb-0 mt-2">
                 <?php foreach ($page->getErrors() as $attr => $messages): ?>
                     <?php foreach ($messages as $message): ?>
@@ -83,25 +83,25 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
 
     <div class="ep-studio__tabs" role="tablist">
         <button type="button" class="ep-studio__tab is-active" data-ep-tab="builder" role="tab" aria-selected="true">
-            <?= Yii::t('EngagementPagesModule.base', 'Page builder') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page builder') ?>
         </button>
         <button type="button" class="ep-studio__tab" data-ep-tab="settings" role="tab" aria-selected="false">
-            <?= Yii::t('EngagementPagesModule.base', 'Settings') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Settings') ?>
         </button>
         <button type="button" class="ep-studio__tab" data-ep-tab="share" role="tab" aria-selected="false">
-            <?= Yii::t('EngagementPagesModule.base', 'Share') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Share') ?>
         </button>
     </div>
 
     <div class="ep-studio__panel is-active" data-ep-panel="builder">
         <div class="ep-studio__workspace">
             <aside class="ep-studio__palette" data-ep-palette>
-                <div class="ep-palette__title"><?= Yii::t('EngagementPagesModule.base', 'Add sections') ?></div>
+                <div class="ep-palette__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Add sections') ?></div>
                 <?php
                 $groups = [
-                    'layout' => Yii::t('EngagementPagesModule.base', 'Layout'),
-                    'content' => Yii::t('EngagementPagesModule.base', 'Content'),
-                    'engagement' => Yii::t('EngagementPagesModule.base', 'Engagement'),
+                    'layout' => Yii::t('ThiscoveryPageBuilderModule.base', 'Layout'),
+                    'content' => Yii::t('ThiscoveryPageBuilderModule.base', 'Content'),
+                    'engagement' => Yii::t('ThiscoveryPageBuilderModule.base', 'Engagement'),
                 ];
                 foreach ($groups as $groupKey => $groupLabel):
                     $items = array_filter($palette, static fn($p) => $p['group'] === $groupKey);
@@ -125,14 +125,14 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                 <?php endforeach; ?>
 
                 <button type="button" class="btn btn-sm btn-dark ep-palette__clear" data-ep-clear-sections>
-                    <?= Yii::t('EngagementPagesModule.base', 'Clear') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Clear') ?>
                 </button>
             </aside>
 
             <div class="ep-studio__canvas" data-ep-canvas>
                 <div class="ep-layout-bar">
                     <label class="ep-layout-bar__label" for="ep-layout-select">
-                        <?= Yii::t('EngagementPagesModule.base', 'Columns') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Columns') ?>
                     </label>
                     <select id="ep-layout-select" class="form-control ep-layout-bar__select"
                             name="EngagementPage[layout]" data-ep-layout-select>
@@ -143,7 +143,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                         <?php endforeach; ?>
                     </select>
                     <label class="ep-layout-bar__label" for="ep-width-select">
-                        <?= Yii::t('EngagementPagesModule.base', 'Page width') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page width') ?>
                     </label>
                     <select id="ep-width-select" class="form-control ep-layout-bar__select"
                             name="EngagementPage[page_width]" data-ep-page-width>
@@ -154,15 +154,15 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                         <?php endforeach; ?>
                     </select>
                     <p class="ep-layout-bar__hint">
-                        <?= Yii::t('EngagementPagesModule.base', 'Choose columns for the canvas, and the public page width for this client.') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Choose columns for the canvas, and the public page width for this client.') ?>
                     </p>
                 </div>
 
                 <div class="ep-edit-stage d-none" data-ep-edit-stage aria-hidden="true">
                     <div class="ep-edit-stage__bar">
-                        <strong><?= Yii::t('EngagementPagesModule.base', 'Edit section') ?></strong>
+                        <strong><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Edit section') ?></strong>
                         <button type="button" class="btn btn-sm btn-primary" data-ep-edit-done>
-                            <?= Yii::t('EngagementPagesModule.base', 'Done') ?>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Done') ?>
                         </button>
                     </div>
                     <div class="ep-edit-stage__body" data-ep-edit-stage-body></div>
@@ -171,8 +171,8 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                 <div class="ep-canvas-empty<?= !empty($sections) ? ' d-none' : '' ?>" data-ep-empty>
                     <div class="ep-canvas-empty__inner">
                         <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
-                        <p><?= Yii::t('EngagementPagesModule.base', 'Drag a section or container into a column.') ?></p>
-                        <span><?= Yii::t('EngagementPagesModule.base', 'Or click a palette item to add it to the main column.') ?></span>
+                        <p><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Drag a section or container into a column.') ?></p>
+                        <span><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Or click a palette item to add it to the main column.') ?></span>
                     </div>
                 </div>
 
@@ -227,10 +227,10 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
 
     <div class="ep-studio__panel" data-ep-panel="settings">
         <div class="ep-studio__settings">
-            <h5 class="ep-section__title"><?= Yii::t('EngagementPagesModule.base', 'Page details') ?></h5>
+            <h5 class="ep-section__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page details') ?></h5>
 
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Title') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?></label>
                 <input type="text" class="form-control form-control-lg" name="EngagementPage[title]" value="<?= Html::encode($page->title) ?>" required>
                 <?php if ($page->hasErrors('title')): ?>
                     <div class="help-block help-block-error"><?= Html::encode(implode(' ', $page->getErrors('title'))) ?></div>
@@ -238,7 +238,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
             </div>
 
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'URL slug') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'URL slug') ?></label>
                 <?php if ($isDirectory): ?>
                     <div class="input-group">
                         <span class="input-group-text">/</span>
@@ -248,7 +248,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                                data-ep-home-slug>
                     </div>
                     <div class="ep-hint text-muted">
-                        <?= Yii::t('EngagementPagesModule.base', 'Public homepage URL. Other pages are nested under this path, for example /your-slug/another-page.') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public homepage URL. Other pages are nested under this path, for example /your-slug/another-page.') ?>
                     </div>
                     <?php if ($page->hasErrors('slug')): ?>
                         <div class="help-block help-block-error"><?= Html::encode(implode(' ', $page->getErrors('slug'))) ?></div>
@@ -259,7 +259,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                         <input type="text" class="form-control" name="EngagementPage[slug]" value="<?= Html::encode($page->slug) ?>" required>
                     </div>
                     <div class="ep-hint text-muted">
-                        <?= Yii::t('EngagementPagesModule.base', 'Custom URL path for this page. Use lowercase letters, numbers, and hyphens.') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Custom URL path for this page. Use lowercase letters, numbers, and hyphens.') ?>
                     </div>
                     <?php if ($page->hasErrors('slug')): ?>
                         <div class="help-block help-block-error"><?= Html::encode(implode(' ', $page->getErrors('slug'))) ?></div>
@@ -268,15 +268,15 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
             </div>
 
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Summary') ?>
-                    <span class="ep-optional"><?= Yii::t('EngagementPagesModule.base', 'optional') ?></span>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Summary') ?>
+                    <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
                 </label>
                 <div class="ep-rich-editor" data-ep-rich-editor>
                     <?= EditorField::widget([
                         'id' => 'ep-page-summary',
                         'name' => 'EngagementPage[summary]',
                         'value' => (string) $page->summary,
-                        'placeholder' => Yii::t('EngagementPagesModule.base', 'Short summary for directories…'),
+                        'placeholder' => Yii::t('ThiscoveryPageBuilderModule.base', 'Short summary for directories…'),
                         'height' => 180,
                         'profile' => 'simple',
                     ]) ?>
@@ -284,12 +284,12 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
             </div>
 
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Status') ?></label>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Status') ?></label>
                 <?php if ($isTemplate): ?>
                     <input type="hidden" name="EngagementPage[status]" value="<?= (int) EngagementPage::STATUS_DRAFT ?>">
                     <input type="hidden" name="EngagementPage[is_template]" value="1">
                     <p class="ep-hint text-muted mb-0">
-                        <?= Yii::t('EngagementPagesModule.base', 'Templates stay as drafts and are not published publicly.') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Templates stay as drafts and are not published publicly.') ?>
                     </p>
                 <?php else: ?>
                     <select class="form-control" name="EngagementPage[status]" style="max-width:280px">
@@ -304,7 +304,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
 
             <div class="form-group">
                 <label class="ep-label" for="ep-width-select-settings">
-                    <?= Yii::t('EngagementPagesModule.base', 'Page width') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page width') ?>
                 </label>
                 <select id="ep-width-select-settings" class="form-control" name="EngagementPage[page_width]"
                         data-ep-page-width style="max-width:320px">
@@ -315,13 +315,13 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                     <?php endforeach; ?>
                 </select>
                 <div class="ep-hint text-muted">
-                    <?= Yii::t('EngagementPagesModule.base', 'Controls how wide this page appears publicly. Wide is 1440px; Full uses the browser width with side padding.') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Controls how wide this page appears publicly. Wide is 1440px; Full uses the browser width with side padding.') ?>
                 </div>
             </div>
 
             <?php if (!$isTemplate): ?>
                 <div class="form-group">
-                    <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Who can view') ?></label>
+                    <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Who can view') ?></label>
                     <select class="form-control" name="EngagementPage[audience]" style="max-width:360px">
                         <?php foreach (EngagementPage::audienceOptions() as $value => $label): ?>
                             <option value="<?= Html::encode($value) ?>" <?= $page->getAudienceKey() === $value ? 'selected' : '' ?>>
@@ -330,26 +330,26 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                         <?php endforeach; ?>
                     </select>
                     <div class="ep-hint text-muted">
-                        <?= Yii::t('EngagementPagesModule.base', 'Public pages are open to guests. Community members only requires sign-in.') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public pages are open to guests. Community members only requires sign-in.') ?>
                     </div>
                 </div>
             <?php else: ?>
                 <input type="hidden" name="EngagementPage[audience]" value="<?= Html::encode(EngagementPage::AUDIENCE_PUBLIC) ?>">
             <?php endif; ?>
 
-            <h5 class="ep-section__title" style="margin-top:1.75rem"><?= Yii::t('EngagementPagesModule.base', 'Directory listing') ?></h5>
+            <h5 class="ep-section__title" style="margin-top:1.75rem"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Directory listing') ?></h5>
             <?php if ($isTemplate): ?>
                 <input type="hidden" name="EngagementPage[listed]" value="0">
                 <input type="hidden" name="EngagementPage[featured]" value="0">
                 <p class="ep-hint text-muted">
-                    <?= Yii::t('EngagementPagesModule.base', 'Templates are never listed on the public homepage. Use “Create from template” on the page list.') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Templates are never listed on the public homepage. Use “Create from template” on the page list.') ?>
                 </p>
             <?php elseif ($isDirectory): ?>
                 <input type="hidden" name="EngagementPage[listed]" value="0">
                 <input type="hidden" name="EngagementPage[featured]" value="0">
                 <input type="hidden" name="EngagementPage[is_directory]" value="1">
                 <p class="ep-hint text-muted">
-                    <?= Yii::t('EngagementPagesModule.base', 'Add a Collection section in the builder to list pages, forms, or spaces. This homepage is never listed as a card on itself.') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Add a Collection section in the builder to list pages, forms, or spaces. This homepage is never listed as a card on itself.') ?>
                 </p>
             <?php else: ?>
                 <div class="form-check mb-2">
@@ -357,7 +357,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                     <input class="form-check-input" type="checkbox" value="1" name="EngagementPage[listed]" id="ep-listed"
                         <?= !empty($page->listed) || $page->isNewRecord ? 'checked' : '' ?>>
                     <label class="form-check-label" for="ep-listed">
-                        <?= Yii::t('EngagementPagesModule.base', 'Show in public directory') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Show in public directory') ?>
                     </label>
                 </div>
                 <div class="form-check mb-3">
@@ -365,23 +365,23 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                     <input class="form-check-input" type="checkbox" value="1" name="EngagementPage[featured]" id="ep-featured"
                         <?= !empty($page->featured) ? 'checked' : '' ?>>
                     <label class="form-check-label" for="ep-featured">
-                        <?= Yii::t('EngagementPagesModule.base', 'Featured on directory') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Featured on directory') ?>
                     </label>
                 </div>
             <?php endif; ?>
             <?php if (!$isDirectory): ?>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Category') ?>
-                    <span class="ep-optional"><?= Yii::t('EngagementPagesModule.base', 'optional') ?></span>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Category') ?>
+                    <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
                 </label>
                 <input type="text" class="form-control" name="EngagementPage[category]"
                        value="<?= Html::encode((string) $page->category) ?>"
-                       placeholder="<?= Yii::t('EngagementPagesModule.base', 'e.g. Consultation, Survey') ?>"
+                       placeholder="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'e.g. Consultation, Survey') ?>"
                        style="max-width:320px">
             </div>
             <div class="form-group">
-                <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Closes at') ?>
-                    <span class="ep-optional"><?= Yii::t('EngagementPagesModule.base', 'optional') ?></span>
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Closes at') ?>
+                    <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
                 </label>
                 <input type="date" class="form-control" name="EngagementPage[closes_at]"
                        value="<?= Html::encode($page->closes_at ? date('Y-m-d', strtotime((string) $page->closes_at)) : '') ?>"
@@ -393,28 +393,28 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
 
     <div class="ep-studio__panel" data-ep-panel="share">
         <div class="ep-studio__settings">
-            <h5 class="ep-section__title"><?= Yii::t('EngagementPagesModule.base', 'Public URL') ?></h5>
+            <h5 class="ep-section__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public URL') ?></h5>
             <?php if ($isNew): ?>
                 <p class="ep-hint text-muted">
-                    <?= Yii::t('EngagementPagesModule.base', 'Save the page first to generate a shareable link.') ?>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Save the page first to generate a shareable link.') ?>
                 </p>
             <?php else: ?>
                 <div class="form-group">
-                    <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Public link') ?></label>
+                    <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public link') ?></label>
                     <div class="input-group">
                         <input type="text" class="form-control" readonly value="<?= Html::encode($shareUrl) ?>" data-ep-share-url>
                         <button type="button" class="btn btn-primary" data-ep-copy-url>
                             <i class="fa fa-clipboard"></i>
-                            <?= Yii::t('EngagementPagesModule.base', 'Copy link') ?>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Copy link') ?>
                         </button>
                     </div>
                     <div class="ep-copy-feedback text-success d-none" data-ep-copy-feedback>
-                        <?= Yii::t('EngagementPagesModule.base', 'Copied!') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Copied!') ?>
                     </div>
                 </div>
                 <p>
                     <a href="<?= Html::encode(Url::toPublic($page)) ?>" target="_blank" rel="noopener">
-                        <?= Yii::t('EngagementPagesModule.base', 'Open public page') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open public page') ?>
                         <i class="fa fa-external-link"></i>
                     </a>
                 </p>
@@ -439,34 +439,34 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
         $templateSettings = match ($type) {
             'downloads' => ['items' => [['label' => '', 'file_guid' => '', 'alt' => '']]],
             'container' => [
-                'title' => Yii::t('EngagementPagesModule.base', 'Container'),
+                'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Container'),
                 'show_title' => true,
                 'columns' => 2,
             ],
-            'phases' => ['title' => Yii::t('EngagementPagesModule.base', 'Project phases'), 'style' => 'linear', 'items' => [['label' => '', 'description' => '', 'status' => 'upcoming']]],
-            'events' => ['title' => Yii::t('EngagementPagesModule.base', 'Upcoming events'), 'items' => [['title' => '', 'date' => '', 'time' => '', 'location' => '', 'url' => '', 'cta_label' => Yii::t('EngagementPagesModule.base', 'Register')]]],
-            'team' => ['title' => Yii::t('EngagementPagesModule.base', 'Meet the team'), 'people' => [['name' => '', 'role' => '', 'email' => '', 'phone' => '', 'bio' => '']]],
-            'contact' => ['title' => Yii::t('EngagementPagesModule.base', 'Contact us'), 'show_email_link' => true],
+            'phases' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Project phases'), 'style' => 'linear', 'items' => [['label' => '', 'description' => '', 'status' => 'upcoming']]],
+            'events' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Upcoming events'), 'items' => [['title' => '', 'date' => '', 'time' => '', 'location' => '', 'url' => '', 'cta_label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Register')]]],
+            'team' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Meet the team'), 'people' => [['name' => '', 'role' => '', 'email' => '', 'phone' => '', 'bio' => '']]],
+            'contact' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Contact us'), 'show_email_link' => true],
             'updates' => [],
             'comments' => [
-                'title' => Yii::t('EngagementPagesModule.base', 'Comments'),
+                'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Comments'),
                 'allow_guests' => true,
                 'ask_name' => true,
                 'require_email' => true,
                 'moderate_guests' => true,
                 'show_comments' => true,
             ],
-            'accordion' => ['title' => Yii::t('EngagementPagesModule.base', 'Frequently asked questions'), 'items' => [['heading' => '', 'body' => '']]],
+            'accordion' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Frequently asked questions'), 'items' => [['heading' => '', 'body' => '']]],
             'callout' => ['tone' => 'info'],
             'image' => [],
             'directory' => [
-                'title' => Yii::t('EngagementPagesModule.base', 'Open for feedback'),
+                'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback'),
                 'source' => 'pages',
                 'show_featured_first' => true,
                 'event_limit' => 5,
             ],
             'collection' => [
-                'title' => Yii::t('EngagementPagesModule.base', 'Open for feedback'),
+                'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback'),
                 'source' => 'pages',
                 'show_featured_first' => true,
                 'event_limit' => 5,
@@ -512,7 +512,7 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
     <script type="text/template" id="ep-repeat-template-events">
         <?= $this->render('_item_event', [
             'namePrefix' => 'sections[__SEC__][settings][items][__ROW__]',
-            'item' => ['title' => '', 'date' => '', 'time' => '', 'location' => '', 'url' => '', 'cta_label' => Yii::t('EngagementPagesModule.base', 'Register')],
+            'item' => ['title' => '', 'date' => '', 'time' => '', 'location' => '', 'url' => '', 'cta_label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Register')],
         ]) ?>
     </script>
     <script type="text/template" id="ep-repeat-template-team">
@@ -530,15 +530,15 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
     </script>
 
     <div class="ep-studio__footer">
-        <?= Button::light(Yii::t('EngagementPagesModule.base', 'Cancel'))
+        <?= Button::light(Yii::t('ThiscoveryPageBuilderModule.base', 'Cancel'))
             ->link(Url::toIndex($contentContainer)) ?>
         <?php if (!$isNew && !$isDirectory && !$isTemplate): ?>
             <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#ep-save-template-modal">
                 <i class="fa fa-files-o"></i>
-                <?= Yii::t('EngagementPagesModule.base', 'Save as template') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Save as template') ?>
             </button>
         <?php endif; ?>
-        <?= Button::save(Yii::t('EngagementPagesModule.base', $isTemplate ? 'Save template' : 'Save page'))->submit()->icon('floppy-o') ?>
+        <?= Button::save(Yii::t('ThiscoveryPageBuilderModule.base', $isTemplate ? 'Save template' : 'Save page'))->submit()->icon('floppy-o') ?>
     </div>
 
     <?= Html::endForm() ?>
@@ -550,25 +550,25 @@ $this->registerJs('humhub.require("engagementPages").initBuilder("#ep-builder");
                     <?= Html::beginForm(Url::toSaveTemplate($page), 'post') ?>
                     <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
                     <div class="modal-header">
-                        <h5 class="modal-title"><?= Yii::t('EngagementPagesModule.base', 'Save as template') ?></h5>
+                        <h5 class="modal-title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Save as template') ?></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <p class="text-muted">
-                            <?= Yii::t('EngagementPagesModule.base', 'Creates a reusable copy of this page’s layout, width, and sections. File uploads stay shared by GUID.') ?>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Creates a reusable copy of this page’s layout, width, and sections. File uploads stay shared by GUID.') ?>
                         </p>
                         <div class="form-group mb-0">
-                            <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Template name') ?></label>
+                            <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Template name') ?></label>
                             <input type="text" class="form-control" name="template_title"
                                    value="<?= Html::encode($page->title) ?>" required>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            <?= Yii::t('EngagementPagesModule.base', 'Cancel') ?>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Cancel') ?>
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <?= Yii::t('EngagementPagesModule.base', 'Save template') ?>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Save template') ?>
                         </button>
                     </div>
                     <?= Html::endForm() ?>

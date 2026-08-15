@@ -5,24 +5,24 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\services;
+namespace humhub\modules\thiscoveryPageBuilder\services;
 
-use humhub\modules\engagementPages\blocks\AccordionBlock;
-use humhub\modules\engagementPages\blocks\CalloutBlock;
-use humhub\modules\engagementPages\blocks\CollectionBlock;
-use humhub\modules\engagementPages\blocks\CommentsBlock;
-use humhub\modules\engagementPages\blocks\ContactBlock;
-use humhub\modules\engagementPages\blocks\ContainerBlock;
-use humhub\modules\engagementPages\blocks\DownloadsBlock;
-use humhub\modules\engagementPages\blocks\EventsBlock;
-use humhub\modules\engagementPages\blocks\HeroBlock;
-use humhub\modules\engagementPages\blocks\ImageBlock;
-use humhub\modules\engagementPages\blocks\PhasesBlock;
-use humhub\modules\engagementPages\blocks\PollEmbedBlock;
-use humhub\modules\engagementPages\blocks\RichTextBlock;
-use humhub\modules\engagementPages\blocks\SurveyCtaBlock;
-use humhub\modules\engagementPages\blocks\TeamBlock;
-use humhub\modules\engagementPages\blocks\UpdatesBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\AccordionBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\CalloutBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\CollectionBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\CommentsBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\ContactBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\DownloadsBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\EventsBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\HeroBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\ImageBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\PhasesBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\PollEmbedBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\RichTextBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\SurveyCtaBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\TeamBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\UpdatesBlock;
 use Yii;
 
 class BlockRegistry
@@ -108,10 +108,10 @@ class BlockRegistry
     public static function layoutOptions(): array
     {
         return [
-            self::LAYOUT_MAIN => Yii::t('EngagementPagesModule.base', 'Main column only'),
-            self::LAYOUT_LEFT => Yii::t('EngagementPagesModule.base', 'Left + main'),
-            self::LAYOUT_RIGHT => Yii::t('EngagementPagesModule.base', 'Main + right'),
-            self::LAYOUT_BOTH => Yii::t('EngagementPagesModule.base', 'Left + main + right'),
+            self::LAYOUT_MAIN => Yii::t('ThiscoveryPageBuilderModule.base', 'Main column only'),
+            self::LAYOUT_LEFT => Yii::t('ThiscoveryPageBuilderModule.base', 'Left + main'),
+            self::LAYOUT_RIGHT => Yii::t('ThiscoveryPageBuilderModule.base', 'Main + right'),
+            self::LAYOUT_BOTH => Yii::t('ThiscoveryPageBuilderModule.base', 'Left + main + right'),
         ];
     }
 

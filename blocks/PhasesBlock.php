@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use Yii;
 
@@ -20,7 +20,7 @@ class PhasesBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Phases');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Phases');
     }
 
     public function normalizeSettings(): array
@@ -46,7 +46,7 @@ class PhasesBlock extends BaseBlock
         }
 
         return [
-            'title' => $this->string('title', Yii::t('EngagementPagesModule.base', 'Project phases')),
+            'title' => $this->string('title', Yii::t('ThiscoveryPageBuilderModule.base', 'Project phases')),
             'style' => in_array(($this->settings['style'] ?? ''), ['linear', 'plan'], true)
                 ? (string) $this->settings['style']
                 : 'linear',

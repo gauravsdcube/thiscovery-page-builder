@@ -5,19 +5,19 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\models;
+namespace humhub\modules\thiscoveryPageBuilder\models;
 
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\content\models\Content;
-use humhub\modules\engagementPages\components\PageUrlRule;
-use humhub\modules\engagementPages\helpers\FileHelper;
-use humhub\modules\engagementPages\helpers\RichHtml;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\permissions\CreateGlobalPage;
-use humhub\modules\engagementPages\permissions\CreatePage;
-use humhub\modules\engagementPages\permissions\ManageGlobalPage;
-use humhub\modules\engagementPages\permissions\ManagePages;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\components\PageUrlRule;
+use humhub\modules\thiscoveryPageBuilder\helpers\FileHelper;
+use humhub\modules\thiscoveryPageBuilder\helpers\RichHtml;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\permissions\CreateGlobalPage;
+use humhub\modules\thiscoveryPageBuilder\permissions\CreatePage;
+use humhub\modules\thiscoveryPageBuilder\permissions\ManageGlobalPage;
+use humhub\modules\thiscoveryPageBuilder\permissions\ManagePages;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use humhub\modules\search\interfaces\Searchable;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\components\PermissionManager;
@@ -66,7 +66,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     public const AUDIENCE_PUBLIC = 'public';
     public const AUDIENCE_MEMBERS = 'members';
 
-    public $moduleId = 'engagement-pages';
+    public $moduleId = 'thiscovery-page-builder';
     public $wallEntryClass = null;
     public $silentContentCreation = true;
     public $autoAddToWall = false;
@@ -116,7 +116,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             [['title'], 'string', 'max' => 255],
             [['slug'], 'string', 'max' => 120],
             [['slug'], 'match', 'pattern' => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                'message' => Yii::t('EngagementPagesModule.base', 'Slug may only contain lowercase letters, numbers, and hyphens.')],
+                'message' => Yii::t('ThiscoveryPageBuilderModule.base', 'Slug may only contain lowercase letters, numbers, and hyphens.')],
             [['slug'], 'unique'],
             [['slug'], 'validateSlugReserved'],
             [['summary', 'sections_json'], 'string'],
@@ -140,18 +140,18 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     public function attributeLabels()
     {
         return [
-            'title' => Yii::t('EngagementPagesModule.base', 'Title'),
-            'slug' => Yii::t('EngagementPagesModule.base', 'URL slug'),
-            'summary' => Yii::t('EngagementPagesModule.base', 'Summary'),
-            'status' => Yii::t('EngagementPagesModule.base', 'Status'),
-            'layout' => Yii::t('EngagementPagesModule.base', 'Page layout'),
-            'page_width' => Yii::t('EngagementPagesModule.base', 'Page width'),
-            'audience' => Yii::t('EngagementPagesModule.base', 'Who can view'),
-            'listed' => Yii::t('EngagementPagesModule.base', 'Show in directory'),
-            'featured' => Yii::t('EngagementPagesModule.base', 'Featured'),
-            'is_template' => Yii::t('EngagementPagesModule.base', 'Page template'),
-            'category' => Yii::t('EngagementPagesModule.base', 'Category'),
-            'closes_at' => Yii::t('EngagementPagesModule.base', 'Closes at'),
+            'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Title'),
+            'slug' => Yii::t('ThiscoveryPageBuilderModule.base', 'URL slug'),
+            'summary' => Yii::t('ThiscoveryPageBuilderModule.base', 'Summary'),
+            'status' => Yii::t('ThiscoveryPageBuilderModule.base', 'Status'),
+            'layout' => Yii::t('ThiscoveryPageBuilderModule.base', 'Page layout'),
+            'page_width' => Yii::t('ThiscoveryPageBuilderModule.base', 'Page width'),
+            'audience' => Yii::t('ThiscoveryPageBuilderModule.base', 'Who can view'),
+            'listed' => Yii::t('ThiscoveryPageBuilderModule.base', 'Show in directory'),
+            'featured' => Yii::t('ThiscoveryPageBuilderModule.base', 'Featured'),
+            'is_template' => Yii::t('ThiscoveryPageBuilderModule.base', 'Page template'),
+            'category' => Yii::t('ThiscoveryPageBuilderModule.base', 'Category'),
+            'closes_at' => Yii::t('ThiscoveryPageBuilderModule.base', 'Closes at'),
         ];
     }
 
@@ -164,7 +164,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
 
         if ($this->isDirectoryHome() && in_array($slug, self::reservedPrefixSlugs(), true)) {
             $this->addError($attribute, Yii::t(
-                'EngagementPagesModule.base',
+                'ThiscoveryPageBuilderModule.base',
                 'This URL is reserved by the platform. Choose a different homepage slug.'
             ));
             return;
@@ -172,7 +172,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
 
         if (!$this->isDirectoryHome() && in_array($slug, self::reservedChildSlugs(), true)) {
             $this->addError($attribute, Yii::t(
-                'EngagementPagesModule.base',
+                'ThiscoveryPageBuilderModule.base',
                 'This slug is reserved. Choose a different URL slug.'
             ));
         }
@@ -320,7 +320,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         if ($block === null) {
             return null;
         }
-        if ($block instanceof \humhub\modules\engagementPages\blocks\ContainerBlock) {
+        if ($block instanceof \humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock) {
             $block->setChildren((array) ($section['children'] ?? []));
         }
         return $block;
@@ -363,19 +363,19 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     public static function pageWidthOptions(): array
     {
         return [
-            self::WIDTH_NARROW => Yii::t('EngagementPagesModule.base', 'Narrow (720px)'),
-            self::WIDTH_STANDARD => Yii::t('EngagementPagesModule.base', 'Standard (960px)'),
-            self::WIDTH_COMFORTABLE => Yii::t('EngagementPagesModule.base', 'Comfortable (1100px)'),
-            self::WIDTH_WIDE => Yii::t('EngagementPagesModule.base', 'Wide (1440px)'),
-            self::WIDTH_FULL => Yii::t('EngagementPagesModule.base', 'Full browser width'),
+            self::WIDTH_NARROW => Yii::t('ThiscoveryPageBuilderModule.base', 'Narrow (720px)'),
+            self::WIDTH_STANDARD => Yii::t('ThiscoveryPageBuilderModule.base', 'Standard (960px)'),
+            self::WIDTH_COMFORTABLE => Yii::t('ThiscoveryPageBuilderModule.base', 'Comfortable (1100px)'),
+            self::WIDTH_WIDE => Yii::t('ThiscoveryPageBuilderModule.base', 'Wide (1440px)'),
+            self::WIDTH_FULL => Yii::t('ThiscoveryPageBuilderModule.base', 'Full browser width'),
         ];
     }
 
     public static function audienceOptions(): array
     {
         return [
-            self::AUDIENCE_PUBLIC => Yii::t('EngagementPagesModule.base', 'Public (guests and members)'),
-            self::AUDIENCE_MEMBERS => Yii::t('EngagementPagesModule.base', 'Community members only'),
+            self::AUDIENCE_PUBLIC => Yii::t('ThiscoveryPageBuilderModule.base', 'Public (guests and members)'),
+            self::AUDIENCE_MEMBERS => Yii::t('ThiscoveryPageBuilderModule.base', 'Community members only'),
         ];
     }
 
@@ -472,7 +472,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             try {
                 $this->ensureContentRecord();
             } catch (\Throwable $e) {
-                Yii::error('Engagement Pages content repair failed: ' . $e->getMessage(), 'engagement-pages');
+                Yii::error('Engagement Pages content repair failed: ' . $e->getMessage(), 'thiscovery-page-builder');
             }
         }
 
@@ -481,13 +481,13 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         $this->postProcessIfMarkdown((string) $this->summary);
 
         try {
-            $guids = \humhub\modules\engagementPages\helpers\FileHelper::collectGuidsFromSections($this->getSections());
+            $guids = \humhub\modules\thiscoveryPageBuilder\helpers\FileHelper::collectGuidsFromSections($this->getSections());
             // Attach (and reclaim unattached) so guests can download via File::canView → content ACL.
             if ($guids !== []) {
                 $this->fileManager->attach($guids, true);
             }
         } catch (\Throwable $e) {
-            Yii::warning('Engagement Pages file attach failed: ' . $e->getMessage(), 'engagement-pages');
+            Yii::warning('Engagement Pages file attach failed: ' . $e->getMessage(), 'thiscovery-page-builder');
         }
 
         if ($this->isDirectoryHome() && ($insert || array_key_exists('slug', $changedAttributes))) {
@@ -519,7 +519,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
 
     public function getContentName()
     {
-        return Yii::t('EngagementPagesModule.base', 'Page');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Page');
     }
 
     public function getContentDescription()
@@ -544,9 +544,9 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     public static function statusOptions(): array
     {
         return [
-            self::STATUS_DRAFT => Yii::t('EngagementPagesModule.base', 'Draft'),
-            self::STATUS_PUBLISHED => Yii::t('EngagementPagesModule.base', 'Published'),
-            self::STATUS_ARCHIVED => Yii::t('EngagementPagesModule.base', 'Archived'),
+            self::STATUS_DRAFT => Yii::t('ThiscoveryPageBuilderModule.base', 'Draft'),
+            self::STATUS_PUBLISHED => Yii::t('ThiscoveryPageBuilderModule.base', 'Published'),
+            self::STATUS_ARCHIVED => Yii::t('ThiscoveryPageBuilderModule.base', 'Archived'),
         ];
     }
 
@@ -605,7 +605,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         }
 
         $page = new self();
-        $page->title = Yii::t('EngagementPagesModule.base', 'Engagements');
+        $page->title = Yii::t('ThiscoveryPageBuilderModule.base', 'Engagements');
         $page->slug = self::DEFAULT_PUBLIC_PREFIX;
         $page->status = self::STATUS_PUBLISHED;
         $page->layout = BlockRegistry::LAYOUT_MAIN;
@@ -618,9 +618,9 @@ class EngagementPage extends ContentActiveRecord implements Searchable
                 'type' => 'hero',
                 'region' => BlockRegistry::REGION_FULL,
                 'settings' => [
-                    'headline' => Yii::t('EngagementPagesModule.base', 'Shape local health services'),
+                    'headline' => Yii::t('ThiscoveryPageBuilderModule.base', 'Shape local health services'),
                     'subheadline' => Yii::t(
-                        'EngagementPagesModule.base',
+                        'ThiscoveryPageBuilderModule.base',
                         'Browse open consultations and surveys. Tell us what matters to you.'
                     ),
                 ],
@@ -629,7 +629,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
                 'type' => 'collection',
                 'region' => BlockRegistry::REGION_MAIN,
                 'settings' => [
-                    'title' => Yii::t('EngagementPagesModule.base', 'Open for feedback'),
+                    'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback'),
                     'source' => 'pages',
                 ],
             ],
@@ -702,7 +702,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     {
         if ($this->isDirectoryHome()) {
             throw new \InvalidArgumentException(
-                Yii::t('EngagementPagesModule.base', 'The public homepage cannot be saved as a template.')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'The public homepage cannot be saved as a template.')
             );
         }
 
@@ -710,7 +710,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         $tpl = $container ? new self($container) : new self();
         $baseTitle = trim((string) ($title !== null && $title !== '' ? $title : $this->title));
         if ($baseTitle === '') {
-            $baseTitle = Yii::t('EngagementPagesModule.base', 'Untitled template');
+            $baseTitle = Yii::t('ThiscoveryPageBuilderModule.base', 'Untitled template');
         }
         $tpl->title = $baseTitle;
         $tpl->slug = self::uniqueTemplateSlug($baseTitle);
@@ -730,7 +730,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         }
         if (!$tpl->save()) {
             throw new \RuntimeException(
-                Yii::t('EngagementPagesModule.base', 'Could not save template: {errors}', [
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Could not save template: {errors}', [
                     'errors' => Json::encode($tpl->getErrors()),
                 ])
             );
@@ -920,7 +920,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         try {
             \humhub\modules\content\widgets\richtext\RichText::postProcess($text, $this);
         } catch (\Throwable $e) {
-            Yii::warning('Engagement Pages richtext postProcess failed: ' . $e->getMessage(), 'engagement-pages');
+            Yii::warning('Engagement Pages richtext postProcess failed: ' . $e->getMessage(), 'thiscovery-page-builder');
         }
     }
 }

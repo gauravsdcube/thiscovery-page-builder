@@ -6,10 +6,10 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\CommentsBlock;
-use humhub\modules\engagementPages\models\EngagementPage;
-use humhub\modules\engagementPages\models\PageComment;
-use humhub\modules\engagementPages\models\PageCommentForm;
+use humhub\modules\thiscoveryPageBuilder\blocks\CommentsBlock;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\models\PageComment;
+use humhub\modules\thiscoveryPageBuilder\models\PageCommentForm;
 use humhub\widgets\form\CaptchaField;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -45,8 +45,8 @@ if ($commentForm === null) {
     }
 }
 
-$postUrl = Url::to(['/engagement-pages/public/comment', 'slug' => $page->slug]);
-$anonymousLabel = Yii::t('EngagementPagesModule.base', 'Anonymous');
+$postUrl = Url::to(['/thiscovery-page-builder/public/comment', 'slug' => $page->slug]);
+$anonymousLabel = Yii::t('ThiscoveryPageBuilderModule.base', 'Anonymous');
 ?>
 <section class="ep-block ep-comments" id="ep-comments-<?= (int) $page->id ?>">
     <?php if (($settings['title'] ?? '') !== ''): ?>
@@ -58,19 +58,19 @@ $anonymousLabel = Yii::t('EngagementPagesModule.base', 'Anonymous');
 
     <?php if ($flash === 'ok'): ?>
         <div class="ep-comments__success" role="status">
-            <?= Html::encode($settings['success_message'] ?: Yii::t('EngagementPagesModule.base', 'Thanks — your comment has been submitted for review.')) ?>
+            <?= Html::encode($settings['success_message'] ?: Yii::t('ThiscoveryPageBuilderModule.base', 'Thanks — your comment has been submitted for review.')) ?>
         </div>
     <?php elseif ($flash === 'rate'): ?>
         <div class="ep-comments__error" role="alert">
-            <?= Yii::t('EngagementPagesModule.base', 'Please wait a few minutes before posting another comment.') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Please wait a few minutes before posting another comment.') ?>
         </div>
     <?php elseif ($flash === 'denied'): ?>
         <div class="ep-comments__error" role="alert">
-            <?= Yii::t('EngagementPagesModule.base', 'You need to sign in to comment on this page.') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'You need to sign in to comment on this page.') ?>
         </div>
     <?php elseif ($flash === 'save'): ?>
         <div class="ep-comments__error" role="alert">
-            <?= Yii::t('EngagementPagesModule.base', 'Sorry — we could not save your comment. Please try again.') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Sorry — we could not save your comment. Please try again.') ?>
         </div>
     <?php endif; ?>
 
@@ -101,14 +101,14 @@ $anonymousLabel = Yii::t('EngagementPagesModule.base', 'Anonymous');
             </ul>
         <?php else: ?>
             <p class="ep-comments__empty text-muted">
-                <?= Yii::t('EngagementPagesModule.base', 'No comments yet.') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'No comments yet.') ?>
             </p>
         <?php endif; ?>
     <?php endif; ?>
 
     <?php if ($canComment): ?>
         <div class="ep-comments__form-wrap">
-            <h3 class="ep-comments__form-title"><?= Yii::t('EngagementPagesModule.base', 'Leave a comment') ?></h3>
+            <h3 class="ep-comments__form-title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Leave a comment') ?></h3>
             <?php $form = ActiveForm::begin([
                 'action' => $postUrl,
                 'options' => [
@@ -121,7 +121,7 @@ $anonymousLabel = Yii::t('EngagementPagesModule.base', 'Anonymous');
 
                 <?php if ($commentForm->hasErrors()): ?>
                     <div class="ep-comments__error" role="alert">
-                        <?= Yii::t('EngagementPagesModule.base', 'Please check the form and try again.') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Please check the form and try again.') ?>
                         <ul class="ep-comments__error-list">
                             <?php foreach ($commentForm->getFirstErrors() as $message): ?>
                                 <li><?= Html::encode($message) ?></li>
@@ -151,20 +151,20 @@ $anonymousLabel = Yii::t('EngagementPagesModule.base', 'Anonymous');
                 <?php if ($isGuest): ?>
                     <div class="ep-comments__captcha mb-3">
                         <?= $form->field($commentForm, 'captcha')->widget(CaptchaField::class)->label(
-                            Yii::t('EngagementPagesModule.base', 'Verification')
+                            Yii::t('ThiscoveryPageBuilderModule.base', 'Verification')
                         ) ?>
                     </div>
                 <?php endif; ?>
                 <div class="ep-comments__actions">
                     <button type="submit" class="btn btn-primary">
-                        <?= Yii::t('EngagementPagesModule.base', 'Submit comment') ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Submit comment') ?>
                     </button>
                 </div>
             <?php ActiveForm::end(); ?>
         </div>
     <?php elseif ($isGuest): ?>
         <p class="ep-comments__signin text-muted">
-            <?= Yii::t('EngagementPagesModule.base', 'Please sign in to leave a comment.') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Please sign in to leave a comment.') ?>
         </p>
     <?php endif; ?>
 </section>

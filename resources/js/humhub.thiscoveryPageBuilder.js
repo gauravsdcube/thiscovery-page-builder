@@ -3,7 +3,7 @@
  * Copyright (c) 2026 D Cube Consulting. All rights reserved.
  * License: AGPL-3.0-or-later
  */
-humhub.module('engagementPages', function (module, require, $) {
+humhub.module('thiscoveryPageBuilder', function (module, require, $) {
     var initBuilder = function (root) {
         var $root = $(root);
         if (!$root.length) {

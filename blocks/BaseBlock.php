@@ -5,9 +5,9 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use Yii;
 use yii\base\BaseObject;
 
@@ -34,9 +34,9 @@ abstract class BaseBlock extends BaseObject
     public static function alignOptions(): array
     {
         return [
-            self::ALIGN_START => Yii::t('EngagementPagesModule.base', 'Full width'),
-            self::ALIGN_CENTER => Yii::t('EngagementPagesModule.base', 'Centre'),
-            self::ALIGN_END => Yii::t('EngagementPagesModule.base', 'Right'),
+            self::ALIGN_START => Yii::t('ThiscoveryPageBuilderModule.base', 'Full width'),
+            self::ALIGN_CENTER => Yii::t('ThiscoveryPageBuilderModule.base', 'Centre'),
+            self::ALIGN_END => Yii::t('ThiscoveryPageBuilderModule.base', 'Right'),
         ];
     }
 
@@ -195,7 +195,7 @@ abstract class BaseBlock extends BaseObject
     public function render(EngagementPage $page): string
     {
         $html = Yii::$app->view->render(
-            '@engagement-pages/views/blocks/' . $this->getType(),
+            '@thiscovery-page-builder/views/blocks/' . $this->getType(),
             [
                 'block' => $this,
                 'page' => $page,

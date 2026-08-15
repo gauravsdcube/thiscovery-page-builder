@@ -6,9 +6,9 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\AccordionBlock;
-use humhub\modules\engagementPages\helpers\RichHtml;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\AccordionBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\RichHtml;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var AccordionBlock $block */
 /** @var EngagementPage $page */
@@ -28,7 +28,7 @@ $uid = 'ep-acc-' . (int) $page->id . '-' . substr(md5(json_encode($items)), 0, 8
         <?php foreach ($items as $i => $item): ?>
             <?php
             $itemId = $uid . '-' . $i;
-            $heading = ($item['heading'] ?? '') !== '' ? $item['heading'] : Yii::t('EngagementPagesModule.base', 'Details');
+            $heading = ($item['heading'] ?? '') !== '' ? $item['heading'] : Yii::t('ThiscoveryPageBuilderModule.base', 'Details');
             ?>
             <details class="ep-accordion__item" <?= $i === 0 ? 'open' : '' ?>>
                 <summary class="ep-accordion__summary"><?= Html::encode($heading) ?></summary>

@@ -5,10 +5,10 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use humhub\modules\content\components\ContentContainerActiveRecord;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use Yii;
 
 /**
@@ -37,7 +37,7 @@ class CollectionBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Collection');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Collection');
     }
 
     protected function getDefaultAlign(): string
@@ -62,12 +62,12 @@ class CollectionBlock extends BaseBlock
     public static function sourceOptions(): array
     {
         $options = [
-            self::SOURCE_PAGES => Yii::t('EngagementPagesModule.base', 'Pages'),
-            self::SOURCE_FORMS => Yii::t('EngagementPagesModule.base', 'Forms'),
-            self::SOURCE_SPACES => Yii::t('EngagementPagesModule.base', 'Spaces'),
+            self::SOURCE_PAGES => Yii::t('ThiscoveryPageBuilderModule.base', 'Pages'),
+            self::SOURCE_FORMS => Yii::t('ThiscoveryPageBuilderModule.base', 'Forms'),
+            self::SOURCE_SPACES => Yii::t('ThiscoveryPageBuilderModule.base', 'Spaces'),
         ];
         if (self::calendarEnabled()) {
-            $options[self::SOURCE_CALENDAR] = Yii::t('EngagementPagesModule.base', 'Calendar');
+            $options[self::SOURCE_CALENDAR] = Yii::t('ThiscoveryPageBuilderModule.base', 'Calendar');
         }
         return $options;
     }
@@ -106,7 +106,7 @@ class CollectionBlock extends BaseBlock
             $entries = $service->getUpcomingEntries($container, $days, $limit);
             return is_array($entries) ? $entries : [];
         } catch (\Throwable $e) {
-            Yii::warning('Engagement Pages calendar collection failed: ' . $e->getMessage(), 'engagement-pages');
+            Yii::warning('Engagement Pages calendar collection failed: ' . $e->getMessage(), 'thiscovery-page-builder');
             return [];
         }
     }
@@ -161,19 +161,19 @@ class CollectionBlock extends BaseBlock
         return [
             'title' => $this->string(
                 'title',
-                Yii::t('EngagementPagesModule.base', 'Open for feedback')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback')
             ),
             'source' => $source,
             'empty_message' => $this->string(
                 'empty_message',
-                Yii::t('EngagementPagesModule.base', 'Nothing to show yet.')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Nothing to show yet.')
             ),
             'show_featured_first' => !isset($this->settings['show_featured_first'])
                 || !empty($this->settings['show_featured_first']),
             'event_limit' => self::clampEventLimit($this->settings['event_limit'] ?? self::EVENT_LIMIT_DEFAULT),
             'more_label' => $this->string(
                 'more_label',
-                Yii::t('EngagementPagesModule.base', 'View calendar')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'View calendar')
             ),
         ];
     }

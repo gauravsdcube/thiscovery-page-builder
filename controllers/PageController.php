@@ -5,13 +5,13 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\controllers;
+namespace humhub\modules\thiscoveryPageBuilder\controllers;
 
 use humhub\modules\content\components\ContentContainerController;
-use humhub\modules\engagementPages\assets\EngagementPagesAsset;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\models\EngagementPage;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\assets\ThiscoveryPageBuilderAsset;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use humhub\modules\space\models\Space;
 use humhub\modules\thiscoveryForms\models\CustomForm;
 use Yii;
@@ -47,7 +47,7 @@ class PageController extends ContentContainerController
 
     public function actionIndex()
     {
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
 
         $probe = new EngagementPage($this->contentContainer);
         if (!$probe->canCreate() && !$probe->canManage()
@@ -103,7 +103,7 @@ class PageController extends ContentContainerController
         }
         if ($page->isDirectoryHome()) {
             throw new ForbiddenHttpException(
-                Yii::t('EngagementPagesModule.base', 'The public homepage cannot be saved as a template.')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'The public homepage cannot be saved as a template.')
             );
         }
 
@@ -112,7 +112,7 @@ class PageController extends ContentContainerController
             $tpl = $page->saveAsTemplate($title !== '' ? $title : null);
             Yii::$app->session->setFlash(
                 'success',
-                Yii::t('EngagementPagesModule.base', 'Template “{title}” saved. You can create new pages from it.', [
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Template “{title}” saved. You can create new pages from it.', [
                     'title' => $tpl->title,
                 ])
             );
@@ -135,7 +135,7 @@ class PageController extends ContentContainerController
 
     public function actionView($id)
     {
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
 
         $page = $this->findPage($id);
         if ($page->isPublished() || $page->canManage() || $page->content->canView()) {
@@ -144,7 +144,7 @@ class PageController extends ContentContainerController
             throw new ForbiddenHttpException();
         }
         if (!$page->isPublished() && !$page->canManage()) {
-            throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'This page is not published.'));
+            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'This page is not published.'));
         }
 
         return $this->render('view', [
@@ -163,7 +163,7 @@ class PageController extends ContentContainerController
             throw new ForbiddenHttpException();
         }
         if ($page->isDirectoryHome()) {
-            throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'The public homepage cannot be deleted.'));
+            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'The public homepage cannot be deleted.'));
         }
         $page->hardDelete();
         return $this->redirect(Url::toIndex($this->contentContainer));
@@ -171,7 +171,7 @@ class PageController extends ContentContainerController
 
     protected function handleEdit(EngagementPage $page, bool $isNew)
     {
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
         $request = Yii::$app->request;
 
         if ($request->isPost) {
@@ -201,7 +201,7 @@ class PageController extends ContentContainerController
 
     protected function formOptions(): array
     {
-        $options = ['' => Yii::t('EngagementPagesModule.base', 'Select a form…')];
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a form…')];
         if (!class_exists(CustomForm::class)) {
             return $options;
         }
@@ -210,7 +210,7 @@ class PageController extends ContentContainerController
 
     protected function pollOptions(): array
     {
-        $options = ['' => Yii::t('EngagementPagesModule.base', 'Select a poll…')];
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a poll…')];
         if (!class_exists(CustomForm::class)) {
             return $options;
         }
@@ -225,7 +225,7 @@ class PageController extends ContentContainerController
             ->one();
 
         if ($page === null) {
-            throw new NotFoundHttpException(Yii::t('EngagementPagesModule.base', 'Page not found.'));
+            throw new NotFoundHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'Page not found.'));
         }
 
         return $page;

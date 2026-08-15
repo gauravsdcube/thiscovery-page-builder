@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\helpers\Url;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\widgets\bootstrap\Badge;
 use humhub\widgets\bootstrap\Button;
 
@@ -21,7 +21,7 @@ $templates = $templates ?? [];
 $pendingComments = (int) ($pendingComments ?? 0);
 $subscriptionCount = (int) ($subscriptionCount ?? 0);
 
-$this->title = Yii::t('EngagementPagesModule.base', 'Thiscovery Page Builder');
+$this->title = Yii::t('ThiscoveryPageBuilderModule.base', 'Thiscovery Page Builder');
 $statusOptions = EngagementPage::statusOptions();
 ?>
 
@@ -29,23 +29,23 @@ $statusOptions = EngagementPage::statusOptions();
     <div class="panel-heading">
         <strong><?= Html::encode($this->title) ?></strong>
         <span class="text-muted" style="margin-left:8px;font-weight:normal;">
-            <?= Yii::t('EngagementPagesModule.base', 'Network-level public pages') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Network-level public pages') ?>
         </span>
         <?php if ($canCreate): ?>
-            <?= Button::primary(Yii::t('EngagementPagesModule.base', 'Create page'))
+            <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', 'Create page'))
                 ->link(Url::toGlobalCreate())
                 ->icon('plus')
                 ->right() ?>
         <?php endif; ?>
         <?= Button::defaultType(
-            Yii::t('EngagementPagesModule.base', 'Comments')
+            Yii::t('ThiscoveryPageBuilderModule.base', 'Comments')
             . ($pendingComments > 0 ? ' (' . $pendingComments . ')' : '')
         )
             ->link(Url::toGlobalComments())
             ->icon('comments')
             ->right() ?>
         <?= Button::defaultType(
-            Yii::t('EngagementPagesModule.base', 'Subscriptions')
+            Yii::t('ThiscoveryPageBuilderModule.base', 'Subscriptions')
             . ($subscriptionCount > 0 ? ' (' . $subscriptionCount . ')' : '')
         )
             ->link(Url::toGlobalSubscriptions())
@@ -55,12 +55,12 @@ $statusOptions = EngagementPage::statusOptions();
     <div class="panel-body ep-page-list">
         <p class="text-muted">
             <?= Yii::t(
-                'EngagementPagesModule.base',
+                'ThiscoveryPageBuilderModule.base',
                 'These pages are global — they do not live in a Space. Link Survey CTAs to global Thiscovery Forms so the public never needs Space access.'
             ) ?>
         </p>
         <?php if (empty($pages)): ?>
-            <p class="text-muted"><?= Yii::t('EngagementPagesModule.base', 'No pages yet.') ?></p>
+            <p class="text-muted"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'No pages yet.') ?></p>
         <?php else: ?>
             <?php foreach ($pages as $page): ?>
                 <?php $isDirectory = $page->isDirectoryHome(); ?>
@@ -68,7 +68,7 @@ $statusOptions = EngagementPage::statusOptions();
                     <div>
                         <strong><?= Html::encode($page->title) ?></strong>
                         <?php if ($isDirectory): ?>
-                            <?= Badge::info(Yii::t('EngagementPagesModule.base', 'Homepage'))->pill() ?>
+                            <?= Badge::info(Yii::t('ThiscoveryPageBuilderModule.base', 'Homepage'))->pill() ?>
                         <?php endif; ?>
                         <div class="ep-page-meta">
                             <?= Html::encode($page->getPublicPath()) ?>
@@ -77,16 +77,16 @@ $statusOptions = EngagementPage::statusOptions();
                         </div>
                     </div>
                     <div class="ep-page-actions">
-                        <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'View'))
+                        <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'View'))
                             ->link(Url::toGlobalView($page))
                             ->sm() ?>
                         <?php if ($page->canManage()): ?>
-                            <?= Button::primary(Yii::t('EngagementPagesModule.base', $isDirectory ? 'Edit homepage' : 'Edit page'))
+                            <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', $isDirectory ? 'Edit homepage' : 'Edit page'))
                                 ->link(Url::toGlobalEdit($page))
                                 ->sm() ?>
                         <?php endif; ?>
                         <a class="btn btn-link btn-sm" href="<?= Html::encode(Url::toPublic($page)) ?>" target="_blank" rel="noopener">
-                            <?= Yii::t('EngagementPagesModule.base', 'Public link') ?>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public link') ?>
                         </a>
                     </div>
                 </div>
@@ -97,41 +97,41 @@ $statusOptions = EngagementPage::statusOptions();
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <strong><?= Yii::t('EngagementPagesModule.base', 'Page templates') ?></strong>
+        <strong><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page templates') ?></strong>
         <span class="text-muted" style="margin-left:8px;font-weight:normal;">
-            <?= Yii::t('EngagementPagesModule.base', 'Reuse layouts and sections when creating new pages') ?>
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reuse layouts and sections when creating new pages') ?>
         </span>
     </div>
     <div class="panel-body ep-page-list">
         <?php if (empty($templates)): ?>
             <p class="text-muted">
-                <?= Yii::t('EngagementPagesModule.base', 'No templates yet. Open a page in the builder and choose “Save as template”.') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'No templates yet. Open a page in the builder and choose “Save as template”.') ?>
             </p>
         <?php else: ?>
             <?php foreach ($templates as $template): ?>
                 <div class="ep-page-card ep-page-card--template">
                     <div>
                         <strong><?= Html::encode($template->title) ?></strong>
-                        <?= Badge::warning(Yii::t('EngagementPagesModule.base', 'Template'))->pill() ?>
+                        <?= Badge::warning(Yii::t('ThiscoveryPageBuilderModule.base', 'Template'))->pill() ?>
                         <div class="ep-page-meta">
-                            <?= Yii::t('EngagementPagesModule.base', 'Starter for new pages') ?>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Starter for new pages') ?>
                         </div>
                     </div>
                     <div class="ep-page-actions">
                         <?php if ($canCreate): ?>
-                            <?= Button::primary(Yii::t('EngagementPagesModule.base', 'Create from template'))
+                            <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', 'Create from template'))
                                 ->link(Url::toGlobalCreate((int) $template->id))
                                 ->sm() ?>
                         <?php endif; ?>
                         <?php if ($template->canManage()): ?>
-                            <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Edit template'))
+                            <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Edit template'))
                                 ->link(Url::toGlobalEdit($template))
                                 ->sm() ?>
                             <?= Html::beginForm(Url::toDelete($template), 'post', ['style' => 'display:inline']) ?>
                                 <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
                                 <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm(<?= Html::encode(json_encode(Yii::t('EngagementPagesModule.base', 'Delete this template?'))) ?>);">
-                                    <?= Yii::t('EngagementPagesModule.base', 'Delete') ?>
+                                        onclick="return confirm(<?= Html::encode(json_encode(Yii::t('ThiscoveryPageBuilderModule.base', 'Delete this template?'))) ?>);">
+                                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Delete') ?>
                                 </button>
                             <?= Html::endForm() ?>
                         <?php endif; ?>

@@ -6,10 +6,10 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\HeroBlock;
-use humhub\modules\engagementPages\helpers\RichHtml;
-use humhub\modules\engagementPages\helpers\FileHelper;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\HeroBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\RichHtml;
+use humhub\modules\thiscoveryPageBuilder\helpers\FileHelper;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\widgets\bootstrap\Button;
 
 /** @var HeroBlock $block */

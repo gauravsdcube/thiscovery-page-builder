@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\models;
+namespace humhub\modules\thiscoveryPageBuilder\models;
 
 use humhub\modules\user\models\User;
 use Yii;
@@ -63,19 +63,19 @@ class PageComment extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'body' => Yii::t('EngagementPagesModule.base', 'Comment'),
-            'author_name' => Yii::t('EngagementPagesModule.base', 'Name'),
-            'author_email' => Yii::t('EngagementPagesModule.base', 'Email'),
-            'status' => Yii::t('EngagementPagesModule.base', 'Status'),
+            'body' => Yii::t('ThiscoveryPageBuilderModule.base', 'Comment'),
+            'author_name' => Yii::t('ThiscoveryPageBuilderModule.base', 'Name'),
+            'author_email' => Yii::t('ThiscoveryPageBuilderModule.base', 'Email'),
+            'status' => Yii::t('ThiscoveryPageBuilderModule.base', 'Status'),
         ];
     }
 
     public static function statusOptions(): array
     {
         return [
-            self::STATUS_PENDING => Yii::t('EngagementPagesModule.base', 'Pending'),
-            self::STATUS_APPROVED => Yii::t('EngagementPagesModule.base', 'Approved'),
-            self::STATUS_REJECTED => Yii::t('EngagementPagesModule.base', 'Rejected'),
+            self::STATUS_PENDING => Yii::t('ThiscoveryPageBuilderModule.base', 'Pending'),
+            self::STATUS_APPROVED => Yii::t('ThiscoveryPageBuilderModule.base', 'Approved'),
+            self::STATUS_REJECTED => Yii::t('ThiscoveryPageBuilderModule.base', 'Rejected'),
         ];
     }
 

@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\models;
+namespace humhub\modules\thiscoveryPageBuilder\models;
 
 use Yii;
 use yii\base\Model;
@@ -54,10 +54,10 @@ class PageCommentForm extends Model
     public function attributeLabels()
     {
         return [
-            'author_name' => Yii::t('EngagementPagesModule.base', 'Name'),
-            'author_email' => Yii::t('EngagementPagesModule.base', 'Email'),
-            'body' => Yii::t('EngagementPagesModule.base', 'Comment'),
-            'captcha' => Yii::t('EngagementPagesModule.base', 'Verification code'),
+            'author_name' => Yii::t('ThiscoveryPageBuilderModule.base', 'Name'),
+            'author_email' => Yii::t('ThiscoveryPageBuilderModule.base', 'Email'),
+            'body' => Yii::t('ThiscoveryPageBuilderModule.base', 'Comment'),
+            'captcha' => Yii::t('ThiscoveryPageBuilderModule.base', 'Verification code'),
         ];
     }
 
@@ -70,6 +70,6 @@ class PageCommentForm extends Model
         if ($name !== '') {
             return $name;
         }
-        return Yii::t('EngagementPagesModule.base', 'Anonymous');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Anonymous');
     }
 }

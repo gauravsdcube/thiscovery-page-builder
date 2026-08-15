@@ -5,13 +5,13 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages;
+namespace humhub\modules\thiscoveryPageBuilder;
 
 use humhub\helpers\ControllerHelper;
 use humhub\modules\admin\permissions\ManageModules;
 use humhub\modules\admin\widgets\AdminMenu;
-use humhub\modules\engagementPages\permissions\CreateGlobalPage;
-use humhub\modules\engagementPages\permissions\ManageGlobalPage;
+use humhub\modules\thiscoveryPageBuilder\permissions\CreateGlobalPage;
+use humhub\modules\thiscoveryPageBuilder\permissions\ManageGlobalPage;
 use humhub\modules\space\controllers\SpaceController;
 use humhub\modules\space\models\Space;
 use humhub\modules\ui\menu\MenuLink;
@@ -25,18 +25,18 @@ class Events
     public static function onSpaceMenuInit($event): void
     {
         $space = $event->sender->space ?? null;
-        if ($space === null || !$space->moduleManager->isEnabled('engagement-pages')) {
+        if ($space === null || !$space->moduleManager->isEnabled('thiscovery-page-builder')) {
             return;
         }
 
         $event->sender->addItem([
-            'label' => Yii::t('EngagementPagesModule.base', 'Thiscovery Page Builder'),
+            'label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Thiscovery Page Builder'),
             'group' => 'modules',
-            'url' => $space->createUrl('/engagement-pages/page/index'),
+            'url' => $space->createUrl('/thiscovery-page-builder/page/index'),
             'icon' => '<i class="fa fa-th-large"></i>',
             'isActive' => (
                 Yii::$app->controller->module
-                && Yii::$app->controller->module->id === 'engagement-pages'
+                && Yii::$app->controller->module->id === 'thiscovery-page-builder'
                 && Yii::$app->controller->id === 'page'
             ),
         ]);
@@ -57,25 +57,25 @@ class Events
             return;
         }
 
-        if (!Yii::$app->getModule('engagement-pages')) {
+        if (!Yii::$app->getModule('thiscovery-page-builder')) {
             return;
         }
 
         /** @var AdminMenu $menu */
         $menu = $event->sender;
         $menu->addEntry(new MenuLink([
-            'label' => Yii::t('EngagementPagesModule.base', 'Thiscovery Page Builder'),
-            'id' => 'engagement-pages-admin',
+            'label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Thiscovery Page Builder'),
+            'id' => 'thiscovery-page-builder-admin',
             'icon' => 'th-large',
-            'url' => ['/engagement-pages/global/index'],
+            'url' => ['/thiscovery-page-builder/global/index'],
             'sortOrder' => 555,
-            'isActive' => ControllerHelper::isActivePath('engagement-pages', 'global'),
+            'isActive' => ControllerHelper::isActivePath('thiscovery-page-builder', 'global'),
             'isVisible' => true,
         ]));
     }
 
     /**
-     * When engagement-pages is enabled on a Space, the wall stream is admins-only.
+     * When thiscovery-page-builder is enabled on a Space, the wall stream is admins-only.
      */
     public static function onSpaceControllerBeforeAction($event): void
     {
@@ -90,7 +90,7 @@ class Events
         if (!$space instanceof Space) {
             return;
         }
-        if (!$space->moduleManager->isEnabled('engagement-pages')) {
+        if (!$space->moduleManager->isEnabled('thiscovery-page-builder')) {
             return;
         }
         if ($space->isAdmin()) {
@@ -101,14 +101,14 @@ class Events
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             Yii::$app->response->data = [
                 'content' => '',
-                'errors' => Yii::t('EngagementPagesModule.base', 'The Space stream is only available to administrators.'),
+                'errors' => Yii::t('ThiscoveryPageBuilderModule.base', 'The Space stream is only available to administrators.'),
             ];
             Yii::$app->end();
         }
 
         // Replace home stream with a restricted panel for non-admins.
         $event->isValid = false;
-        Yii::$app->response->content = $controller->render('@engagement-pages/views/space/stream_restricted', [
+        Yii::$app->response->content = $controller->render('@thiscovery-page-builder/views/space/stream_restricted', [
             'space' => $space,
         ]);
         Yii::$app->end();

@@ -5,9 +5,9 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\components;
+namespace humhub\modules\thiscoveryPageBuilder\components;
 
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use Yii;
 use yii\base\Component;
 use yii\web\UrlRuleInterface;
@@ -17,24 +17,24 @@ use yii\web\UrlRuleInterface;
  */
 class PageUrlRule extends Component implements UrlRuleInterface
 {
-    public const CACHE_ID = 'engagement-pages-public-prefix';
+    public const CACHE_ID = 'thiscovery-page-builder-public-prefix';
     public const ADMIN_PREFIX = 'page-builder';
 
     private const ADMIN_FIXED = [
-        'engagement-pages/global/index' => 'page-builder',
-        'engagement-pages/global/create' => 'page-builder/create',
-        'engagement-pages/global/comments' => 'page-builder/comments',
-        'engagement-pages/global/subscriptions' => 'page-builder/subscriptions',
-        'engagement-pages/global/export-subscriptions' => 'page-builder/export-subscriptions',
+        'thiscovery-page-builder/global/index' => 'page-builder',
+        'thiscovery-page-builder/global/create' => 'page-builder/create',
+        'thiscovery-page-builder/global/comments' => 'page-builder/comments',
+        'thiscovery-page-builder/global/subscriptions' => 'page-builder/subscriptions',
+        'thiscovery-page-builder/global/export-subscriptions' => 'page-builder/export-subscriptions',
     ];
 
     private const ADMIN_WITH_ID = [
-        'engagement-pages/global/view' => 'page-builder/view',
-        'engagement-pages/global/edit' => 'page-builder/edit',
-        'engagement-pages/global/save-template' => 'page-builder/save-template',
-        'engagement-pages/global/moderate-comment' => 'page-builder/moderate-comment',
-        'engagement-pages/global/delete-subscription' => 'page-builder/delete-subscription',
-        'engagement-pages/global/delete' => 'page-builder/delete',
+        'thiscovery-page-builder/global/view' => 'page-builder/view',
+        'thiscovery-page-builder/global/edit' => 'page-builder/edit',
+        'thiscovery-page-builder/global/save-template' => 'page-builder/save-template',
+        'thiscovery-page-builder/global/moderate-comment' => 'page-builder/moderate-comment',
+        'thiscovery-page-builder/global/delete-subscription' => 'page-builder/delete-subscription',
+        'thiscovery-page-builder/global/delete' => 'page-builder/delete',
     ];
 
     public static function getPrefix(): string
@@ -84,20 +84,20 @@ class PageUrlRule extends Component implements UrlRuleInterface
 
         $prefix = self::getPrefix();
 
-        if ($route === 'engagement-pages/public/index') {
+        if ($route === 'thiscovery-page-builder/public/index') {
             return $this->appendQuery($prefix, $params);
         }
 
-        if (in_array($route, ['engagement-pages/public/view', 'engagement-pages/public/follow', 'engagement-pages/public/comment'], true)
+        if (in_array($route, ['thiscovery-page-builder/public/view', 'thiscovery-page-builder/public/follow', 'thiscovery-page-builder/public/comment'], true)
             && isset($params['slug'])) {
             $slug = (string) $params['slug'];
             unset($params['slug']);
             $url = ($slug === $prefix)
                 ? $prefix
                 : $prefix . '/' . rawurlencode($slug);
-            if ($route === 'engagement-pages/public/follow') {
+            if ($route === 'thiscovery-page-builder/public/follow') {
                 $url .= '/follow';
-            } elseif ($route === 'engagement-pages/public/comment') {
+            } elseif ($route === 'thiscovery-page-builder/public/comment') {
                 $url .= '/comment';
             }
             return $this->appendQuery($url, $params);
@@ -120,7 +120,7 @@ class PageUrlRule extends Component implements UrlRuleInterface
         }
 
         if ($parts[0] === 'engage' && isset($parts[1]) && $parts[1] !== '') {
-            return ['engagement-pages/public/view', array_merge($query, ['slug' => $parts[1]])];
+            return ['thiscovery-page-builder/public/view', array_merge($query, ['slug' => $parts[1]])];
         }
 
         $prefix = self::getPrefix();
@@ -136,7 +136,7 @@ class PageUrlRule extends Component implements UrlRuleInterface
     {
         $count = count($parts);
         if ($count === 1) {
-            return ['engagement-pages/global/index', $query];
+            return ['thiscovery-page-builder/global/index', $query];
         }
 
         $action = $parts[1];
@@ -162,22 +162,22 @@ class PageUrlRule extends Component implements UrlRuleInterface
         $root = $parts[0];
 
         if ($count === 1) {
-            return ['engagement-pages/public/index', $query];
+            return ['thiscovery-page-builder/public/index', $query];
         }
 
         if ($count === 2 && in_array($parts[1], ['follow', 'comment'], true)) {
-            return ['engagement-pages/public/' . $parts[1], array_merge($query, ['slug' => $root])];
+            return ['thiscovery-page-builder/public/' . $parts[1], array_merge($query, ['slug' => $root])];
         }
 
         if ($count === 2) {
             if ($parts[1] === $root) {
-                return ['engagement-pages/public/index', $query];
+                return ['thiscovery-page-builder/public/index', $query];
             }
-            return ['engagement-pages/public/view', array_merge($query, ['slug' => $parts[1]])];
+            return ['thiscovery-page-builder/public/view', array_merge($query, ['slug' => $parts[1]])];
         }
 
         if ($count === 3 && in_array($parts[2], ['follow', 'comment'], true)) {
-            return ['engagement-pages/public/' . $parts[2], array_merge($query, ['slug' => $parts[1]])];
+            return ['thiscovery-page-builder/public/' . $parts[2], array_merge($query, ['slug' => $parts[1]])];
         }
 
         return false;

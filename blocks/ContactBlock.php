@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use Yii;
 
@@ -23,13 +23,13 @@ class ContactBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Contact');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Contact');
     }
 
     public function normalizeSettings(): array
     {
         return [
-            'title' => $this->string('title', Yii::t('EngagementPagesModule.base', 'Contact us')),
+            'title' => $this->string('title', Yii::t('ThiscoveryPageBuilderModule.base', 'Contact us')),
             'name' => $this->string('name'),
             'role' => $this->string('role'),
             'organisation' => $this->string('organisation'),
@@ -39,7 +39,7 @@ class ContactBlock extends BaseBlock
             'website' => $this->string('website'),
             'website_label' => $this->string(
                 'website_label',
-                Yii::t('EngagementPagesModule.base', 'Visit website')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Visit website')
             ),
             'notes' => $this->string('notes'),
             'show_email_link' => !isset($this->settings['show_email_link']) || (bool) $this->settings['show_email_link'],

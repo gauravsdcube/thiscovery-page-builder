@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use Yii;
 
@@ -20,7 +20,7 @@ class TeamBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Team / contacts');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Team / contacts');
     }
 
     public function normalizeSettings(): array
@@ -44,7 +44,7 @@ class TeamBlock extends BaseBlock
         }
 
         return [
-            'title' => $this->string('title', Yii::t('EngagementPagesModule.base', 'Meet the team')),
+            'title' => $this->string('title', Yii::t('ThiscoveryPageBuilderModule.base', 'Meet the team')),
             'intro' => $this->string('intro'),
             'people' => $people,
         ];

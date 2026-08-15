@@ -6,9 +6,9 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\CalloutBlock;
-use humhub\modules\engagementPages\helpers\RichHtml;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\CalloutBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\RichHtml;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var CalloutBlock $block */
 /** @var EngagementPage $page */

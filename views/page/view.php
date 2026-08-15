@@ -7,9 +7,9 @@
 
 use humhub\helpers\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
-use humhub\modules\engagementPages\helpers\Url as PageUrl;
-use humhub\modules\engagementPages\models\EngagementPage;
-use humhub\modules\engagementPages\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url as PageUrl;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use humhub\widgets\bootstrap\Button;
 
 /** @var ContentContainerActiveRecord|null $contentContainer */
@@ -42,31 +42,31 @@ $showRight = in_array($layout, [BlockRegistry::LAYOUT_RIGHT, BlockRegistry::LAYO
      data-ep-width="<?= Html::encode($page->getPageWidthKey()) ?>">
     <?php if ($canManage): ?>
         <div class="engagement-page-toolbar">
-            <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Thiscovery Page Builder'))
+            <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Thiscovery Page Builder'))
                 ->link(PageUrl::toIndex($contentContainer))
                 ->sm() ?>
-            <?= Button::primary(Yii::t('EngagementPagesModule.base', $isDirectory ? 'Edit homepage' : 'Edit page'))
+            <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', $isDirectory ? 'Edit homepage' : 'Edit page'))
                 ->link(PageUrl::toEdit($page))
                 ->sm() ?>
             <?php if (!$isDirectory && $page->isGlobal()): ?>
-                <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Moderate comments'))
+                <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Moderate comments'))
                     ->link(PageUrl::toGlobalComments('all', (int) $page->id))
                     ->sm() ?>
-                <?= Button::defaultType(Yii::t('EngagementPagesModule.base', 'Subscriptions'))
+                <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Subscriptions'))
                     ->link(PageUrl::toGlobalSubscriptions((int) $page->id))
                     ->sm() ?>
             <?php endif; ?>
             <?php if (!$isDirectory): ?>
                 <?= Html::beginForm(PageUrl::toDelete($page), 'post', ['class' => 'ep-inline-form']) ?>
                     <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
-                    <?= Button::danger(Yii::t('EngagementPagesModule.base', 'Delete'))
+                    <?= Button::danger(Yii::t('ThiscoveryPageBuilderModule.base', 'Delete'))
                         ->submit()
                         ->sm()
-                        ->confirm(Yii::t('EngagementPagesModule.base', 'Are you sure you want to delete this engagement page?')) ?>
+                        ->confirm(Yii::t('ThiscoveryPageBuilderModule.base', 'Are you sure you want to delete this engagement page?')) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>
             <span class="ep-public-link">
-                <?= Yii::t('EngagementPagesModule.base', 'Public link') ?>:
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public link') ?>:
                 <a href="<?= Html::encode(PageUrl::toPublic($page)) ?>">
                     <?= Html::encode($page->getPublicPath()) ?>
                 </a>

@@ -14,12 +14,12 @@ use humhub\modules\thiscoveryEditor\widgets\EditorField;
 ?>
 <div class="ep-repeat-item" data-ep-repeat-item>
     <div class="form-group">
-        <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Heading') ?></label>
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Heading') ?></label>
         <input type="text" class="form-control" name="<?= $namePrefix ?>[heading]"
                value="<?= Html::encode($item['heading'] ?? '') ?>">
     </div>
     <div class="form-group">
-        <label class="ep-label"><?= Yii::t('EngagementPagesModule.base', 'Body') ?></label>
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Body') ?></label>
         <div class="ep-rich-editor" data-ep-rich-editor>
             <?= EditorField::widget([
                 'id' => 'ep-acc-body-' . $safeIndex,
@@ -31,7 +31,7 @@ use humhub\modules\thiscoveryEditor\widgets\EditorField;
         </div>
     </div>
     <button type="button" class="btn btn-light btn-sm" data-ep-repeat-remove>
-        <i class="fa fa-times"></i> <?= Yii::t('EngagementPagesModule.base', 'Remove') ?>
+        <i class="fa fa-times"></i> <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Remove') ?>
     </button>
     <hr>
 </div>

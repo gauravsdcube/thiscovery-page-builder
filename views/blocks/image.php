@@ -6,9 +6,9 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\ImageBlock;
-use humhub\modules\engagementPages\helpers\FileHelper;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\ImageBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\FileHelper;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var ImageBlock $block */
 /** @var EngagementPage $page */

@@ -6,8 +6,8 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\PhasesBlock;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\PhasesBlock;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var PhasesBlock $block */
 /** @var EngagementPage $page */
@@ -20,9 +20,9 @@ if ($items === []) {
 $style = ($settings['style'] ?? 'linear') === 'plan' ? 'plan' : 'linear';
 $statusLabel = static function (string $status): string {
     return match ($status) {
-        'done' => Yii::t('EngagementPagesModule.base', 'Completed'),
-        'current' => Yii::t('EngagementPagesModule.base', 'Current'),
-        default => Yii::t('EngagementPagesModule.base', 'Upcoming'),
+        'done' => Yii::t('ThiscoveryPageBuilderModule.base', 'Completed'),
+        'current' => Yii::t('ThiscoveryPageBuilderModule.base', 'Current'),
+        default => Yii::t('ThiscoveryPageBuilderModule.base', 'Upcoming'),
     };
 };
 ?>

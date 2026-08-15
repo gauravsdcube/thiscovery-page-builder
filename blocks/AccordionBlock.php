@@ -5,7 +5,7 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\blocks;
+namespace humhub\modules\thiscoveryPageBuilder\blocks;
 
 use Yii;
 
@@ -20,7 +20,7 @@ class AccordionBlock extends BaseBlock
 
     public function getLabel(): string
     {
-        return Yii::t('EngagementPagesModule.base', 'Accordion / FAQ');
+        return Yii::t('ThiscoveryPageBuilderModule.base', 'Accordion / FAQ');
     }
 
     public function normalizeSettings(): array
@@ -42,7 +42,7 @@ class AccordionBlock extends BaseBlock
         }
 
         return [
-            'title' => $this->string('title', Yii::t('EngagementPagesModule.base', 'Frequently asked questions')),
+            'title' => $this->string('title', Yii::t('ThiscoveryPageBuilderModule.base', 'Frequently asked questions')),
             'items' => $items,
         ];
     }

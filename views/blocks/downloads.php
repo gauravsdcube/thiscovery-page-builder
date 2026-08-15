@@ -6,9 +6,9 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\DownloadsBlock;
-use humhub\modules\engagementPages\helpers\FileHelper;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\DownloadsBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\FileHelper;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 
 /** @var DownloadsBlock $block */
 /** @var EngagementPage $page */
@@ -20,7 +20,7 @@ if ($items === []) {
 }
 ?>
 <section class="ep-block ep-downloads">
-    <h2><?= Html::encode($settings['title'] ?: Yii::t('EngagementPagesModule.base', 'Documents')) ?></h2>
+    <h2><?= Html::encode($settings['title'] ?: Yii::t('ThiscoveryPageBuilderModule.base', 'Documents')) ?></h2>
     <ul>
         <?php foreach ($items as $item): ?>
             <?php

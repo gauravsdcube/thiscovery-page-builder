@@ -5,17 +5,17 @@
  * @license AGPL-3.0-or-later
  */
 
-namespace humhub\modules\engagementPages\controllers;
+namespace humhub\modules\thiscoveryPageBuilder\controllers;
 
 use humhub\components\Controller;
 use humhub\components\access\ControllerAccess;
-use humhub\modules\engagementPages\assets\EngagementPagesAsset;
-use humhub\modules\engagementPages\blocks\CommentsBlock;
-use humhub\modules\engagementPages\helpers\Url as PageUrl;
-use humhub\modules\engagementPages\models\EngagementPage;
-use humhub\modules\engagementPages\models\PageComment;
-use humhub\modules\engagementPages\models\PageCommentForm;
-use humhub\modules\engagementPages\models\PageFollow;
+use humhub\modules\thiscoveryPageBuilder\assets\ThiscoveryPageBuilderAsset;
+use humhub\modules\thiscoveryPageBuilder\blocks\CommentsBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url as PageUrl;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\models\PageComment;
+use humhub\modules\thiscoveryPageBuilder\models\PageCommentForm;
+use humhub\modules\thiscoveryPageBuilder\models\PageFollow;
 use Yii;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -25,7 +25,7 @@ use yii\web\NotFoundHttpException;
  */
 class PublicController extends Controller
 {
-    public $subLayout = '@engagement-pages/views/layouts/public';
+    public $subLayout = '@thiscovery-page-builder/views/layouts/public';
 
     protected $access = ControllerAccess::class;
 
@@ -40,24 +40,24 @@ class PublicController extends Controller
 
     public function actionIndex()
     {
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
 
         $page = EngagementPage::ensureDirectoryPage();
 
         if (!$page->canAccessPublic()) {
             if (!$page->isPublished() && !$page->canManage()) {
-                throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'This page is not published.'));
+                throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'This page is not published.'));
             }
             if (Yii::$app->user->isGuest && $page->getAudienceKey() === EngagementPage::AUDIENCE_MEMBERS) {
                 return $this->redirect(['/user/auth/login']);
             }
-            throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'You do not have permission to view this page.'));
+            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'You do not have permission to view this page.'));
         }
 
         $this->pageTitle = $page->title;
         $this->view->params['engagementPage'] = $page;
 
-        return $this->render('@engagement-pages/views/page/view', [
+        return $this->render('@thiscovery-page-builder/views/page/view', [
             'contentContainer' => $page->content->container,
             'page' => $page,
             'canManage' => $page->canManage(),
@@ -68,11 +68,11 @@ class PublicController extends Controller
 
     public function actionView($slug)
     {
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
 
         $page = EngagementPage::findBySlug((string) $slug);
         if ($page === null) {
-            throw new NotFoundHttpException(Yii::t('EngagementPagesModule.base', 'Page not found.'));
+            throw new NotFoundHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'Page not found.'));
         }
 
         if ($page->isDirectoryHome()) {
@@ -80,23 +80,23 @@ class PublicController extends Controller
         }
 
         if ($page->isTemplate()) {
-            throw new NotFoundHttpException(Yii::t('EngagementPagesModule.base', 'Page not found.'));
+            throw new NotFoundHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'Page not found.'));
         }
 
         if (!$page->canAccessPublic()) {
             if (!$page->isPublished() && !$page->canManage()) {
-                throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'This page is not published.'));
+                throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'This page is not published.'));
             }
             if (Yii::$app->user->isGuest && $page->getAudienceKey() === EngagementPage::AUDIENCE_MEMBERS) {
                 return $this->redirect(['/user/auth/login']);
             }
-            throw new ForbiddenHttpException(Yii::t('EngagementPagesModule.base', 'You do not have permission to view this page.'));
+            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'You do not have permission to view this page.'));
         }
 
         $this->pageTitle = $page->title;
         $this->view->params['engagementPage'] = $page;
 
-        return $this->render('@engagement-pages/views/page/view', [
+        return $this->render('@thiscovery-page-builder/views/page/view', [
             'contentContainer' => $page->content->container,
             'page' => $page,
             'canManage' => $page->canManage(),
@@ -189,12 +189,12 @@ class PublicController extends Controller
         }
 
         // Re-render page with form errors.
-        EngagementPagesAsset::register($this->view);
+        ThiscoveryPageBuilderAsset::register($this->view);
         $this->pageTitle = $page->title;
         $this->view->params['engagementPage'] = $page;
         $this->view->params['epCommentForm'] = $form;
 
-        return $this->render('@engagement-pages/views/page/view', [
+        return $this->render('@thiscovery-page-builder/views/page/view', [
             'contentContainer' => $page->content->container,
             'page' => $page,
             'canManage' => $page->canManage(),

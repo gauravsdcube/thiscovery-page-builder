@@ -6,16 +6,16 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\engagementPages\blocks\UpdatesBlock;
-use humhub\modules\engagementPages\helpers\Url as PageUrl;
-use humhub\modules\engagementPages\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\blocks\UpdatesBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url as PageUrl;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use yii\helpers\Url;
 
 /** @var UpdatesBlock $block */
 /** @var EngagementPage $page */
 /** @var array $settings */
 
-$followUrl = Url::to(['/engagement-pages/public/follow', 'slug' => $page->slug]);
+$followUrl = Url::to(['/thiscovery-page-builder/public/follow', 'slug' => $page->slug]);
 $flashKey = 'ep-follow-' . $page->id;
 $success = Yii::$app->session->getFlash($flashKey);
 ?>
@@ -29,13 +29,13 @@ $success = Yii::$app->session->getFlash($flashKey);
 
     <?php if ($success): ?>
         <div class="ep-updates__success" role="status">
-            <?= Html::encode($settings['success_message'] ?: Yii::t('EngagementPagesModule.base', 'Thanks — we will keep you updated.')) ?>
+            <?= Html::encode($settings['success_message'] ?: Yii::t('ThiscoveryPageBuilderModule.base', 'Thanks — we will keep you updated.')) ?>
         </div>
     <?php else: ?>
         <?= Html::beginForm($followUrl, 'post', ['class' => 'ep-updates__form']) ?>
             <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
             <label class="sr-only" for="ep-follow-email-<?= (int) $page->id ?>">
-                <?= Yii::t('EngagementPagesModule.base', 'Email address') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Email address') ?>
             </label>
             <div class="ep-updates__row">
                 <input type="email"
@@ -43,10 +43,10 @@ $success = Yii::$app->session->getFlash($flashKey);
                        required
                        name="email"
                        id="ep-follow-email-<?= (int) $page->id ?>"
-                       placeholder="<?= Html::encode(Yii::t('EngagementPagesModule.base', 'Email address')) ?>"
+                       placeholder="<?= Html::encode(Yii::t('ThiscoveryPageBuilderModule.base', 'Email address')) ?>"
                        autocomplete="email">
                 <button type="submit" class="btn btn-primary">
-                    <?= Html::encode($settings['button_label'] ?: Yii::t('EngagementPagesModule.base', 'Subscribe')) ?>
+                    <?= Html::encode($settings['button_label'] ?: Yii::t('ThiscoveryPageBuilderModule.base', 'Subscribe')) ?>
                 </button>
             </div>
         <?= Html::endForm() ?>
