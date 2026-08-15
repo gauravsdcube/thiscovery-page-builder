@@ -11,13 +11,21 @@ class uninstall extends Migration
 {
     public function up()
     {
-        if ($this->db->schema->getTableSchema('engagement_page_follow', true) !== null) {
-            $this->dropTable('engagement_page_follow');
+        foreach (['thiscovery_page_follow', 'engagement_page_follow'] as $table) {
+            if ($this->db->schema->getTableSchema($table, true) !== null) {
+                $this->dropTable($table);
+            }
         }
-        if ($this->db->schema->getTableSchema('engagement_page_comment', true) !== null) {
-            $this->dropTable('engagement_page_comment');
+        foreach (['thiscovery_page_comment', 'engagement_page_comment'] as $table) {
+            if ($this->db->schema->getTableSchema($table, true) !== null) {
+                $this->dropTable($table);
+            }
         }
-        $this->safeDropTable('engagement_page');
+        foreach (['thiscovery_page', 'engagement_page'] as $table) {
+            if ($this->db->schema->getTableSchema($table, true) !== null) {
+                $this->dropTable($table);
+            }
+        }
     }
 
     public function down()

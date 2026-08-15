@@ -38,7 +38,7 @@ class PageComment extends ActiveRecord
 
     public static function tableName()
     {
-        return 'engagement_page_comment';
+        return 'thiscovery_page_comment';
     }
 
     public function rules()

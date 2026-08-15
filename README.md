@@ -1,6 +1,6 @@
 # Thiscovery Page Builder
 
-**Version 1.4.0**  
+**Version 1.4.1**  
 **Copyright (c) 2026 D Cube Consulting. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 

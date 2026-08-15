@@ -1,8 +1,12 @@
 # Changelog
 
+## 1.4.1 — 2026-08-15
+
+- Enh: Database tables renamed to `thiscovery_page`, `thiscovery_page_follow`, and `thiscovery_page_comment`
+
 ## 1.4.0 — 2026-08-15
 
-- Enh: HumHub module id is now `thiscovery-page-builder` (folder, routes, and namespace). Database tables stay `engagement_page*`. Legacy `/engagement-pages/...` admin URLs still resolve.
+- Enh: HumHub module id is now `thiscovery-page-builder` (folder, routes, and namespace). Legacy `/engagement-pages/...` admin URLs still resolve.
 
 ## 1.3.2 — 2026-08-14
 

@@ -20,7 +20,7 @@ class SmokeController extends Controller
     {
         $m = Yii::$app->getModule('thiscovery-page-builder');
         $this->stdout('module=' . ($m ? get_class($m) : 'null') . "\n", Console::FG_GREEN);
-        $this->stdout('table=' . (Yii::$app->db->getTableSchema('engagement_page') ? 'yes' : 'no') . "\n");
+        $this->stdout('table=' . (Yii::$app->db->getTableSchema('thiscovery_page') ? 'yes' : 'no') . "\n");
         $this->stdout('types=' . implode(',', array_keys(BlockRegistry::types())) . "\n");
 
         $page = new EngagementPage();

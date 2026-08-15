@@ -9,7 +9,7 @@ use yii\db\Migration;
 
 /**
  * Rename HumHub module id engagement-pages → thiscovery-page-builder.
- * Page tables stay engagement_page*.
+ * Page tables stay engagement_page* until m260815_081500.
  */
 class m260815_080000_rename_module_id extends Migration
 {

@@ -12,7 +12,7 @@ use Yii;
 
 class ManageGlobalPage extends BaseAdminPermission
 {
-    protected $id = 'engagement_pages_manage_global';
+    protected $id = 'thiscovery_page_builder_manage_global';
     protected $moduleId = 'thiscovery-page-builder';
 
     public function __construct($config = [])

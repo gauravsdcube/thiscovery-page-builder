@@ -26,7 +26,7 @@ class PageFollow extends ActiveRecord
 {
     public static function tableName()
     {
-        return 'engagement_page_follow';
+        return 'thiscovery_page_follow';
     }
 
     public function rules()
@@ -106,7 +106,7 @@ class PageFollow extends ActiveRecord
         $pages = EngagementPage::find()
             ->alias('p')
             ->joinWith('content')
-            ->innerJoin('engagement_page_follow f', 'f.page_id = p.id')
+            ->innerJoin(self::tableName() . ' f', 'f.page_id = p.id')
             ->andWhere(['content.contentcontainer_id' => null])
             ->andWhere(['p.is_template' => false])
             ->orderBy(['p.title' => SORT_ASC])

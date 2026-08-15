@@ -74,13 +74,14 @@ class GlobalController extends Controller
         EngagementPage::ensureDirectoryPage();
 
         $pages = EngagementPage::find()
+            ->alias('p')
             ->joinWith('content')
             ->andWhere(['content.contentcontainer_id' => null])
-            ->andWhere(['engagement_page.is_template' => false])
+            ->andWhere(['p.is_template' => false])
             ->orderBy([
-                'engagement_page.is_directory' => SORT_DESC,
-                'engagement_page.updated_at' => SORT_DESC,
-                'engagement_page.id' => SORT_DESC,
+                'p.is_directory' => SORT_DESC,
+                'p.updated_at' => SORT_DESC,
+                'p.id' => SORT_DESC,
             ])
             ->all();
 

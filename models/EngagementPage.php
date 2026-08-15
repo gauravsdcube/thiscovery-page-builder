@@ -79,7 +79,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
 
     public static function tableName()
     {
-        return 'engagement_page';
+        return 'thiscovery_page';
     }
 
     public function init()
@@ -682,9 +682,10 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             return [];
         }
         $query = static::find()
+            ->alias('p')
             ->joinWith('content')
-            ->andWhere(['engagement_page.is_template' => true])
-            ->orderBy(['engagement_page.title' => SORT_ASC, 'engagement_page.id' => SORT_DESC]);
+            ->andWhere(['p.is_template' => true])
+            ->orderBy(['p.title' => SORT_ASC, 'p.id' => SORT_DESC]);
 
         if ($contentContainerId === null) {
             $query->andWhere(['content.contentcontainer_id' => null]);

@@ -56,9 +56,10 @@ class PageController extends ContentContainerController
         }
 
         $pages = EngagementPage::find()
+            ->alias('p')
             ->contentContainer($this->contentContainer)
-            ->andWhere(['engagement_page.is_template' => false])
-            ->orderBy(['engagement_page.updated_at' => SORT_DESC, 'engagement_page.id' => SORT_DESC])
+            ->andWhere(['p.is_template' => false])
+            ->orderBy(['p.updated_at' => SORT_DESC, 'p.id' => SORT_DESC])
             ->all();
 
         $templates = EngagementPage::findTemplates((int) $this->contentContainer->contentcontainer_id);
@@ -84,8 +85,9 @@ class PageController extends ContentContainerController
         $templateId = (int) ($template_id ?: Yii::$app->request->get('template_id', 0));
         if ($templateId > 0) {
             $template = EngagementPage::find()
+                ->alias('p')
                 ->contentContainer($this->contentContainer)
-                ->andWhere(['engagement_page.id' => $templateId, 'engagement_page.is_template' => true])
+                ->andWhere(['p.id' => $templateId, 'p.is_template' => true])
                 ->one();
             if ($template instanceof EngagementPage) {
                 $template->applyTemplateTo($page);
@@ -220,8 +222,9 @@ class PageController extends ContentContainerController
     protected function findPage($id): EngagementPage
     {
         $page = EngagementPage::find()
+            ->alias('p')
             ->contentContainer($this->contentContainer)
-            ->andWhere(['engagement_page.id' => (int) $id])
+            ->andWhere(['p.id' => (int) $id])
             ->one();
 
         if ($page === null) {
