@@ -13,6 +13,32 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
         var sectionIndex = 0;
         var REGION_ORDER = ['full', 'left', 'main', 'right'];
 
+        var layoutStudioPanes = function () {
+            var $workspace = $root.find('.ep-studio__workspace');
+            if (!$workspace.length) {
+                return;
+            }
+            $workspace.css('height', '');
+            if (!$root.find('[data-ep-panel="builder"]').hasClass('is-active')) {
+                return;
+            }
+            if (window.matchMedia && window.matchMedia('(max-width: 991px)').matches) {
+                return;
+            }
+            var el = $workspace.get(0);
+            var top = el.getBoundingClientRect().top;
+            if (top < 0) {
+                top = 0;
+            }
+            var $footer = $root.find('.ep-studio__footer:visible');
+            var footerH = $footer.length ? $footer.outerHeight(true) : 0;
+            var height = Math.floor(window.innerHeight - top - footerH - 12);
+            if (height < 280) {
+                height = 280;
+            }
+            $workspace.css('height', height + 'px');
+        };
+
         var applyLayoutVisibility = function () {
             var layout = String($root.find('[data-ep-layout-select]').val() || 'main');
             var showLeft = (layout === 'left' || layout === 'both');
@@ -500,6 +526,25 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
             $(this).addClass('is-active').attr('aria-selected', 'true');
             $root.find('[data-ep-panel]').removeClass('is-active');
             $root.find('[data-ep-panel="' + tab + '"]').addClass('is-active');
+            var $hidden = $root.find('[data-ep-studio-tab]');
+            if ($hidden.length) {
+                $hidden.val(tab);
+            }
+            var $help = $root.find('[data-ep-studio-help]');
+            if ($help.length) {
+                var pages = {};
+                try {
+                    pages = JSON.parse($help.attr('data-ep-help-pages') || '{}');
+                } catch (err) {}
+                if (pages[tab]) {
+                    $help.attr('href', pages[tab]);
+                }
+            }
+            try {
+                var url = new URL(window.location.href);
+                url.searchParams.set('tab', tab);
+                window.history.replaceState({}, '', url.toString());
+            } catch (err) {}
             if (tab === 'settings' || tab === 'builder') {
                 setTimeout(function () {
                     var $panel = $root.find('[data-ep-panel="' + tab + '"]');
@@ -507,9 +552,33 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
                         destroyTinyMce($panel);
                     }
                     initRichEditors($panel);
+                    layoutStudioPanes();
                 }, 30);
             }
         });
+
+        $root.on('click', '[data-ep-guide-toggle]', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var next = $btn.attr('aria-expanded') !== 'true';
+            var $panel = $('#' + $btn.attr('aria-controls'));
+            $btn.attr('aria-expanded', next ? 'true' : 'false');
+            $btn.toggleClass('is-open', next);
+            $panel.prop('hidden', !next);
+        });
+
+        $root.on('click', '[data-ep-acc-all]', function () {
+            var open = $(this).attr('data-ep-acc-all') === 'open';
+            $root.find('[data-ep-panel="settings"] details.ep-set-acc').prop('open', open);
+        });
+
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var openTab = params.get('tab');
+            if (openTab) {
+                $root.find('[data-ep-tab="' + openTab + '"]').trigger('click');
+            }
+        } catch (e) {}
 
         $root.on('change', '[data-ep-page-width]', function () {
             var val = String($(this).val() || 'wide');
@@ -696,6 +765,36 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
                 $input.trigger('select');
                 try { document.execCommand('copy'); } catch (err) {}
                 done();
+            }
+        });
+
+
+        var syncButtonFields = function ($card) {
+            var $sel = $card.find('[data-ep-button-action]');
+            if (!$sel.length) {
+                return;
+            }
+            var action = String($sel.val() || 'link');
+            $card.find('[data-ep-button-field]').each(function () {
+                var keys = String($(this).data('ep-button-field') || '').split(/\s+/);
+                $(this).toggle(keys.indexOf(action) !== -1 || (action === 'custom' && keys.indexOf('custom') !== -1) || (action === 'link' && keys.indexOf('link') !== -1));
+            });
+        };
+        $root.find('[data-ep-section]').each(function () {
+            syncButtonFields($(this));
+        });
+        $root.on('change', '[data-ep-button-action]', function () {
+            syncButtonFields($(this).closest('[data-ep-section]'));
+        });
+        $(document).on('click', '[data-ep-scroll]', function (e) {
+            var id = String($(this).data('ep-scroll') || '');
+            if (!id) {
+                return;
+            }
+            var el = document.getElementById(id);
+            if (el) {
+                e.preventDefault();
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
 
@@ -1063,15 +1162,28 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
         if ($root.find('[data-ep-form-errors]').length) {
             $root.find('[data-ep-tab="settings"]').trigger('click');
         }
+
+        $(window).off('resize.epStudioPanes').on('resize.epStudioPanes', layoutStudioPanes);
+        layoutStudioPanes();
     };
 
     var init = function () {
         // Legacy no-op for data-ui-widget; builder is started via registerJs.
     };
 
+    var initListPages = function () {
+        $(document).off('change.epListSubmit').on('change.epListSubmit', 'select[data-ep-auto-submit]', function () {
+            var form = $(this).closest('form');
+            if (form.length) {
+                form.trigger('submit');
+            }
+        });
+    };
+
     module.export({
         init: init,
         initBuilder: initBuilder,
+        initListPages: initListPages,
         initOnAjaxLoad: true
     });
 });

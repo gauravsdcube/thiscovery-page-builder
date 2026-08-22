@@ -8,6 +8,7 @@
 namespace humhub\modules\thiscoveryPageBuilder\services;
 
 use humhub\modules\thiscoveryPageBuilder\blocks\AccordionBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\ButtonBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\CalloutBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\CollectionBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\CommentsBlock;
@@ -20,6 +21,11 @@ use humhub\modules\thiscoveryPageBuilder\blocks\ImageBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\PhasesBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\PollEmbedBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\RichTextBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\SpaceCalendarBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\SpaceFilesBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\SpaceGalleryBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\SpaceStreamBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\SpaceTasksBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\SurveyCtaBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\TeamBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\UpdatesBlock;
@@ -56,6 +62,12 @@ class BlockRegistry
             CalloutBlock::TYPE => CalloutBlock::class,
             ImageBlock::TYPE => ImageBlock::class,
             CollectionBlock::TYPE => CollectionBlock::class,
+            ButtonBlock::TYPE => ButtonBlock::class,
+            SpaceStreamBlock::TYPE => SpaceStreamBlock::class,
+            SpaceTasksBlock::TYPE => SpaceTasksBlock::class,
+            SpaceFilesBlock::TYPE => SpaceFilesBlock::class,
+            SpaceGalleryBlock::TYPE => SpaceGalleryBlock::class,
+            SpaceCalendarBlock::TYPE => SpaceCalendarBlock::class,
             // Legacy type name before rename to Collection
             CollectionBlock::LEGACY_TYPE => CollectionBlock::class,
         ];
@@ -83,6 +95,7 @@ class BlockRegistry
             ['type' => AccordionBlock::TYPE, 'icon' => 'fa-list-alt', 'group' => 'content'],
             ['type' => CalloutBlock::TYPE, 'icon' => 'fa-info-circle', 'group' => 'content'],
             ['type' => DownloadsBlock::TYPE, 'icon' => 'fa-download', 'group' => 'content'],
+            ['type' => ButtonBlock::TYPE, 'icon' => 'fa-hand-pointer-o', 'group' => 'content'],
             ['type' => SurveyCtaBlock::TYPE, 'icon' => 'fa-wpforms', 'group' => 'engagement'],
             ['type' => PollEmbedBlock::TYPE, 'icon' => 'fa-bar-chart', 'group' => 'engagement'],
             ['type' => PhasesBlock::TYPE, 'icon' => 'fa-road', 'group' => 'engagement'],
@@ -92,6 +105,11 @@ class BlockRegistry
             ['type' => UpdatesBlock::TYPE, 'icon' => 'fa-envelope-o', 'group' => 'engagement'],
             ['type' => CommentsBlock::TYPE, 'icon' => 'fa-comments', 'group' => 'engagement'],
             ['type' => CollectionBlock::TYPE, 'icon' => 'fa-th-list', 'group' => 'engagement'],
+            ['type' => SpaceStreamBlock::TYPE, 'icon' => 'fa-rss', 'group' => 'space'],
+            ['type' => SpaceTasksBlock::TYPE, 'icon' => 'fa-check-square-o', 'group' => 'space'],
+            ['type' => SpaceFilesBlock::TYPE, 'icon' => 'fa-folder-open-o', 'group' => 'space'],
+            ['type' => SpaceGalleryBlock::TYPE, 'icon' => 'fa-picture-o', 'group' => 'space'],
+            ['type' => SpaceCalendarBlock::TYPE, 'icon' => 'fa-calendar-check-o', 'group' => 'space'],
         ];
     }
 

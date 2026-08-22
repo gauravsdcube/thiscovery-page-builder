@@ -10,15 +10,19 @@ namespace humhub\modules\thiscoveryPageBuilder;
 use humhub\helpers\ControllerHelper;
 use humhub\modules\admin\permissions\ManageModules;
 use humhub\modules\admin\widgets\AdminMenu;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url as PageUrl;
+use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\models\PageHome;
 use humhub\modules\thiscoveryPageBuilder\permissions\CreateGlobalPage;
 use humhub\modules\thiscoveryPageBuilder\permissions\ManageGlobalPage;
 use humhub\modules\space\controllers\SpaceController;
 use humhub\modules\space\models\Space;
 use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\space\widgets\Menu;
+use humhub\widgets\TopMenu;
 use Yii;
-use yii\base\Event;
-use yii\web\ForbiddenHttpException;
+use yii\base\ActionEvent;
+use yii\web\UserEvent;
 
 class Events
 {
@@ -106,11 +110,104 @@ class Events
             Yii::$app->end();
         }
 
-        // Replace home stream with a restricted panel for non-admins.
         $event->isValid = false;
         Yii::$app->response->content = $controller->render('@thiscovery-page-builder/views/space/stream_restricted', [
             'space' => $space,
         ]);
         Yii::$app->end();
+    }
+
+    public static function onTopMenuInit($event): void
+    {
+        if (!Yii::$app->getModule('thiscovery-page-builder')) {
+            return;
+        }
+
+        try {
+            if (!(new EngagementPage())->hasAttribute('show_in_top_menu')) {
+                return;
+            }
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $isGuest = Yii::$app->user->isGuest;
+        $pages = EngagementPage::find()
+            ->where([
+                'show_in_top_menu' => 1,
+                'status' => EngagementPage::STATUS_PUBLISHED,
+                'is_template' => 0,
+            ])
+            ->orderBy(['top_menu_sort_order' => SORT_ASC, 'title' => SORT_ASC])
+            ->all();
+
+        /** @var TopMenu $menu */
+        $menu = $event->sender;
+        foreach ($pages as $page) {
+            $visibility = (string) ($page->top_menu_visibility ?: EngagementPage::TOP_MENU_ALL);
+            if ($visibility === EngagementPage::TOP_MENU_GUESTS && !$isGuest) {
+                continue;
+            }
+            if ($visibility === EngagementPage::TOP_MENU_USERS && $isGuest) {
+                continue;
+            }
+            if (!$page->canAccessPublic()) {
+                continue;
+            }
+
+            $label = trim((string) ($page->top_menu_label ?: $page->title));
+            $url = PageUrl::toPublic($page);
+            $menu->addEntry(new MenuLink([
+                'id' => 'thiscovery-page-' . $page->id,
+                'label' => $label,
+                'url' => $url,
+                'icon' => 'file-text-o',
+                'sortOrder' => (int) ($page->top_menu_sort_order ?: 400),
+                'isActive' => (Yii::$app->request->url === $url)
+                    || str_starts_with(ltrim(Yii::$app->request->pathInfo, '/'), ltrim($page->getPublicPath(), '/')),
+                'isVisible' => true,
+            ]));
+        }
+    }
+
+    public static function onApplicationBeforeAction(ActionEvent $event): void
+    {
+        if (Yii::$app->request->isConsoleRequest) {
+            return;
+        }
+        try {
+            if (Yii::$app->db->schema->getTableSchema('thiscovery_page_home', true) === null) {
+                return;
+            }
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $homepageUrl = PageHome::resolveHomeUrl();
+        if ($homepageUrl) {
+            if (Yii::$app->homeUrl !== $homepageUrl) {
+                Yii::$app->homeUrl = $homepageUrl;
+            }
+            if (Yii::$app->user->isGuest && Yii::$app->user->loginUrl !== $homepageUrl) {
+                $userModule = Yii::$app->getModule('user');
+                if ($userModule && !$userModule->settings->get('auth.allowGuestAccess')) {
+                    Yii::$app->user->loginUrl = $homepageUrl;
+                }
+            }
+        }
+    }
+
+    public static function onAfterLogin(UserEvent $event): void
+    {
+        if (!Yii::$app->user->identity) {
+            return;
+        }
+        if (Yii::$app->user->getReturnUrl() !== Yii::$app->homeUrl) {
+            return;
+        }
+        $homepageUrl = PageHome::getUrlForUser();
+        if ($homepageUrl) {
+            Yii::$app->response->redirect($homepageUrl)->send();
+        }
     }
 }

@@ -13,11 +13,12 @@ use yii\base\Component;
 use yii\web\UrlRuleInterface;
 
 /**
- * Pretty public URLs under the editable homepage slug, plus /page-builder admin aliases.
+ * Pretty public URLs for collections, nested pages, and top-level pages, plus /page-builder admin aliases.
  */
 class PageUrlRule extends Component implements UrlRuleInterface
 {
     public const CACHE_ID = 'thiscovery-page-builder-public-prefix';
+    public const ROOT_SLUGS_CACHE_ID = 'thiscovery-page-builder-root-slugs';
     public const ADMIN_PREFIX = 'page-builder';
 
     private const ADMIN_FIXED = [
@@ -37,6 +38,9 @@ class PageUrlRule extends Component implements UrlRuleInterface
         'thiscovery-page-builder/global/delete' => 'page-builder/delete',
     ];
 
+    /**
+     * Legacy helper: primary collection slug (former directory homepage).
+     */
     public static function getPrefix(): string
     {
         $cached = Yii::$app->cache->get(self::CACHE_ID);
@@ -59,9 +63,44 @@ class PageUrlRule extends Component implements UrlRuleInterface
         return $prefix;
     }
 
+    /**
+     * @return string[] lowercase root page/collection slugs
+     */
+    public static function getRootSlugs(): array
+    {
+        $cached = Yii::$app->cache->get(self::ROOT_SLUGS_CACHE_ID);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $slugs = [];
+        try {
+            if ((new EngagementPage())->hasAttribute('parent_id')) {
+                $slugs = EngagementPage::find()
+                    ->select('slug')
+                    ->where(['parent_id' => null])
+                    ->andWhere(['or', ['is_template' => 0], ['is_template' => null]])
+                    ->column();
+            } else {
+                $slugs = [self::getPrefix()];
+            }
+        } catch (\Throwable $e) {
+            $slugs = [EngagementPage::DEFAULT_PUBLIC_PREFIX];
+        }
+
+        $slugs = array_values(array_unique(array_filter(array_map(
+            static fn ($s) => strtolower(trim((string) $s)),
+            $slugs
+        ))));
+
+        Yii::$app->cache->set(self::ROOT_SLUGS_CACHE_ID, $slugs, 3600);
+        return $slugs;
+    }
+
     public static function flushCache(): void
     {
         Yii::$app->cache->delete(self::CACHE_ID);
+        Yii::$app->cache->delete(self::ROOT_SLUGS_CACHE_ID);
     }
 
     public function createUrl($manager, $route, $params)
@@ -82,19 +121,25 @@ class PageUrlRule extends Component implements UrlRuleInterface
             return $this->appendQuery($url, $params);
         }
 
-        $prefix = self::getPrefix();
-
         if ($route === 'thiscovery-page-builder/public/index') {
-            return $this->appendQuery($prefix, $params);
+            return $this->appendQuery(self::getPrefix(), $params);
         }
 
-        if (in_array($route, ['thiscovery-page-builder/public/view', 'thiscovery-page-builder/public/follow', 'thiscovery-page-builder/public/comment'], true)
-            && isset($params['slug'])) {
+        if (in_array($route, [
+            'thiscovery-page-builder/public/view',
+            'thiscovery-page-builder/public/follow',
+            'thiscovery-page-builder/public/comment',
+        ], true) && isset($params['slug'])) {
             $slug = (string) $params['slug'];
-            unset($params['slug']);
-            $url = ($slug === $prefix)
-                ? $prefix
-                : $prefix . '/' . rawurlencode($slug);
+            $parentSlug = isset($params['parentSlug']) ? (string) $params['parentSlug'] : '';
+            unset($params['slug'], $params['parentSlug']);
+
+            if ($parentSlug !== '') {
+                $url = rawurlencode($parentSlug) . '/' . rawurlencode($slug);
+            } else {
+                $url = rawurlencode($slug);
+            }
+
             if ($route === 'thiscovery-page-builder/public/follow') {
                 $url .= '/follow';
             } elseif ($route === 'thiscovery-page-builder/public/comment') {
@@ -123,10 +168,26 @@ class PageUrlRule extends Component implements UrlRuleInterface
             return ['thiscovery-page-builder/public/view', array_merge($query, ['slug' => $parts[1]])];
         }
 
-        $prefix = self::getPrefix();
-        $publicRoots = array_unique([$prefix, EngagementPage::DEFAULT_PUBLIC_PREFIX]);
-        if (!in_array($parts[0], $publicRoots, true)) {
+        $root = strtolower((string) $parts[0]);
+        if (in_array($root, EngagementPage::reservedPrefixSlugs(), true)) {
             return false;
+        }
+
+        $rootSlugs = self::getRootSlugs();
+        // Accept known roots; also allow lookup for newly created roots before cache refresh.
+        if (!in_array($root, $rootSlugs, true) && !in_array($root, [self::getPrefix(), EngagementPage::DEFAULT_PUBLIC_PREFIX], true)) {
+            // Soft probe: only claim the path if a root page with this slug exists.
+            try {
+                $probe = EngagementPage::find()
+                    ->where(['slug' => $root])
+                    ->andWhere(['parent_id' => null])
+                    ->one();
+                if ($probe === null) {
+                    return false;
+                }
+            } catch (\Throwable $e) {
+                return false;
+            }
         }
 
         return $this->parsePublic($parts, $query);
@@ -159,25 +220,36 @@ class PageUrlRule extends Component implements UrlRuleInterface
     private function parsePublic(array $parts, array $query): array|false
     {
         $count = count($parts);
-        $root = $parts[0];
+        $root = strtolower((string) $parts[0]);
 
         if ($count === 1) {
-            return ['thiscovery-page-builder/public/index', $query];
+            // Top-level collection or standalone page.
+            return ['thiscovery-page-builder/public/view', array_merge($query, ['slug' => $root])];
         }
 
         if ($count === 2 && in_array($parts[1], ['follow', 'comment'], true)) {
-            return ['thiscovery-page-builder/public/' . $parts[1], array_merge($query, ['slug' => $root])];
+            return [
+                'thiscovery-page-builder/public/' . $parts[1],
+                array_merge($query, ['slug' => $root]),
+            ];
         }
 
         if ($count === 2) {
-            if ($parts[1] === $root) {
-                return ['thiscovery-page-builder/public/index', $query];
-            }
-            return ['thiscovery-page-builder/public/view', array_merge($query, ['slug' => $parts[1]])];
+            $child = strtolower((string) $parts[1]);
+            return [
+                'thiscovery-page-builder/public/view',
+                array_merge($query, ['slug' => $child, 'parentSlug' => $root]),
+            ];
         }
 
         if ($count === 3 && in_array($parts[2], ['follow', 'comment'], true)) {
-            return ['thiscovery-page-builder/public/' . $parts[2], array_merge($query, ['slug' => $parts[1]])];
+            return [
+                'thiscovery-page-builder/public/' . $parts[2],
+                array_merge($query, [
+                    'slug' => strtolower((string) $parts[1]),
+                    'parentSlug' => $root,
+                ]),
+            ];
         }
 
         return false;

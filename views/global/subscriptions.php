@@ -28,6 +28,11 @@ $this->title = Yii::t('ThiscoveryPageBuilderModule.base', 'Subscriptions');
             ->link(Url::toGlobalIndex())
             ->sm()
             ->right() ?>
+        <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Help'))
+            ->link(Url::toHelp(null, 'creators-engagement'))
+            ->icon('question-circle')
+            ->sm()
+            ->right() ?>
         <?php if ($follows !== []): ?>
             <?= Button::primary(Yii::t('ThiscoveryPageBuilderModule.base', 'Export CSV'))
                 ->link(Url::toGlobalExportSubscriptions($pageId))

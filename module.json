@@ -9,7 +9,7 @@
     "consultation",
     "nhs"
   ],
-  "version": "1.4.1",
+    "version": "1.6.1",
   "humhub": {
     "minVersion": "1.18"
   },

@@ -7,8 +7,7 @@
 
 namespace humhub\modules\thiscoveryPageBuilder\controllers;
 
-use humhub\components\Controller;
-use humhub\components\access\ControllerAccess;
+use humhub\modules\admin\components\Controller;
 use humhub\modules\content\models\Content;
 use humhub\modules\thiscoveryPageBuilder\assets\ThiscoveryPageBuilderAsset;
 use humhub\modules\thiscoveryPageBuilder\helpers\Url;
@@ -26,15 +25,18 @@ use yii\web\NotFoundHttpException;
 
 /**
  * Network-level engagement pages (primary admin path).
+ * Uses the Administration layout (left admin menu), same as Thiscovery Forms.
  * No Space required — pair with global Thiscovery Forms.
  */
 class GlobalController extends Controller
 {
     use SectionPostParserTrait;
+    use HelpTrait;
 
-    public $subLayout = '@thiscovery-page-builder/views/layouts/admin';
-
-    protected $access = ControllerAccess::class;
+    /**
+     * @inheritdoc
+     */
+    public $adminOnly = false;
 
     protected function getAccessRules()
     {
@@ -45,7 +47,7 @@ class GlobalController extends Controller
 
     public function behaviors()
     {
-        return [
+        return array_merge(parent::behaviors(), [
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -55,7 +57,7 @@ class GlobalController extends Controller
                     'delete-subscription' => ['POST'],
                 ],
             ],
-        ];
+        ]);
     }
 
     public function actionIndex()
@@ -79,21 +81,24 @@ class GlobalController extends Controller
             ->andWhere(['content.contentcontainer_id' => null])
             ->andWhere(['p.is_template' => false])
             ->orderBy([
+                'p.is_collection' => SORT_DESC,
                 'p.is_directory' => SORT_DESC,
-                'p.updated_at' => SORT_DESC,
+                'p.parent_id' => SORT_ASC,
+                'p.title' => SORT_ASC,
                 'p.id' => SORT_DESC,
             ])
             ->all();
 
         $templates = EngagementPage::findTemplates(null);
 
-        return $this->render('index', [
+        return $this->render('@thiscovery-page-builder/views/page/index', [
             'pages' => $pages,
             'templates' => $templates,
             'pendingComments' => PageComment::countPending(),
             'subscriptionCount' => PageFollow::countGlobal(),
             'canCreate' => Yii::$app->user->can(CreateGlobalPage::class) || Yii::$app->user->isAdmin(),
             'contentContainer' => null,
+            'canViewHelp' => $this->canViewHelp(),
         ]);
     }
 
@@ -274,7 +279,7 @@ class GlobalController extends Controller
         }
     }
 
-    public function actionCreate($template_id = null)
+    public function actionCreate($template_id = null, $parent_id = null, $collection = null)
     {
         if (!Yii::$app->user->can(CreateGlobalPage::class) && !Yii::$app->user->isAdmin()) {
             throw new ForbiddenHttpException();
@@ -282,8 +287,22 @@ class GlobalController extends Controller
 
         $page = new EngagementPage();
         $page->status = EngagementPage::STATUS_DRAFT;
-        $page->sections = $this->defaultSections();
+        $page->sections = [];
         $page->content->visibility = Content::VISIBILITY_PUBLIC;
+
+        $asCollection = (int) ($collection ?: Yii::$app->request->get('collection', 0)) === 1;
+        if ($asCollection && $page->hasAttribute('is_collection')) {
+            $page->is_collection = true;
+            $page->listed = false;
+        }
+
+        $parentId = (int) ($parent_id ?: Yii::$app->request->get('parent_id', 0));
+        if (!$asCollection && $parentId > 0 && $page->hasAttribute('parent_id')) {
+            $parent = EngagementPage::findOne($parentId);
+            if ($parent !== null && $parent->isCollection() && $parent->isGlobal()) {
+                $page->parent_id = $parent->id;
+            }
+        }
 
         $templateId = (int) ($template_id ?: Yii::$app->request->get('template_id', 0));
         if ($templateId > 0) {
@@ -350,7 +369,7 @@ class GlobalController extends Controller
             'page' => $page,
             'canManage' => $page->canManage(),
             'publicLayout' => false,
-            'isDirectory' => $page->isDirectoryHome(),
+            'isDirectory' => $page->isCollection(),
         ]);
     }
 
@@ -363,12 +382,20 @@ class GlobalController extends Controller
         if ($page->isDirectoryHome()) {
             Yii::$app->session->setFlash(
                 'error',
-                Yii::t('ThiscoveryPageBuilderModule.base', 'The public homepage cannot be deleted. Edit it in the page builder instead.')
+                Yii::t('ThiscoveryPageBuilderModule.base', 'The primary public collection cannot be deleted. Edit it in the page builder instead.')
             );
             return $this->redirect(Url::toGlobalEdit($page));
         }
+        if ($page->isCollection() && $page->getChildren()->count() > 0) {
+            Yii::$app->session->setFlash(
+                'error',
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Move or delete pages in this collection before deleting the collection.')
+            );
+            return $this->redirect(Url::toGlobalEdit($page));
+        }
+        $parentId = (int) $page->parent_id;
         $page->hardDelete();
-        return $this->redirect(Url::toGlobalIndex());
+        return $this->redirect(Url::toIndex(null, $parentId > 0 ? ['collection' => $parentId] : []));
     }
 
     protected function handleEdit(EngagementPage $page, bool $isNew)
@@ -384,13 +411,43 @@ class GlobalController extends Controller
                 $page->featured = false;
                 $page->status = EngagementPage::STATUS_DRAFT;
             }
+            if ($page->hasAttribute('is_collection') && $request->post('EngagementPage') !== null) {
+                // Keep collection flag from hidden field / checkbox.
+            }
+            if ($page->hasAttribute('parent_id') && $page->isCollection()) {
+                $page->parent_id = null;
+            }
+            if ($page->hasAttribute('bound_space_id')) {
+                $bound = $request->post('EngagementPage')['bound_space_id'] ?? '';
+                $page->bound_space_id = ($bound === '' || $bound === null) ? null : (int) $bound;
+            }
             $page->sections = $this->parseSectionsFromPost();
             $page->content->visibility = ((int) $page->status === EngagementPage::STATUS_PUBLISHED)
                 ? Content::VISIBILITY_PUBLIC
                 : Content::VISIBILITY_PRIVATE;
 
             if ($page->save()) {
-                return $this->redirect(Url::toGlobalView($page));
+                $this->syncPageHomes($page);
+                $postedHomes = Yii::$app->request->post('PageHome', []);
+                $homeEnabled = false;
+                if (is_array($postedHomes)) {
+                    foreach ($postedHomes as $row) {
+                        if (!empty($row['enabled'])) {
+                            $homeEnabled = true;
+                            break;
+                        }
+                    }
+                }
+                if ($homeEnabled && !$page->isPublished()) {
+                    Yii::$app->session->setFlash(
+                        'warning',
+                        Yii::t(
+                            'ThiscoveryPageBuilderModule.base',
+                            'Homepage assignment was saved, but this page is still a draft. Publish it for the site homepage to take effect.'
+                        )
+                    );
+                }
+                return $this->redirectAfterStudioSave($page);
             }
         }
 
@@ -402,6 +459,83 @@ class GlobalController extends Controller
             'formOptions' => $this->formOptions(),
             'pollOptions' => $this->pollOptions(),
             'templates' => EngagementPage::findTemplates(null),
+            'collectionOptions' => EngagementPage::collectionOptions(null, $page->id),
+            'spaceOptions' => EngagementPage::spaceOptions(),
+            'pageOptions' => EngagementPage::publishedPageOptions($page->id),
+            'groupOptions' => $this->groupOptions(),
+            'pageHomes' => $page->isNewRecord ? [] : $page->pageHomes,
+        ]);
+    }
+
+    protected function syncPageHomes(EngagementPage $page): void
+    {
+        if ($page->isTemplate() || !class_exists(\humhub\modules\thiscoveryPageBuilder\models\PageHome::class)) {
+            return;
+        }
+        $posted = Yii::$app->request->post('PageHome', []);
+        if (!is_array($posted)) {
+            $posted = [];
+        }
+        \humhub\modules\thiscoveryPageBuilder\models\PageHome::syncForPage($page, $posted);
+    }
+
+    /**
+     * Stay in the studio after save, or open the public preview.
+     */
+    protected function redirectAfterStudioSave(EngagementPage $page)
+    {
+        $after = (string) Yii::$app->request->post('after_save', 'stay');
+        if ($after === 'preview') {
+            if ($page->isTemplate()) {
+                Yii::$app->session->setFlash(
+                    'info',
+                    Yii::t('ThiscoveryPageBuilderModule.base', 'Templates cannot be previewed publicly. Open the page builder Share tab after creating a page from this template.')
+                );
+                return $this->redirect(Url::toEdit($page));
+            }
+            return $this->redirect(Url::toPublic($page));
+        }
+
+        $tab = trim((string) Yii::$app->request->post('studio_tab', ''));
+        $url = Url::toEdit($page);
+        if ($tab !== '' && $tab !== 'builder') {
+            $url .= (str_contains($url, '?') ? '&' : '?') . 'tab=' . rawurlencode($tab);
+        }
+        Yii::$app->session->setFlash(
+            'success',
+            Yii::t('ThiscoveryPageBuilderModule.base', 'Page saved.')
+        );
+        return $this->redirect($url);
+    }
+
+    protected function groupOptions(): array
+    {
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a group…')];
+        foreach (\humhub\modules\user\models\Group::find()->orderBy(['name' => SORT_ASC])->all() as $group) {
+            $options[(string) $group->id] = $group->name;
+        }
+        return $options;
+    }
+
+    protected function defaultCollectionSections(): array
+    {
+        return BlockRegistry::normalizeSections([
+            [
+                'type' => 'hero',
+                'region' => BlockRegistry::REGION_FULL,
+                'settings' => [
+                    'headline' => Yii::t('ThiscoveryPageBuilderModule.base', 'New collection'),
+                    'subheadline' => '',
+                ],
+            ],
+            [
+                'type' => 'collection',
+                'region' => BlockRegistry::REGION_MAIN,
+                'settings' => [
+                    'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Pages'),
+                    'source' => 'pages',
+                ],
+            ],
         ]);
     }
 

@@ -14,15 +14,21 @@ class Url
 {
     public static function toPublic(EngagementPage $page, $scheme = false): string
     {
-        if ($page->isDirectoryHome()) {
-            return BaseUrl::to(['/thiscovery-page-builder/public/index'], $scheme);
+        $params = ['/thiscovery-page-builder/public/view', 'slug' => $page->slug];
+        $parentSlug = $page->getParentUrlSlug();
+        if ($parentSlug) {
+            $params['parentSlug'] = $parentSlug;
         }
-        $url = BaseUrl::to(['/thiscovery-page-builder/public/view', 'slug' => $page->slug], $scheme);
+        $url = BaseUrl::to($params, $scheme);
         return $scheme ? self::ensureHttps($url) : $url;
     }
 
     public static function toDirectory($scheme = false): string
     {
+        $home = EngagementPage::findDirectoryHome();
+        if ($home !== null) {
+            return self::toPublic($home, $scheme);
+        }
         return BaseUrl::to(['/thiscovery-page-builder/public/index'], $scheme);
     }
 
@@ -31,11 +37,17 @@ class Url
         return BaseUrl::to(['/thiscovery-page-builder/global/index']);
     }
 
-    public static function toGlobalCreate(?int $templateId = null): string
+    public static function toGlobalCreate(?int $templateId = null, ?int $parentId = null, bool $asCollection = false): string
     {
         $params = ['/thiscovery-page-builder/global/create'];
         if ($templateId) {
             $params['template_id'] = $templateId;
+        }
+        if ($parentId) {
+            $params['parent_id'] = $parentId;
+        }
+        if ($asCollection) {
+            $params['collection'] = 1;
         }
         return BaseUrl::to($params);
     }
@@ -108,12 +120,13 @@ class Url
         return $page->content->container->createUrl('/thiscovery-page-builder/page/edit', ['id' => $page->id]);
     }
 
-    public static function toIndex($container = null): string
+    public static function toIndex($container = null, array $params = []): string
     {
+        $params = array_filter($params, static fn($value) => $value !== null && $value !== '');
         if ($container === null) {
-            return self::toGlobalIndex();
+            return BaseUrl::to(array_merge(['/thiscovery-page-builder/global/index'], $params));
         }
-        return $container->createUrl('/thiscovery-page-builder/page/index');
+        return $container->createUrl(array_merge(['/thiscovery-page-builder/page/index'], $params));
     }
 
     public static function toSaveTemplate(EngagementPage $page): string
@@ -124,16 +137,34 @@ class Url
         return $page->content->container->createUrl('/thiscovery-page-builder/page/save-template', ['id' => $page->id]);
     }
 
-    public static function toCreate($container = null, ?int $templateId = null): string
+    public static function toCreate($container = null, ?int $templateId = null, ?int $parentId = null, bool $asCollection = false): string
     {
         if ($container === null) {
-            return self::toGlobalCreate($templateId);
+            return self::toGlobalCreate($templateId, $parentId, $asCollection);
         }
         $params = ['/thiscovery-page-builder/page/create'];
         if ($templateId) {
             $params['template_id'] = $templateId;
         }
+        if ($parentId) {
+            $params['parent_id'] = $parentId;
+        }
+        if ($asCollection) {
+            $params['collection'] = 1;
+        }
         return $container->createUrl($params);
+    }
+
+    public static function toHelp($container = null, ?string $page = null): string
+    {
+        $params = [];
+        if ($page) {
+            $params['page'] = $page;
+        }
+        if ($container === null) {
+            return BaseUrl::to(array_merge(['/thiscovery-page-builder/global/help'], $params));
+        }
+        return $container->createUrl(array_merge(['/thiscovery-page-builder/page/help'], $params));
     }
 
     public static function toDelete(EngagementPage $page): string

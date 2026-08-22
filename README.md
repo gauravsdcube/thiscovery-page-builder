@@ -1,6 +1,6 @@
 # Thiscovery Page Builder
 
-**Version 1.4.1**  
+**Version 1.6.0**  
 **Copyright (c) 2026 D Cube Consulting. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 
@@ -14,6 +14,7 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 - PHP 8.1+
 - [Thiscovery Editor](https://github.com/gauravsdcube/thiscovery-editor) module (`thiscovery-editor`) for rich text
 - Optional: [Thiscovery Forms](https://github.com/gauravsdcube) module for Survey CTA and Quick poll blocks
+- Optional Space modules for embeds: Tasks, Files (`cfiles`), Gallery, Calendar
 
 ## Install
 
@@ -21,22 +22,30 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 2. Enable **Thiscovery Page Builder** in Administration → Modules
 3. Run pending migrations (HumHub will apply module migrations on enable, or use `php protected/yii migrate/up --migrationPath=@thiscovery-page-builder/migrations`)
 
-## Features (v1.3)
+## Features (v1.6)
+
+- **In-product Help** for administrators and page creators (page list, studio, comments, subscriptions)
 
 - **Global page builder** at `/page-builder`
-- Public URLs: `/{homepage-slug}` and `/{homepage-slug}/{page-slug}` (homepage slug is editable in Settings)
-- Drag-and-drop sections: hero, rich text, survey CTA, quick poll, downloads, grid containers, phases, events, team, contact, updates, comments, accordion, callout, image, collections
-- Page width and column layouts
-- Page templates (save / create from template)
-- Visibility: **public (guests)** or **community members only**
-- **Comments** element with guest CAPTCHA, rate limits, optional anonymous name, show/hide approved comments, admin moderation history
-- **Collections** can list pages, forms, spaces, or upcoming Calendar events
-- **Get updates** subscriptions stored per page, with admin table and CSV export
-- Space stream lockdown when the module is enabled on a space (ops-focused)
+- **Collections** as top-level URL prefixes (`/collection`) and **standalone** pages (`/about`)
+- Pages nested under a collection: `/collection/page-slug`
+- Configurable slugs with duplicate-slug warnings
+- Drag-and-drop sections including **Button**, Space widgets (stream / tasks / files / gallery / calendar), hero, rich text, survey CTA, quick poll, downloads, containers, phases, events, team, contact, updates, comments, accordion, callout, image, collections
+- Bind one **Space** per page for all space widgets
+- **Top menu** entries per page; **site homepage** for guests, logged-in users, and groups (configure here, then disable the Homepage module)
+- Page templates, audience visibility, comments moderation, subscriptions CSV
+
+## Retiring Homepage module
+
+1. Open a published page → Settings → Site homepage
+2. Assign guest / logged-in / group homes and save
+3. Confirm Home and post-login redirects
+4. Disable **Homepage** under Administration → Modules
 
 ## Admin
 
 - Administration → **Thiscovery Page Builder**
+- In-product **Help** from the page list
 - Comment moderation: `/page-builder/comments`
 - Subscriptions (Get updates emails): `/page-builder/subscriptions`
 
