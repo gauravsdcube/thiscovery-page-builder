@@ -22,6 +22,7 @@ use yii\web\NotFoundHttpException;
 class PageController extends ContentContainerController
 {
     use SectionPostParserTrait;
+    use HelpTrait;
 
     public $validContentContainerClasses = [Space::class];
 
@@ -69,10 +70,11 @@ class PageController extends ContentContainerController
             'pages' => $pages,
             'templates' => $templates,
             'canCreate' => $probe->canCreate(),
+            'canViewHelp' => $this->canViewHelp(),
         ]);
     }
 
-    public function actionCreate($template_id = null)
+    public function actionCreate($template_id = null, $parent_id = null, $collection = null)
     {
         $page = new EngagementPage($this->contentContainer);
         if (!$page->canCreate()) {
@@ -80,7 +82,28 @@ class PageController extends ContentContainerController
         }
 
         $page->status = EngagementPage::STATUS_DRAFT;
-        $page->sections = $this->defaultSections();
+        $page->sections = [];
+        if ($page->hasAttribute('bound_space_id') && $this->contentContainer instanceof Space) {
+            $page->bound_space_id = (int) $this->contentContainer->id;
+        }
+
+        $asCollection = (int) ($collection ?: Yii::$app->request->get('collection', 0)) === 1;
+        if ($asCollection && $page->hasAttribute('is_collection')) {
+            $page->is_collection = true;
+            $page->listed = false;
+        }
+
+        $parentId = (int) ($parent_id ?: Yii::$app->request->get('parent_id', 0));
+        if (!$asCollection && $parentId > 0 && $page->hasAttribute('parent_id')) {
+            $parent = EngagementPage::find()
+                ->alias('p')
+                ->contentContainer($this->contentContainer)
+                ->andWhere(['p.id' => $parentId])
+                ->one();
+            if ($parent instanceof EngagementPage && $parent->isCollection()) {
+                $page->parent_id = $parent->id;
+            }
+        }
 
         $templateId = (int) ($template_id ?: Yii::$app->request->get('template_id', 0));
         if ($templateId > 0) {
@@ -154,7 +177,7 @@ class PageController extends ContentContainerController
             'page' => $page,
             'canManage' => $page->canManage(),
             'publicLayout' => false,
-            'isDirectory' => $page->isDirectoryHome(),
+            'isDirectory' => $page->isCollection(),
         ]);
     }
 
@@ -165,10 +188,16 @@ class PageController extends ContentContainerController
             throw new ForbiddenHttpException();
         }
         if ($page->isDirectoryHome()) {
-            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'The public homepage cannot be deleted.'));
+            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'The primary public collection cannot be deleted.'));
         }
+        if ($page->isCollection() && $page->getChildren()->count() > 0) {
+            throw new ForbiddenHttpException(
+                Yii::t('ThiscoveryPageBuilderModule.base', 'Move or delete pages in this collection before deleting the collection.')
+            );
+        }
+        $parentId = (int) $page->parent_id;
         $page->hardDelete();
-        return $this->redirect(Url::toIndex($this->contentContainer));
+        return $this->redirect(Url::toIndex($this->contentContainer, $parentId > 0 ? ['collection' => $parentId] : []));
     }
 
     protected function handleEdit(EngagementPage $page, bool $isNew)
@@ -184,11 +213,20 @@ class PageController extends ContentContainerController
                 $page->featured = false;
                 $page->status = EngagementPage::STATUS_DRAFT;
             }
+            if ($page->hasAttribute('parent_id') && $page->isCollection()) {
+                $page->parent_id = null;
+            }
+            if ($page->hasAttribute('bound_space_id')) {
+                $bound = $request->post('EngagementPage')['bound_space_id'] ?? '';
+                $page->bound_space_id = ($bound === '' || $bound === null) ? null : (int) $bound;
+            }
             $page->sections = $this->parseSectionsFromPost();
             if ($page->save()) {
-                return $this->redirect(Url::toViewInSpace($page));
+                return $this->redirectAfterStudioSave($page);
             }
         }
+
+        $ccId = (int) $this->contentContainer->contentcontainer_id;
 
         return $this->render('edit', [
             'contentContainer' => $this->contentContainer,
@@ -197,7 +235,12 @@ class PageController extends ContentContainerController
             'blockLabels' => BlockRegistry::labels(),
             'formOptions' => $this->formOptions(),
             'pollOptions' => $this->pollOptions(),
-            'templates' => EngagementPage::findTemplates((int) $this->contentContainer->contentcontainer_id),
+            'templates' => EngagementPage::findTemplates($ccId),
+            'collectionOptions' => EngagementPage::collectionOptions($ccId, $page->id),
+            'spaceOptions' => EngagementPage::spaceOptions(),
+            'pageOptions' => EngagementPage::publishedPageOptions($page->id),
+            'groupOptions' => [],
+            'pageHomes' => [],
         ]);
     }
 
@@ -217,6 +260,35 @@ class PageController extends ContentContainerController
             return $options;
         }
         return $options + CustomForm::pickerOptions($this->contentContainer, CustomForm::KIND_POLL, true);
+    }
+
+    /**
+     * Stay in the studio after save, or open the public preview.
+     */
+    protected function redirectAfterStudioSave(EngagementPage $page)
+    {
+        $after = (string) Yii::$app->request->post('after_save', 'stay');
+        if ($after === 'preview') {
+            if ($page->isTemplate()) {
+                Yii::$app->session->setFlash(
+                    'info',
+                    Yii::t('ThiscoveryPageBuilderModule.base', 'Templates cannot be previewed publicly. Open the page builder Share tab after creating a page from this template.')
+                );
+                return $this->redirect(Url::toEdit($page));
+            }
+            return $this->redirect(Url::toPublic($page));
+        }
+
+        $tab = trim((string) Yii::$app->request->post('studio_tab', ''));
+        $url = Url::toEdit($page);
+        if ($tab !== '' && $tab !== 'builder') {
+            $url .= (str_contains($url, '?') ? '&' : '?') . 'tab=' . rawurlencode($tab);
+        }
+        Yii::$app->session->setFlash(
+            'success',
+            Yii::t('ThiscoveryPageBuilderModule.base', 'Page saved.')
+        );
+        return $this->redirect($url);
     }
 
     protected function findPage($id): EngagementPage

@@ -82,6 +82,9 @@ trait SectionPostParserTrait
             $settings['show_featured_first'] = !empty($settings['show_featured_first']);
             $settings['event_limit'] = CollectionBlock::clampEventLimit($settings['event_limit'] ?? CollectionBlock::EVENT_LIMIT_DEFAULT);
         }
+        if ($type === 'button') {
+            $settings['new_tab'] = !empty($settings['new_tab']);
+        }
 
         $section = [
             'type' => $type,

@@ -37,6 +37,13 @@ use yii\helpers\Json;
  * @property bool $listed
  * @property bool $featured
  * @property bool $is_directory
+ * @property bool $is_collection
+ * @property int|null $parent_id
+ * @property int|null $bound_space_id
+ * @property bool $show_in_top_menu
+ * @property string|null $top_menu_label
+ * @property int $top_menu_sort_order
+ * @property string $top_menu_visibility
  * @property bool $is_template
  * @property string|null $category
  * @property string|null $closes_at
@@ -44,9 +51,16 @@ use yii\helpers\Json;
  * @property int|null $created_by
  * @property string|null $updated_at
  * @property int|null $updated_by
+ *
+ * @property-read EngagementPage|null $parent
+ * @property-read EngagementPage[] $children
  */
 class EngagementPage extends ContentActiveRecord implements Searchable
 {
+    public const TOP_MENU_ALL = 'all';
+    public const TOP_MENU_GUESTS = 'guests';
+    public const TOP_MENU_USERS = 'users';
+
     public const STATUS_DRAFT = 0;
     public const STATUS_PUBLISHED = 1;
     public const STATUS_ARCHIVED = 2;
@@ -117,8 +131,12 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             [['slug'], 'string', 'max' => 120],
             [['slug'], 'match', 'pattern' => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
                 'message' => Yii::t('ThiscoveryPageBuilderModule.base', 'Slug may only contain lowercase letters, numbers, and hyphens.')],
-            [['slug'], 'unique'],
+            [['slug'], 'unique', 'message' => Yii::t(
+                'ThiscoveryPageBuilderModule.base',
+                'This slug is already used by another page. Choose a different URL slug.'
+            )],
             [['slug'], 'validateSlugReserved'],
+            [['slug'], 'validateSlugCollisionMessage'],
             [['summary', 'sections_json'], 'string'],
             [['category'], 'string', 'max' => 64],
             [['closes_at'], 'safe'],
@@ -132,6 +150,24 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         if ($this->hasAttribute('audience')) {
             $rules[] = [['audience'], 'default', 'value' => self::AUDIENCE_PUBLIC];
             $rules[] = [['audience'], 'in', 'range' => array_keys(self::audienceOptions())];
+        }
+        if ($this->hasAttribute('is_collection')) {
+            $rules[] = [['is_collection'], 'boolean'];
+        }
+        if ($this->hasAttribute('parent_id')) {
+            $rules[] = [['parent_id'], 'integer'];
+            $rules[] = [['parent_id'], 'validateParent'];
+        }
+        if ($this->hasAttribute('bound_space_id')) {
+            $rules[] = [['bound_space_id'], 'integer'];
+            $rules[] = [['bound_space_id'], 'exist', 'skipOnEmpty' => true,
+                'targetClass' => Space::class, 'targetAttribute' => ['bound_space_id' => 'id']];
+        }
+        if ($this->hasAttribute('show_in_top_menu')) {
+            $rules[] = [['show_in_top_menu'], 'boolean'];
+            $rules[] = [['top_menu_label'], 'string', 'max' => 64];
+            $rules[] = [['top_menu_sort_order'], 'integer'];
+            $rules[] = [['top_menu_visibility'], 'in', 'range' => array_keys(self::topMenuVisibilityOptions())];
         }
 
         return $rules;
@@ -150,6 +186,13 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             'listed' => Yii::t('ThiscoveryPageBuilderModule.base', 'Show in directory'),
             'featured' => Yii::t('ThiscoveryPageBuilderModule.base', 'Featured'),
             'is_template' => Yii::t('ThiscoveryPageBuilderModule.base', 'Page template'),
+            'is_collection' => Yii::t('ThiscoveryPageBuilderModule.base', 'Collection'),
+            'parent_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Collection'),
+            'bound_space_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Bound Space'),
+            'show_in_top_menu' => Yii::t('ThiscoveryPageBuilderModule.base', 'Show in top menu'),
+            'top_menu_label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Top menu label'),
+            'top_menu_sort_order' => Yii::t('ThiscoveryPageBuilderModule.base', 'Top menu order'),
+            'top_menu_visibility' => Yii::t('ThiscoveryPageBuilderModule.base', 'Top menu visibility'),
             'category' => Yii::t('ThiscoveryPageBuilderModule.base', 'Category'),
             'closes_at' => Yii::t('ThiscoveryPageBuilderModule.base', 'Closes at'),
         ];
@@ -162,15 +205,16 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             return;
         }
 
-        if ($this->isDirectoryHome() && in_array($slug, self::reservedPrefixSlugs(), true)) {
+        $isRoot = $this->isCollection() || $this->isDirectoryHome() || empty($this->parent_id);
+        if ($isRoot && in_array($slug, self::reservedPrefixSlugs(), true)) {
             $this->addError($attribute, Yii::t(
                 'ThiscoveryPageBuilderModule.base',
-                'This URL is reserved by the platform. Choose a different homepage slug.'
+                'This URL is reserved by the platform. Choose a different slug.'
             ));
             return;
         }
 
-        if (!$this->isDirectoryHome() && in_array($slug, self::reservedChildSlugs(), true)) {
+        if (!$isRoot && in_array($slug, self::reservedChildSlugs(), true)) {
             $this->addError($attribute, Yii::t(
                 'ThiscoveryPageBuilderModule.base',
                 'This slug is reserved. Choose a different URL slug.'
@@ -179,7 +223,59 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     }
 
     /**
-     * First URL segment used for all public pages (the directory homepage slug).
+     * Enrich unique-slug errors with the conflicting page title when possible.
+     */
+    public function validateSlugCollisionMessage($attribute): void
+    {
+        if ($this->hasErrors($attribute)) {
+            $other = static::find()
+                ->where(['slug' => (string) $this->$attribute])
+                ->andFilterWhere(['<>', 'id', $this->id])
+                ->one();
+            if ($other !== null) {
+                $this->clearErrors($attribute);
+                $this->addError($attribute, Yii::t(
+                    'ThiscoveryPageBuilderModule.base',
+                    'This slug is already used by “{title}”. Choose a different URL slug.',
+                    ['title' => $other->title]
+                ));
+            }
+            return;
+        }
+    }
+
+    public function validateParent($attribute): void
+    {
+        if ($this->isCollection() || $this->isDirectoryHome()) {
+            if (!empty($this->parent_id)) {
+                $this->addError($attribute, Yii::t(
+                    'ThiscoveryPageBuilderModule.base',
+                    'Collections cannot be nested under another page.'
+                ));
+            }
+            return;
+        }
+        if (empty($this->parent_id)) {
+            return;
+        }
+        $parent = static::findOne((int) $this->parent_id);
+        if ($parent === null || (!$parent->isCollection() && !$parent->isDirectoryHome())) {
+            $this->addError($attribute, Yii::t(
+                'ThiscoveryPageBuilderModule.base',
+                'Parent must be an existing collection.'
+            ));
+            return;
+        }
+        if ((int) $parent->id === (int) $this->id) {
+            $this->addError($attribute, Yii::t(
+                'ThiscoveryPageBuilderModule.base',
+                'A page cannot be its own parent.'
+            ));
+        }
+    }
+
+    /**
+     * First URL segment of the legacy primary collection (directory homepage).
      */
     public static function publicPrefix(): string
     {
@@ -187,15 +283,24 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     }
 
     /**
-     * Public path for this page, e.g. /consultations or /consultations/my-page.
+     * Public path for this page, e.g. /about or /consultations/my-page.
      */
     public function getPublicPath(): string
     {
-        $prefix = '/' . self::publicPrefix();
-        if ($this->isDirectoryHome()) {
-            return '/' . ($this->slug ?: self::DEFAULT_PUBLIC_PREFIX);
+        if ($this->hasAttribute('parent_id') && !empty($this->parent_id)) {
+            $parent = $this->parent;
+            $parentSlug = $parent ? $parent->slug : self::publicPrefix();
+            return '/' . $parentSlug . '/' . $this->slug;
         }
-        return $prefix . '/' . $this->slug;
+        return '/' . ($this->slug ?: self::DEFAULT_PUBLIC_PREFIX);
+    }
+
+    public function getParentUrlSlug(): ?string
+    {
+        if (!$this->hasAttribute('parent_id') || empty($this->parent_id)) {
+            return null;
+        }
+        return $this->parent?->slug;
     }
 
     /**
@@ -257,14 +362,20 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $this->content->hidden = true;
         }
 
-        // Directory homepage is never listed as a card on itself.
-        if (!empty($this->is_directory)) {
+        // Directory / collection roots are never listed as cards on themselves.
+        if (!empty($this->is_directory) || $this->isCollection()) {
             $this->listed = false;
             $this->featured = false;
             if ($this->hasAttribute('is_template')) {
                 $this->is_template = false;
             }
-            if ($this->slug === '' || $this->slug === null || $this->slug === 'directory') {
+            if ($this->hasAttribute('parent_id')) {
+                $this->parent_id = null;
+            }
+            if ($this->hasAttribute('is_collection') && !empty($this->is_directory)) {
+                $this->is_collection = true;
+            }
+            if (!empty($this->is_directory) && ($this->slug === '' || $this->slug === null || $this->slug === 'directory')) {
                 $this->slug = self::DEFAULT_PUBLIC_PREFIX;
             }
         }
@@ -274,6 +385,15 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $this->listed = false;
             $this->featured = false;
             $this->is_directory = false;
+            if ($this->hasAttribute('is_collection')) {
+                $this->is_collection = false;
+            }
+            if ($this->hasAttribute('parent_id')) {
+                $this->parent_id = null;
+            }
+            if ($this->hasAttribute('show_in_top_menu')) {
+                $this->show_in_top_menu = false;
+            }
             $this->status = self::STATUS_DRAFT;
         }
 
@@ -490,8 +610,22 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             Yii::warning('Engagement Pages file attach failed: ' . $e->getMessage(), 'thiscovery-page-builder');
         }
 
-        if ($this->isDirectoryHome() && ($insert || array_key_exists('slug', $changedAttributes))) {
+        if (($this->isDirectoryHome() || $this->isCollection() || empty($this->parent_id))
+            && ($insert || array_key_exists('slug', $changedAttributes) || array_key_exists('parent_id', $changedAttributes))) {
             PageUrlRule::flushCache();
+        }
+
+        // Homepage URLs depend on published status and slug.
+        if ($insert
+            || array_key_exists('status', $changedAttributes)
+            || array_key_exists('slug', $changedAttributes)
+            || array_key_exists('parent_id', $changedAttributes)
+            || array_key_exists('is_template', $changedAttributes)
+        ) {
+            try {
+                PageHome::flushCache();
+            } catch (\Throwable $e) {
+            }
         }
     }
 
@@ -556,6 +690,136 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     }
 
     /**
+     * Resolve a public page from root slug and optional child slug.
+     */
+    public static function findByPublicPath(string $slug, ?string $parentSlug = null): ?self
+    {
+        $slug = strtolower(trim($slug));
+        if ($slug === '') {
+            return null;
+        }
+
+        if ($parentSlug !== null && $parentSlug !== '') {
+            $parentSlug = strtolower(trim($parentSlug));
+            $parent = static::find()
+                ->where(['slug' => $parentSlug])
+                ->andWhere(['parent_id' => null])
+                ->one();
+            if ($parent === null) {
+                return null;
+            }
+            return static::find()
+                ->where(['slug' => $slug, 'parent_id' => $parent->id])
+                ->one();
+        }
+
+        // Prefer exact root match; fall back to any slug (legacy flat URLs).
+        $root = static::find()
+            ->where(['slug' => $slug])
+            ->andWhere(['parent_id' => null])
+            ->one();
+        if ($root !== null) {
+            return $root;
+        }
+        return static::findBySlug($slug);
+    }
+
+    public function getParent()
+    {
+        return $this->hasOne(self::class, ['id' => 'parent_id']);
+    }
+
+    public function getChildren()
+    {
+        return $this->hasMany(self::class, ['parent_id' => 'id'])
+            ->andWhere(['is_template' => false])
+            ->orderBy(['title' => SORT_ASC, 'id' => SORT_ASC]);
+    }
+
+    public function getPageHomes()
+    {
+        return $this->hasMany(PageHome::class, ['page_id' => 'id']);
+    }
+
+    /**
+     * @return self[]
+     */
+    public static function findCollections(?int $contentContainerId = null): array
+    {
+        $query = static::find()
+            ->alias('p')
+            ->joinWith('content')
+            ->andWhere(['or', ['p.is_collection' => 1], ['p.is_directory' => 1]])
+            ->andWhere(['p.is_template' => false])
+            ->orderBy(['p.title' => SORT_ASC, 'p.id' => SORT_ASC]);
+
+        if ($contentContainerId === null) {
+            $query->andWhere(['content.contentcontainer_id' => null]);
+        } else {
+            $query->andWhere(['content.contentcontainer_id' => $contentContainerId]);
+        }
+
+        return $query->all();
+    }
+
+    public static function collectionOptions(?int $contentContainerId = null, ?int $excludeId = null): array
+    {
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Top-level — not in a collection')];
+        foreach (self::findCollections($contentContainerId) as $collection) {
+            if ($excludeId && (int) $collection->id === (int) $excludeId) {
+                continue;
+            }
+            $options[(string) $collection->id] = $collection->title . ' (/' . $collection->slug . ')';
+        }
+        return $options;
+    }
+
+    public static function spaceOptions(): array
+    {
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'No Space bound')];
+        $spaces = Space::find()->orderBy(['name' => SORT_ASC])->limit(500)->all();
+        foreach ($spaces as $space) {
+            $options[(string) $space->id] = $space->getDisplayName();
+        }
+        return $options;
+    }
+
+    public static function topMenuVisibilityOptions(): array
+    {
+        return [
+            self::TOP_MENU_ALL => Yii::t('ThiscoveryPageBuilderModule.base', 'Everyone'),
+            self::TOP_MENU_GUESTS => Yii::t('ThiscoveryPageBuilderModule.base', 'Guests only'),
+            self::TOP_MENU_USERS => Yii::t('ThiscoveryPageBuilderModule.base', 'Logged-in users only'),
+        ];
+    }
+
+    public function getBoundSpace(): ?Space
+    {
+        if (!$this->hasAttribute('bound_space_id') || empty($this->bound_space_id)) {
+            return null;
+        }
+        return Space::findOne((int) $this->bound_space_id);
+    }
+
+    /**
+     * Published pages for button/page pickers.
+     */
+    public static function publishedPageOptions(?int $excludeId = null): array
+    {
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a page…')];
+        $query = static::find()
+            ->where(['status' => self::STATUS_PUBLISHED, 'is_template' => false])
+            ->orderBy(['title' => SORT_ASC]);
+        if ($excludeId) {
+            $query->andWhere(['<>', 'id', $excludeId]);
+        }
+        foreach ($query->all() as $page) {
+            $options[(string) $page->id] = $page->title . ' (' . $page->getPublicPath() . ')';
+        }
+        return $options;
+    }
+
+    /**
      * Published pages that should appear in the public directory listing block.
      * @return self[]
      */
@@ -574,6 +838,9 @@ class EngagementPage extends ContentActiveRecord implements Searchable
 
         if ((new static())->hasAttribute('is_directory')) {
             $query->andWhere(['is_directory' => false]);
+        }
+        if ((new static())->hasAttribute('is_collection')) {
+            $query->andWhere(['is_collection' => false]);
         }
         if ((new static())->hasAttribute('is_template')) {
             $query->andWhere(['is_template' => false]);
@@ -613,6 +880,9 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         $page->listed = false;
         $page->featured = false;
         $page->is_directory = true;
+        if ($page->hasAttribute('is_collection')) {
+            $page->is_collection = true;
+        }
         $page->sections = BlockRegistry::normalizeSections([
             [
                 'type' => 'hero',
@@ -666,6 +936,22 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     public function isDirectoryHome(): bool
     {
         return $this->hasAttribute('is_directory') && !empty($this->is_directory);
+    }
+
+    public function isCollection(): bool
+    {
+        if ($this->isDirectoryHome()) {
+            return true;
+        }
+        return $this->hasAttribute('is_collection') && !empty($this->is_collection);
+    }
+
+    public function isTopLevel(): bool
+    {
+        if (!$this->hasAttribute('parent_id')) {
+            return $this->isDirectoryHome();
+        }
+        return empty($this->parent_id);
     }
 
     public function isTemplate(): bool
@@ -722,6 +1008,12 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         $tpl->listed = false;
         $tpl->featured = false;
         $tpl->is_directory = false;
+        if ($tpl->hasAttribute('is_collection')) {
+            $tpl->is_collection = false;
+        }
+        if ($tpl->hasAttribute('parent_id')) {
+            $tpl->parent_id = null;
+        }
         $tpl->is_template = true;
         $tpl->category = $this->category;
         $tpl->closes_at = null;

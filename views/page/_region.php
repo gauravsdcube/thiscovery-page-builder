@@ -12,6 +12,8 @@ use humhub\helpers\Html;
 /** @var array $items */
 /** @var array $formOptions */
 /** @var array $pollOptions */
+/** @var array $pageOptions */
+/** @var array $spaceOptions */
 /** @var array $blockLabels */
 /** @var bool $hidden */
 /** @var \humhub\modules\thiscoveryPageBuilder\models\EngagementPage|null $page */
@@ -19,6 +21,8 @@ use humhub\helpers\Html;
 $hidden = !empty($hidden);
 $page = $page ?? null;
 $pollOptions = $pollOptions ?? [];
+$pageOptions = $pageOptions ?? [];
+$spaceOptions = $spaceOptions ?? [];
 ?>
 <div class="ep-region<?= $hidden ? ' is-hidden' : '' ?>"
      data-ep-region="<?= Html::encode($region) ?>"
@@ -27,13 +31,16 @@ $pollOptions = $pollOptions ?? [];
         <span class="ep-region__label"><?= Html::encode($label) ?></span>
         <span class="ep-region__hint"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Drop here') ?></span>
     </div>
-    <div class="ep-region__list" data-ep-region-list="<?= Html::encode($region) ?>" data-ep-drop-zone="region">
+    <div class="ep-region__list" data-ep-region-list="<?= Html::encode($region) ?>" data-ep-drop-zone="region"
+         data-empty-label="<?= Html::encode(Yii::t('ThiscoveryPageBuilderModule.base', 'Drop a section here')) ?>">
         <?php foreach ($items as $i => $section): ?>
             <?= $this->render('_section_card', [
                 'index' => $region . '-' . $i,
                 'section' => array_merge($section, ['region' => $region]),
                 'formOptions' => $formOptions,
                 'pollOptions' => $pollOptions ?? [],
+                'pageOptions' => $pageOptions,
+                'spaceOptions' => $spaceOptions,
                 'blockLabels' => $blockLabels,
                 'collapsed' => true,
                 'isChild' => false,

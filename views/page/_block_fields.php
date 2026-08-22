@@ -18,8 +18,13 @@
 
 use humhub\helpers\Html;
 use humhub\modules\thiscoveryEditor\widgets\EditorField;
+use humhub\modules\thiscoveryPageBuilder\blocks\ButtonBlock;
 
 $page = $page ?? null;
+$pageOptions = $pageOptions ?? [];
+$spaceOptions = $spaceOptions ?? [];
+$formOptions = $formOptions ?? ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a form…')];
+
 
 if ($type === 'phases'): ?>
     <div class="form-group">
@@ -463,5 +468,118 @@ if ($type === 'phases'): ?>
     </div>
     <p class="ep-hint text-muted">
         <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Pages: published items with “Show in public directory”. Forms: open global Thiscovery Forms. Spaces: visible spaces. Calendar: upcoming events (requires the Calendar module).') ?>
+    </p>
+
+<?php elseif ($type === 'button'): ?>
+    <?php
+    $pageOptions = $pageOptions ?: ($page ? \humhub\modules\thiscoveryPageBuilder\models\EngagementPage::publishedPageOptions($page->id) : []);
+    $spaceOptions = $spaceOptions ?: \humhub\modules\thiscoveryPageBuilder\models\EngagementPage::spaceOptions();
+    $action = $settings['action'] ?? ButtonBlock::ACTION_LINK;
+    ?>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Button label') ?></label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][label]"
+               value="<?= Html::encode($settings['label'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Learn more')) ?>"
+               data-ep-card-title-source>
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Action') ?></label>
+        <select class="form-control" name="<?= $namePrefix ?>[settings][action]" data-ep-button-action style="max-width:320px">
+            <?php foreach (ButtonBlock::actionOptions() as $value => $labelOpt): ?>
+                <option value="<?= Html::encode($value) ?>" <?= $action === $value ? 'selected' : '' ?>>
+                    <?= Html::encode($labelOpt) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="form-group" data-ep-button-field="link custom">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'URL') ?></label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][url]"
+               value="<?= Html::encode($settings['url'] ?? '') ?>" placeholder="https://">
+    </div>
+    <div class="form-group" data-ep-button-field="page">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page') ?></label>
+        <select class="form-control" name="<?= $namePrefix ?>[settings][page_id]" style="max-width:420px">
+            <?php foreach ($pageOptions as $value => $labelOpt): ?>
+                <option value="<?= Html::encode($value) ?>" <?= (string) ($settings['page_id'] ?? '') === (string) $value ? 'selected' : '' ?>>
+                    <?= Html::encode($labelOpt) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="form-group" data-ep-button-field="form">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Form') ?></label>
+        <select class="form-control" name="<?= $namePrefix ?>[settings][form_id]" style="max-width:420px">
+            <?php foreach ($formOptions as $value => $labelOpt): ?>
+                <option value="<?= Html::encode($value) ?>" <?= (string) ($settings['form_id'] ?? '') === (string) $value ? 'selected' : '' ?>>
+                    <?= Html::encode($labelOpt) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="form-group" data-ep-button-field="space">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Space') ?></label>
+        <select class="form-control" name="<?= $namePrefix ?>[settings][space_id]" style="max-width:420px">
+            <option value=""><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Use page’s bound Space') ?></option>
+            <?php foreach ($spaceOptions as $value => $labelOpt): ?>
+                <?php if ($value === '') continue; ?>
+                <option value="<?= Html::encode($value) ?>" <?= (string) ($settings['space_id'] ?? '') === (string) $value ? 'selected' : '' ?>>
+                    <?= Html::encode($labelOpt) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="form-group" data-ep-button-field="mailto">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Email address') ?></label>
+        <input type="email" class="form-control" name="<?= $namePrefix ?>[settings][mailto]"
+               value="<?= Html::encode($settings['mailto'] ?? '') ?>">
+    </div>
+    <div class="form-group" data-ep-button-field="tel">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Phone number') ?></label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][tel]"
+               value="<?= Html::encode($settings['tel'] ?? '') ?>">
+    </div>
+    <div class="form-group" data-ep-button-field="scroll">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Element id') ?></label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][scroll_target]"
+               value="<?= Html::encode($settings['scroll_target'] ?? '') ?>" placeholder="ep-comments-1">
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Style') ?></label>
+        <select class="form-control" name="<?= $namePrefix ?>[settings][tone]" style="max-width:220px">
+            <?php foreach (ButtonBlock::toneOptions() as $value => $labelOpt): ?>
+                <option value="<?= Html::encode($value) ?>" <?= ($settings['tone'] ?? 'primary') === $value ? 'selected' : '' ?>>
+                    <?= Html::encode($labelOpt) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Icon class') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][icon]"
+               value="<?= Html::encode($settings['icon'] ?? '') ?>" placeholder="fa-arrow-right" style="max-width:220px">
+    </div>
+    <div class="form-check mb-2">
+        <input type="hidden" name="<?= $namePrefix ?>[settings][new_tab]" value="0">
+        <input class="form-check-input" type="checkbox" value="1" name="<?= $namePrefix ?>[settings][new_tab]"
+               id="ep-btn-newtab-<?= Html::encode($safeIndex) ?>" <?= !empty($settings['new_tab']) ? 'checked' : '' ?>>
+        <label class="form-check-label" for="ep-btn-newtab-<?= Html::encode($safeIndex) ?>">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open in new tab') ?>
+        </label>
+    </div>
+
+<?php elseif (str_starts_with((string) $type, 'space_')): ?>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][title]"
+               value="<?= Html::encode($settings['title'] ?? '') ?>"
+               data-ep-card-title-source>
+    </div>
+    <p class="ep-hint text-muted">
+        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Uses the Space bound in page settings. Enable the matching module on that Space.') ?>
     </p>
 <?php endif; ?>

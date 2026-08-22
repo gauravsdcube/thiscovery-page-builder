@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.6.0 — 2026-08-20
+
+- Enh: In-product Help with sections for administrators and page creators. Open it from the page list, studio, comments, and subscriptions
+
+## 1.5.2 — 2026-08-20
+
+- Enh: Studio navigation aligned with Thiscovery Forms (Back, Preview, Save, Open page)
+- Enh: Settings tab uses collapsible sections with Expand all / Collapse all and ? guidance
+- Enh: Preview saves then opens the public page; normal save stays in the editor
+- Fix: Administration pages (list, editor, comments, etc.) keep the left Administration menu, matching Thiscovery Forms
+
+## 1.5.1 — 2026-08-20
+
+- Fix: Site homepage assignments only apply when the page is **Published** (draft pages were silently ignored)
+- Fix: Flush homepage URL cache when a page is published or its slug changes
+- Enh: Warn in the editor when assigning homepage on a draft page
+
+## 1.5.0 — 2026-08-20
+
+- Enh: Multiple collections and standalone top-level pages (not only one nested homepage prefix)
+- Enh: Configurable URL slugs with clear collision messages when a slug is already used
+- Enh: Button block with presets (link, page, form, space, login/register, mailto/tel, scroll, custom URL)
+- Enh: Bind a Space once per page; embed Stream, Tasks, Files, Gallery, and Calendar widgets
+- Enh: Add pages to the top menu; set guest / logged-in / group site homepages (retires need for Homepage module)
+- Note: After configuring homepage assignments, disable the Homepage module
+
 ## 1.4.1 — 2026-08-15
 
 - Enh: Database tables renamed to `thiscovery_page`, `thiscovery_page_follow`, and `thiscovery_page_comment`

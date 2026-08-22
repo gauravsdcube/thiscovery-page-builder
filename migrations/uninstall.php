@@ -11,6 +11,11 @@ class uninstall extends Migration
 {
     public function up()
     {
+        foreach (['thiscovery_page_home'] as $table) {
+            if ($this->db->schema->getTableSchema($table, true) !== null) {
+                $this->dropTable($table);
+            }
+        }
         foreach (['thiscovery_page_follow', 'engagement_page_follow'] as $table) {
             if ($this->db->schema->getTableSchema($table, true) !== null) {
                 $this->dropTable($table);

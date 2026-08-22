@@ -21,7 +21,7 @@ use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
- * Guest-friendly public URLs: /{homepage-slug} and /{homepage-slug}/{page-slug}
+ * Guest-friendly public URLs for collections, nested pages, and top-level pages.
  */
 class PublicController extends Controller
 {
@@ -40,74 +40,30 @@ class PublicController extends Controller
 
     public function actionIndex()
     {
-        ThiscoveryPageBuilderAsset::register($this->view);
-
+        // Legacy entry: show the primary collection (former directory homepage).
         $page = EngagementPage::ensureDirectoryPage();
-
-        if (!$page->canAccessPublic()) {
-            if (!$page->isPublished() && !$page->canManage()) {
-                throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'This page is not published.'));
-            }
-            if (Yii::$app->user->isGuest && $page->getAudienceKey() === EngagementPage::AUDIENCE_MEMBERS) {
-                return $this->redirect(['/user/auth/login']);
-            }
-            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'You do not have permission to view this page.'));
-        }
-
-        $this->pageTitle = $page->title;
-        $this->view->params['engagementPage'] = $page;
-
-        return $this->render('@thiscovery-page-builder/views/page/view', [
-            'contentContainer' => $page->content->container,
-            'page' => $page,
-            'canManage' => $page->canManage(),
-            'publicLayout' => true,
-            'isDirectory' => true,
-        ]);
+        return $this->renderPage($page);
     }
 
-    public function actionView($slug)
+    public function actionView($slug, $parentSlug = null)
     {
         ThiscoveryPageBuilderAsset::register($this->view);
 
-        $page = EngagementPage::findBySlug((string) $slug);
+        $page = EngagementPage::findByPublicPath((string) $slug, $parentSlug !== null ? (string) $parentSlug : null);
         if ($page === null) {
             throw new NotFoundHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'Page not found.'));
-        }
-
-        if ($page->isDirectoryHome()) {
-            return $this->redirect(PageUrl::toDirectory());
         }
 
         if ($page->isTemplate()) {
             throw new NotFoundHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'Page not found.'));
         }
 
-        if (!$page->canAccessPublic()) {
-            if (!$page->isPublished() && !$page->canManage()) {
-                throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'This page is not published.'));
-            }
-            if (Yii::$app->user->isGuest && $page->getAudienceKey() === EngagementPage::AUDIENCE_MEMBERS) {
-                return $this->redirect(['/user/auth/login']);
-            }
-            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'You do not have permission to view this page.'));
-        }
-
-        $this->pageTitle = $page->title;
-        $this->view->params['engagementPage'] = $page;
-
-        return $this->render('@thiscovery-page-builder/views/page/view', [
-            'contentContainer' => $page->content->container,
-            'page' => $page,
-            'canManage' => $page->canManage(),
-            'publicLayout' => true,
-            'isDirectory' => false,
-        ]);
+        return $this->renderPage($page);
     }
 
-    public function actionFollow($slug)
+    public function actionFollow($slug, $parentSlug = null)
     {
-        $page = EngagementPage::findBySlug((string) $slug);
+        $page = EngagementPage::findByPublicPath((string) $slug, $parentSlug !== null ? (string) $parentSlug : null);
         if ($page === null || !$page->canAccessPublic()) {
             throw new NotFoundHttpException();
         }
@@ -130,9 +86,9 @@ class PublicController extends Controller
         return $this->redirect(PageUrl::toPublic($page) . '#ep-updates-' . $page->id);
     }
 
-    public function actionComment($slug)
+    public function actionComment($slug, $parentSlug = null)
     {
-        $page = EngagementPage::findBySlug((string) $slug);
+        $page = EngagementPage::findByPublicPath((string) $slug, $parentSlug !== null ? (string) $parentSlug : null);
         if ($page === null || !$page->canAccessPublic()) {
             throw new NotFoundHttpException();
         }
@@ -188,7 +144,6 @@ class PublicController extends Controller
             Yii::$app->session->setFlash($flashKey, 'save');
         }
 
-        // Re-render page with form errors.
         ThiscoveryPageBuilderAsset::register($this->view);
         $this->pageTitle = $page->title;
         $this->view->params['engagementPage'] = $page;
@@ -199,7 +154,33 @@ class PublicController extends Controller
             'page' => $page,
             'canManage' => $page->canManage(),
             'publicLayout' => true,
-            'isDirectory' => $page->isDirectoryHome(),
+            'isDirectory' => $page->isCollection(),
+        ]);
+    }
+
+    private function renderPage(EngagementPage $page)
+    {
+        ThiscoveryPageBuilderAsset::register($this->view);
+
+        if (!$page->canAccessPublic()) {
+            if (!$page->isPublished() && !$page->canManage()) {
+                throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'This page is not published.'));
+            }
+            if (Yii::$app->user->isGuest && $page->getAudienceKey() === EngagementPage::AUDIENCE_MEMBERS) {
+                return $this->redirect(['/user/auth/login']);
+            }
+            throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'You do not have permission to view this page.'));
+        }
+
+        $this->pageTitle = $page->title;
+        $this->view->params['engagementPage'] = $page;
+
+        return $this->render('@thiscovery-page-builder/views/page/view', [
+            'contentContainer' => $page->content->container,
+            'page' => $page,
+            'canManage' => $page->canManage(),
+            'publicLayout' => true,
+            'isDirectory' => $page->isCollection(),
         ]);
     }
 

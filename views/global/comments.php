@@ -40,6 +40,11 @@ $filterLabels = [
             ->link(Url::toGlobalIndex())
             ->sm()
             ->right() ?>
+        <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Help'))
+            ->link(Url::toHelp(null, 'creators-engagement'))
+            ->icon('question-circle')
+            ->sm()
+            ->right() ?>
     </div>
     <div class="panel-body">
         <p class="text-muted ep-comment-history-hint">
