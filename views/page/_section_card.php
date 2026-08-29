@@ -13,6 +13,7 @@ use humhub\modules\thiscoveryEditor\widgets\EditorField;
 /** @var array $section */
 /** @var array $formOptions */
 /** @var array $pollOptions */
+/** @var array $mapOptions */
 /** @var array $blockLabels */
 /** @var bool $collapsed */
 /** @var bool $isChild */
@@ -29,6 +30,7 @@ $spaceOptions = $spaceOptions ?? [];
 $type = $section['type'] ?? 'rich_text';
 $settings = $section['settings'] ?? [];
 $pollOptions = $pollOptions ?? [];
+$mapOptions = $mapOptions ?? [];
 $region = $section['region'] ?? BlockRegistry::REGION_MAIN;
 $column = (int) ($column ?? ($section['column'] ?? 0));
 $label = $blockLabels[$type] ?? $type;
@@ -41,6 +43,7 @@ $titleHint = match ($type) {
     'survey_cta' => $settings['button_label'] ?? '',
     'button' => $settings['label'] ?? '',
     'poll_embed' => '',
+    'map_embed' => '',
     'downloads', 'container', 'phases', 'events', 'team', 'contact', 'updates', 'comments', 'accordion', 'callout' => $settings['title'] ?? '',
     'image' => $settings['alt'] ?? ($settings['caption'] ?? ''),
     'directory' => $settings['title'] ?? '',
@@ -242,6 +245,40 @@ $titleHint = match ($type) {
                 </div>
             </div>
 
+        <?php elseif ($type === 'map_embed'): ?>
+            <?php if (!\humhub\modules\thiscoveryPageBuilder\helpers\MappingAvailability::isEnabled()): ?>
+                <div class="alert alert-warning mb-0">
+                    <?= Yii::t(
+                        'ThiscoveryPageBuilderModule.base',
+                        'This map requires the Thiscovery Mapping module to be installed and enabled.'
+                    ) ?>
+                </div>
+                <input type="hidden" name="<?= $namePrefix ?>[settings][map_id]" value="<?= Html::encode((string) ($settings['map_id'] ?? '')) ?>">
+                <input type="hidden" name="<?= $namePrefix ?>[settings][height]" value="<?= Html::encode((string) ($settings['height'] ?? 480)) ?>">
+            <?php else: ?>
+            <div class="form-group">
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Map') ?></label>
+                <select class="form-control" name="<?= $namePrefix ?>[settings][map_id]">
+                    <?php foreach ($mapOptions as $id => $title): ?>
+                        <option value="<?= Html::encode((string) $id) ?>" <?= (string) ($settings['map_id'] ?? '') === (string) $id ? 'selected' : '' ?>>
+                            <?= Html::encode($title) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="ep-hint text-muted">
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Shows an interactive map on the page.') ?>
+                    <?php if (count($mapOptions) <= 1): ?>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Create a map in Thiscovery Mapping first, then choose it here.') ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Map height') ?></label>
+                <input type="number" class="form-control" name="<?= $namePrefix ?>[settings][height]" min="280" max="720" step="10"
+                       value="<?= Html::encode((string) ($settings['height'] ?? 480)) ?>" style="max-width:160px">
+            </div>
+            <?php endif; ?>
+
         <?php elseif ($type === 'downloads'): ?>
             <div class="form-group">
                 <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?></label>
@@ -312,6 +349,7 @@ $titleHint = match ($type) {
                 'safeIndex' => $safeIndex,
                 'formOptions' => $formOptions,
                 'pollOptions' => $pollOptions ?? [],
+                'mapOptions' => $mapOptions ?? [],
                 'pageOptions' => $pageOptions,
                 'spaceOptions' => $spaceOptions,
                 'page' => $page,
@@ -351,6 +389,7 @@ $titleHint = match ($type) {
                                     'section' => $child,
                                     'formOptions' => $formOptions,
                                     'pollOptions' => $pollOptions ?? [],
+                'mapOptions' => $mapOptions ?? [],
                                     'pageOptions' => $pageOptions,
                                     'spaceOptions' => $spaceOptions,
                                     'blockLabels' => $blockLabels,

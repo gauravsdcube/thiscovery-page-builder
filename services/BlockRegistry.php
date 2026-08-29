@@ -18,9 +18,11 @@ use humhub\modules\thiscoveryPageBuilder\blocks\DownloadsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\EventsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\HeroBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\ImageBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\MapEmbedUnavailableBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\PhasesBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\PollEmbedBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\RichTextBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\MappingAvailability;
 use humhub\modules\thiscoveryPageBuilder\blocks\SpaceCalendarBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\SpaceFilesBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\SpaceGalleryBlock;
@@ -30,9 +32,12 @@ use humhub\modules\thiscoveryPageBuilder\blocks\SurveyCtaBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\TeamBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\UpdatesBlock;
 use Yii;
+use yii\base\Event;
 
 class BlockRegistry
 {
+    public const EVENT_REGISTER = 'register';
+
     public const REGION_FULL = 'full';
     public const REGION_LEFT = 'left';
     public const REGION_MAIN = 'main';
@@ -43,7 +48,17 @@ class BlockRegistry
     public const LAYOUT_RIGHT = 'right';
     public const LAYOUT_BOTH = 'both';
 
+    private static ?array $resolvedTypes = null;
+
+    private static ?array $resolvedPalette = null;
+
     public static function types(): array
+    {
+        self::resolve();
+        return self::$resolvedTypes;
+    }
+
+    private static function coreTypes(): array
     {
         return [
             HeroBlock::TYPE => HeroBlock::class,
@@ -73,6 +88,55 @@ class BlockRegistry
         ];
     }
 
+    private static function resolve(): void
+    {
+        if (self::$resolvedTypes !== null) {
+            return;
+        }
+        self::bootBlockProviders();
+        $event = new RegisterBlocksEvent();
+        $event->types = self::coreTypes();
+        $event->palette = self::corePalette();
+        Event::trigger(self::class, self::EVENT_REGISTER, $event);
+        self::ensureOptionalTypeStubs($event);
+        self::$resolvedTypes = $event->types;
+        self::$resolvedPalette = $event->palette;
+    }
+
+    /**
+     * Load optional modules that register extra blocks from Module::init().
+     * HumHub does not init every enabled module on each request.
+     */
+    private static function bootBlockProviders(): void
+    {
+        if (!MappingAvailability::isEnabled()) {
+            return;
+        }
+        try {
+            Yii::$app->getModule('thiscovery-mapping');
+        } catch (\Throwable $e) {
+            Yii::warning('Could not boot block provider thiscovery-mapping: ' . $e->getMessage(), 'thiscovery-page-builder');
+        }
+    }
+
+    /**
+     * Keep known soft-dependency blocks persistable when their provider module is off.
+     * Stubs are never added to the palette.
+     */
+    private static function ensureOptionalTypeStubs(RegisterBlocksEvent $event): void
+    {
+        $type = MappingAvailability::MAP_EMBED_TYPE;
+        if (!isset($event->types[$type])) {
+            $event->types[$type] = MapEmbedUnavailableBlock::class;
+        }
+        if (!MappingAvailability::isEnabled()) {
+            $event->palette = array_values(array_filter(
+                $event->palette,
+                static fn(array $item): bool => ($item['type'] ?? '') !== $type
+            ));
+        }
+    }
+
     public static function labels(): array
     {
         $labels = [];
@@ -86,6 +150,12 @@ class BlockRegistry
     }
 
     public static function palette(): array
+    {
+        self::resolve();
+        return self::$resolvedPalette;
+    }
+
+    private static function corePalette(): array
     {
         return [
             ['type' => HeroBlock::TYPE, 'icon' => 'fa-picture-o', 'group' => 'layout'],

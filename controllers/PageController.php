@@ -235,6 +235,7 @@ class PageController extends ContentContainerController
             'blockLabels' => BlockRegistry::labels(),
             'formOptions' => $this->formOptions(),
             'pollOptions' => $this->pollOptions(),
+            'mapOptions' => $this->mapOptions(),
             'templates' => EngagementPage::findTemplates($ccId),
             'collectionOptions' => EngagementPage::collectionOptions($ccId, $page->id),
             'spaceOptions' => EngagementPage::spaceOptions(),
@@ -260,6 +261,18 @@ class PageController extends ContentContainerController
             return $options;
         }
         return $options + CustomForm::pickerOptions($this->contentContainer, CustomForm::KIND_POLL, true);
+    }
+
+    protected function mapOptions(): array
+    {
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a map…')];
+        if (!\humhub\modules\thiscoveryPageBuilder\helpers\MappingAvailability::isEnabled()) {
+            return $options;
+        }
+        if (!class_exists(\humhub\modules\thiscoveryMapping\models\Map::class)) {
+            return $options;
+        }
+        return $options + \humhub\modules\thiscoveryMapping\models\Map::pickerOptions($this->contentContainer);
     }
 
     /**

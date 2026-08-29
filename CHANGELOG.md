@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.7.0 — 2026-08-29
+
+- Enh: Extensible block registry (`RegisterBlocksEvent`) so other modules can register page sections
+- Enh: Map embed section (map picker + height) when Thiscovery Mapping is installed and enabled
+- Change: Map section is hidden from the palette when Mapping is off; existing embeds keep their settings and show a clear message
+- Fix: Rich-text image wrap CSS tweak
+
+## 1.6.1 — 2026-08-22
+
+- Maintenance release (studio and help polish)
+
 ## 1.6.0 — 2026-08-20
 
 - Enh: In-product Help with sections for administrators and page creators. Open it from the page list, studio, comments, and subscriptions

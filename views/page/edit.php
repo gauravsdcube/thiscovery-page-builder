@@ -19,6 +19,7 @@ use humhub\widgets\bootstrap\Button;
 /** @var array $blockLabels */
 /** @var array $formOptions */
 /** @var array $pollOptions */
+/** @var array $mapOptions */
 /** @var EngagementPage[]|null $templates */
 /** @var array $collectionOptions */
 /** @var array $spaceOptions */
@@ -32,6 +33,7 @@ $isDirectory = $page->isCollection();
 $isTemplate = $page->isTemplate();
 $templates = $templates ?? [];
 $pollOptions = $pollOptions ?? [];
+$mapOptions = $mapOptions ?? [];
 $collectionOptions = $collectionOptions ?? EngagementPage::collectionOptions(null, $page->id);
 $spaceOptions = $spaceOptions ?? EngagementPage::spaceOptions();
 $pageOptions = $pageOptions ?? EngagementPage::publishedPageOptions($page->id);
@@ -259,6 +261,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
                         'items' => $grouped[BlockRegistry::REGION_FULL] ?? [],
                         'formOptions' => $formOptions,
                         'pollOptions' => $pollOptions ?? [],
+                        'mapOptions' => $mapOptions ?? [],
                         'pageOptions' => $pageOptions,
                         'spaceOptions' => $spaceOptions,
                         'blockLabels' => $blockLabels,
@@ -273,6 +276,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
                             'items' => $grouped[BlockRegistry::REGION_LEFT] ?? [],
                             'formOptions' => $formOptions,
                         'pollOptions' => $pollOptions ?? [],
+                        'mapOptions' => $mapOptions ?? [],
                         'pageOptions' => $pageOptions,
                         'spaceOptions' => $spaceOptions,
                             'blockLabels' => $blockLabels,
@@ -285,6 +289,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
                             'items' => $grouped[BlockRegistry::REGION_MAIN] ?? [],
                             'formOptions' => $formOptions,
                         'pollOptions' => $pollOptions ?? [],
+                        'mapOptions' => $mapOptions ?? [],
                         'pageOptions' => $pageOptions,
                         'spaceOptions' => $spaceOptions,
                             'blockLabels' => $blockLabels,
@@ -297,6 +302,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
                             'items' => $grouped[BlockRegistry::REGION_RIGHT] ?? [],
                             'formOptions' => $formOptions,
                         'pollOptions' => $pollOptions ?? [],
+                        'mapOptions' => $mapOptions ?? [],
                         'pageOptions' => $pageOptions,
                         'spaceOptions' => $spaceOptions,
                             'blockLabels' => $blockLabels,
@@ -361,6 +367,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
             'section' => ['type' => 'rich_text', 'region' => 'main', 'settings' => []],
             'formOptions' => $formOptions,
             'pollOptions' => $pollOptions ?? [],
+            'mapOptions' => $mapOptions ?? [],
             'pageOptions' => $pageOptions,
             'spaceOptions' => $spaceOptions,
             'blockLabels' => $blockLabels,
@@ -411,6 +418,9 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
                 'action' => 'link',
                 'tone' => 'primary',
             ],
+            'map_embed' => [
+                'height' => 480,
+            ],
             'space_stream', 'space_tasks', 'space_files', 'space_gallery', 'space_calendar' => [
                 'title' => '',
             ],
@@ -429,6 +439,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
                 ],
                 'formOptions' => $formOptions,
                 'pollOptions' => $pollOptions ?? [],
+                'mapOptions' => $mapOptions ?? [],
                 'pageOptions' => $pageOptions,
                 'spaceOptions' => $spaceOptions,
                 'blockLabels' => $blockLabels,

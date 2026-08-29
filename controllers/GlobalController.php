@@ -458,6 +458,7 @@ class GlobalController extends Controller
             'blockLabels' => BlockRegistry::labels(),
             'formOptions' => $this->formOptions(),
             'pollOptions' => $this->pollOptions(),
+            'mapOptions' => $this->mapOptions(),
             'templates' => EngagementPage::findTemplates(null),
             'collectionOptions' => EngagementPage::collectionOptions(null, $page->id),
             'spaceOptions' => EngagementPage::spaceOptions(),
@@ -555,6 +556,18 @@ class GlobalController extends Controller
             return $options;
         }
         return $options + CustomForm::pickerOptions(null, CustomForm::KIND_POLL, true);
+    }
+
+    protected function mapOptions(): array
+    {
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a map…')];
+        if (!\humhub\modules\thiscoveryPageBuilder\helpers\MappingAvailability::isEnabled()) {
+            return $options;
+        }
+        if (!class_exists(\humhub\modules\thiscoveryMapping\models\Map::class)) {
+            return $options;
+        }
+        return $options + \humhub\modules\thiscoveryMapping\models\Map::pickerOptions(null);
     }
 
     protected function findPage($id): EngagementPage
