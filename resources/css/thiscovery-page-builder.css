@@ -1947,6 +1947,8 @@ body .tox-tinymce-aux { z-index: 2400; }
 .ep-rich-text-body.richtext-output,
 .ep-survey-intro.richtext-output { line-height: 1.65; }
 .ep-block .richtext-output img { max-width: 100%; height: auto; }
+.ep-block .richtext-output .te-image-wrap { margin: 0 0 1rem; }
+.ep-block .richtext-output .te-image-wrap img { display: block; }
 .ep-block .richtext-output iframe { max-width: 100%; }
 .ep-block .richtext-output table {
   width: 100%;

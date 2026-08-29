@@ -12,6 +12,7 @@ use humhub\helpers\Html;
 /** @var array $items */
 /** @var array $formOptions */
 /** @var array $pollOptions */
+/** @var array $mapOptions */
 /** @var array $pageOptions */
 /** @var array $spaceOptions */
 /** @var array $blockLabels */
@@ -21,6 +22,7 @@ use humhub\helpers\Html;
 $hidden = !empty($hidden);
 $page = $page ?? null;
 $pollOptions = $pollOptions ?? [];
+$mapOptions = $mapOptions ?? [];
 $pageOptions = $pageOptions ?? [];
 $spaceOptions = $spaceOptions ?? [];
 ?>
@@ -39,6 +41,7 @@ $spaceOptions = $spaceOptions ?? [];
                 'section' => array_merge($section, ['region' => $region]),
                 'formOptions' => $formOptions,
                 'pollOptions' => $pollOptions ?? [],
+                'mapOptions' => $mapOptions ?? [],
                 'pageOptions' => $pageOptions,
                 'spaceOptions' => $spaceOptions,
                 'blockLabels' => $blockLabels,
