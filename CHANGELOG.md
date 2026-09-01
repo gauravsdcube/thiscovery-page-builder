@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.1 — 2026-09-01
+
+- Change: When Thiscovery Navigation is enabled, pages are added to the top bar there instead of from this module
+- Change: Studio Navigation section points to Site navigation
+
 ## 1.7.0 — 2026-08-29
 
 - Enh: Extensible block registry (`RegisterBlocksEvent`) so other modules can register page sections

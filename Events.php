@@ -94,6 +94,12 @@ class Events
         if (!$space instanceof Space) {
             return;
         }
+        if (
+            class_exists(\humhub\modules\thiscoverySpaceExperience\helpers\Experience::class)
+            && \humhub\modules\thiscoverySpaceExperience\helpers\Experience::isActive($space)
+        ) {
+            return;
+        }
         if (!$space->moduleManager->isEnabled('thiscovery-page-builder')) {
             return;
         }
@@ -119,6 +125,11 @@ class Events
 
     public static function onTopMenuInit($event): void
     {
+        if (class_exists(\humhub\modules\thiscoveryNavigation\helpers\Navigation::class)
+            && \humhub\modules\thiscoveryNavigation\helpers\Navigation::isActive()) {
+            return;
+        }
+
         if (!Yii::$app->getModule('thiscovery-page-builder')) {
             return;
         }
