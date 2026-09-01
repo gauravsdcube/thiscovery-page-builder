@@ -154,6 +154,8 @@ return [
     'Add page' => 'Add page',
     'Bound Space' => 'Bound Space',
     'Show in top menu' => 'Show in top menu',
+    'Managed in Site navigation' => 'Managed in Site navigation',
+    'This page can be added to the site top bar in <a href="{url}">Site navigation</a>.' => 'This page can be added to the site top bar in <a href="{url}">Site navigation</a>.',
     'Site homepage' => 'Site homepage',
     'Homepage for guests' => 'Homepage for guests',
     'Default homepage for logged-in users' => 'Default homepage for logged-in users',

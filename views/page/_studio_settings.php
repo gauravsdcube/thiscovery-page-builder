@@ -266,12 +266,25 @@ $guide = static function (string $text) use ($view) {
     </details>
 
     <?php if (!$isTemplate && $page->hasAttribute('show_in_top_menu') && $contentContainer === null): ?>
+    <?php $navManaged = class_exists(\humhub\modules\thiscoveryNavigation\helpers\Navigation::class)
+        && \humhub\modules\thiscoveryNavigation\helpers\Navigation::isActive(); ?>
     <details class="ep-set-acc">
         <summary>
             <span class="ep-set-acc__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Navigation') ?></span>
-            <span class="ep-set-acc__summary"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Top menu label, order, and visibility') ?></span>
+            <span class="ep-set-acc__summary"><?= $navManaged
+                ? Yii::t('ThiscoveryPageBuilderModule.base', 'Managed in Site navigation')
+                : Yii::t('ThiscoveryPageBuilderModule.base', 'Top menu label, order, and visibility') ?></span>
         </summary>
         <div class="ep-set-acc__body">
+            <?php if ($navManaged): ?>
+                <p class="help-block mb-0">
+                    <?= Yii::t(
+                        'ThiscoveryPageBuilderModule.base',
+                        'This page can be added to the site top bar in <a href="{url}">Site navigation</a>.',
+                        ['url' => \yii\helpers\Url::to(['/thiscovery-navigation/admin/index'])]
+                    ) ?>
+                </p>
+            <?php else: ?>
             <div class="ep-check-setting">
                 <div>
                     <input type="hidden" name="EngagementPage[show_in_top_menu]" value="0">
@@ -307,6 +320,7 @@ $guide = static function (string $text) use ($view) {
                     <?php endforeach; ?>
                 </select>
             </div>
+            <?php endif; ?>
         </div>
     </details>
 
