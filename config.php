@@ -16,18 +16,27 @@ use humhub\modules\user\controllers\AuthController;
 use humhub\widgets\TopMenu;
 use yii\base\Controller;
 
-return [
-    'id' => 'thiscovery-page-builder',
-    'class' => Module::class,
-    'namespace' => 'humhub\modules\thiscoveryPageBuilder',
-    'events' => [
+$events = [
         ['class' => Menu::class, 'event' => Menu::EVENT_INIT, 'callback' => [Events::class, 'onSpaceMenuInit']],
         ['class' => AdminMenu::class, 'event' => AdminMenu::EVENT_INIT, 'callback' => [Events::class, 'onAdminMenuInit']],
         ['class' => SpaceController::class, 'event' => Controller::EVENT_BEFORE_ACTION, 'callback' => [Events::class, 'onSpaceControllerBeforeAction']],
         ['class' => TopMenu::class, 'event' => TopMenu::EVENT_INIT, 'callback' => [Events::class, 'onTopMenuInit']],
         ['class' => Application::class, 'event' => Application::EVENT_BEFORE_ACTION, 'callback' => [Events::class, 'onApplicationBeforeAction']],
         ['class' => AuthController::class, 'event' => AuthController::EVENT_AFTER_LOGIN, 'callback' => [Events::class, 'onAfterLogin']],
-    ],
+];
+
+$events = array_values(array_filter($events, static function (array $e): bool {
+    $target = $e['class'] ?? null;
+    $cb = $e['callback'][0] ?? null;
+    return is_string($target) && $target !== '' && class_exists($target)
+        && is_string($cb) && $cb !== '' && class_exists($cb);
+}));
+
+return [
+    'id' => 'thiscovery-page-builder',
+    'class' => Module::class,
+    'namespace' => 'humhub\modules\thiscoveryPageBuilder',
+    'events' => $events,
     'urlManagerRules' => [
         ['class' => PageUrlRule::class],
         'thiscovery-page-builder/global/view/<id:\d+>' => 'thiscovery-page-builder/global/view',

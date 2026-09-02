@@ -145,7 +145,7 @@ class PublicController extends Controller
         }
 
         ThiscoveryPageBuilderAsset::register($this->view);
-        $this->pageTitle = $page->title;
+        $this->pageTitle = self::maybeTranslatePageTitle($page);
         $this->view->params['engagementPage'] = $page;
         $this->view->params['epCommentForm'] = $form;
 
@@ -172,7 +172,7 @@ class PublicController extends Controller
             throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'You do not have permission to view this page.'));
         }
 
-        $this->pageTitle = $page->title;
+        $this->pageTitle = self::maybeTranslatePageTitle($page);
         $this->view->params['engagementPage'] = $page;
 
         return $this->render('@thiscovery-page-builder/views/page/view', [
@@ -217,5 +217,26 @@ class PublicController extends Controller
         $key = $this->commentRateCacheKey($page);
         $count = (int) Yii::$app->cache->get($key);
         Yii::$app->cache->set($key, $count + 1, self::COMMENT_RATE_WINDOW);
+    }
+
+    /**
+     * Soft-dep on thiscovery-translate for browser/page title.
+     */
+    protected static function maybeTranslatePageTitle(EngagementPage $page): string
+    {
+        $title = (string)$page->title;
+        try {
+            $tt = Yii::$app->getModule('thiscovery-translate');
+            if ($tt && method_exists($tt, 'getIsEnabled') && $tt->getIsEnabled()
+                && class_exists(\humhub\modules\thiscoveryTranslate\services\PageBuilderHook::class)) {
+                $meta = \humhub\modules\thiscoveryTranslate\services\PageBuilderHook::translatePageMeta($page);
+                if (!empty($meta['title'])) {
+                    return (string)$meta['title'];
+                }
+            }
+        } catch (\Throwable $e) {
+            // keep source
+        }
+        return $title;
     }
 }

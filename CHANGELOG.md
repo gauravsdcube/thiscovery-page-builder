@@ -1,5 +1,12 @@
 # Changelog
 
+
+## 1.7.2 (September 2, 2026)
+
+- Enh: Soft-dep on thiscovery-translate for block display copy (BaseBlock) and public page title
+- Enh: Top menu engagement page labels use PageBuilderHook when translate is enabled
+- Fix: onAfterLogin listens for UserEvent (compatible signature)
+
 ## 1.7.1 — 2026-09-01
 
 - Change: When Thiscovery Navigation is enabled, pages are added to the top bar there instead of from this module
