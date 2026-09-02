@@ -22,7 +22,7 @@ use humhub\modules\space\widgets\Menu;
 use humhub\widgets\TopMenu;
 use Yii;
 use yii\base\ActionEvent;
-use yii\web\UserEvent;
+use humhub\modules\user\events\UserEvent;
 
 class Events
 {
@@ -167,6 +167,18 @@ class Events
             }
 
             $label = trim((string) ($page->top_menu_label ?: $page->title));
+            try {
+                $tt = Yii::$app->getModule('thiscovery-translate');
+                if ($tt && method_exists($tt, 'getIsEnabled') && $tt->getIsEnabled()
+                    && class_exists(\humhub\modules\thiscoveryTranslate\services\PageBuilderHook::class)) {
+                    $translated = \humhub\modules\thiscoveryTranslate\services\PageBuilderHook::translateTopMenuLabel($page);
+                    if ($translated !== '') {
+                        $label = $translated;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // keep source label
+            }
             $url = PageUrl::toPublic($page);
             $menu->addEntry(new MenuLink([
                 'id' => 'thiscovery-page-' . $page->id,

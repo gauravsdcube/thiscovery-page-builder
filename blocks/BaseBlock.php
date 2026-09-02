@@ -194,16 +194,39 @@ abstract class BaseBlock extends BaseObject
 
     public function render(EngagementPage $page): string
     {
+        $settings = $this->getPersistedSettings();
+        $settings = self::maybeTranslateSettings($page, $this->getType(), $settings);
+
         $html = Yii::$app->view->render(
             '@thiscovery-page-builder/views/blocks/' . $this->getType(),
             [
                 'block' => $this,
                 'page' => $page,
-                'settings' => $this->getPersistedSettings(),
+                'settings' => $settings,
             ]
         );
 
         return $this->wrapAligned($html);
+    }
+
+    /**
+     * Soft-dep on thiscovery-translate: translate display copy without mutating stored JSON.
+     */
+    protected static function maybeTranslateSettings(EngagementPage $page, string $blockType, array $settings): array
+    {
+        try {
+            $module = Yii::$app->getModule('thiscovery-translate');
+            if ($module === null || !method_exists($module, 'getIsEnabled') || !$module->getIsEnabled()) {
+                return $settings;
+            }
+            $hook = \humhub\modules\thiscoveryTranslate\services\PageBuilderHook::class;
+            if (!class_exists($hook)) {
+                return $settings;
+            }
+            return $hook::translateBlockSettings($page, $blockType, $settings);
+        } catch (\Throwable $e) {
+            return $settings;
+        }
     }
 
     protected function wrapAligned(string $html): string
