@@ -1036,6 +1036,34 @@
   font-size: 0.9rem;
 }
 
+.ep-oembed { margin: 0; }
+.ep-oembed__title {
+  margin: 0 0 8px;
+  color: var(--ep-t-text);
+  font-weight: 600;
+}
+.ep-oembed__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--ep-t-radius);
+  background: #111;
+}
+.ep-oembed__media iframe,
+.ep-oembed__media .oembed_snippet,
+.ep-oembed__media .oembed_snippet > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  max-width: 100%;
+}
+.ep-oembed__media .oembed_snippet {
+  display: block;
+}
+
 .ep-repeat-item { margin-bottom: 8px; }
 
 @media (max-width: 640px) {

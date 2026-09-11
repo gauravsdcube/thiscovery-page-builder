@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.3 (September 11, 2026)
+
+- Enh: Video embed section for YouTube and Vimeo (URL or pasted iframe)
+- Fix: Restore Administration left-menu entry (module event cache was dropping the handler)
 
 ## 1.7.2 (September 2, 2026)
 

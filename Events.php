@@ -52,6 +52,7 @@ class Events
             return;
         }
 
+        // Don't put permission checks only in isVisible — same pattern as Thiscovery Forms.
         $allowed = Yii::$app->user->isAdmin()
             || Yii::$app->user->can(ManageModules::class)
             || Yii::$app->user->can(ManageGlobalPage::class)
@@ -61,7 +62,8 @@ class Events
             return;
         }
 
-        if (!Yii::$app->getModule('thiscovery-page-builder')) {
+        $module = Yii::$app->getModule('thiscovery-page-builder');
+        if ($module === null || (method_exists($module, 'getIsEnabled') && !$module->getIsEnabled())) {
             return;
         }
 

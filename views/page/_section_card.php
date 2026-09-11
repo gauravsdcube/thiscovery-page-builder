@@ -44,6 +44,7 @@ $titleHint = match ($type) {
     'button' => $settings['label'] ?? '',
     'poll_embed' => '',
     'map_embed' => '',
+    'oembed' => $settings['title'] ?? ($settings['url'] ?? ''),
     'downloads', 'container', 'phases', 'events', 'team', 'contact', 'updates', 'comments', 'accordion', 'callout' => $settings['title'] ?? '',
     'image' => $settings['alt'] ?? ($settings['caption'] ?? ''),
     'directory' => $settings['title'] ?? '',

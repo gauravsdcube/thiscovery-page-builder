@@ -410,6 +410,26 @@ if ($type === 'phases'): ?>
         </div>
     </div>
 
+<?php elseif ($type === 'oembed'): ?>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][title]"
+               value="<?= Html::encode($settings['title'] ?? '') ?>"
+               data-ep-card-title-source
+               placeholder="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Heading shown above the video') ?>">
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Video URL') ?></label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][url]"
+               value="<?= Html::encode($settings['url'] ?? '') ?>"
+               placeholder="https://www.youtube.com/watch?v=…">
+        <div class="ep-hint text-muted">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Paste a YouTube or Vimeo link, or an embed iframe from those sites. Other hosts are not shown.') ?>
+        </div>
+    </div>
+
 <?php elseif ($type === 'collection' || $type === 'directory'): ?>
     <div class="form-group">
         <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Section title') ?></label>

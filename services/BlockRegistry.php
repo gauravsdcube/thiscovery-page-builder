@@ -19,6 +19,7 @@ use humhub\modules\thiscoveryPageBuilder\blocks\EventsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\HeroBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\ImageBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\MapEmbedUnavailableBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\OembedBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\PhasesBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\PollEmbedBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\RichTextBlock;
@@ -76,6 +77,7 @@ class BlockRegistry
             AccordionBlock::TYPE => AccordionBlock::class,
             CalloutBlock::TYPE => CalloutBlock::class,
             ImageBlock::TYPE => ImageBlock::class,
+            OembedBlock::TYPE => OembedBlock::class,
             CollectionBlock::TYPE => CollectionBlock::class,
             ButtonBlock::TYPE => ButtonBlock::class,
             SpaceStreamBlock::TYPE => SpaceStreamBlock::class,
@@ -162,6 +164,7 @@ class BlockRegistry
             ['type' => ContainerBlock::TYPE, 'icon' => 'fa-th', 'group' => 'layout'],
             ['type' => ImageBlock::TYPE, 'icon' => 'fa-image', 'group' => 'layout'],
             ['type' => RichTextBlock::TYPE, 'icon' => 'fa-paragraph', 'group' => 'content'],
+            ['type' => OembedBlock::TYPE, 'icon' => 'fa-play-circle', 'group' => 'content'],
             ['type' => AccordionBlock::TYPE, 'icon' => 'fa-list-alt', 'group' => 'content'],
             ['type' => CalloutBlock::TYPE, 'icon' => 'fa-info-circle', 'group' => 'content'],
             ['type' => DownloadsBlock::TYPE, 'icon' => 'fa-download', 'group' => 'content'],
