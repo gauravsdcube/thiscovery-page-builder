@@ -401,6 +401,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
             'accordion' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Frequently asked questions'), 'items' => [['heading' => '', 'body' => '']]],
             'callout' => ['tone' => 'info'],
             'image' => [],
+            'oembed' => [],
             'directory' => [
                 'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback'),
                 'source' => 'pages',
