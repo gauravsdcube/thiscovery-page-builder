@@ -42,6 +42,7 @@ return [
     'Hero' => 'Hero',
     'Rich text' => 'Rich text',
     'Video embed' => 'Video embed',
+    'Open one item at a time' => 'Open one item at a time',
     'Video URL' => 'Video URL',
     'Heading shown above the video' => 'Heading shown above the video',
     'Paste a YouTube or Vimeo link, or an embed iframe from those sites. Other hosts are not shown.' => 'Paste a YouTube or Vimeo link, or an embed iframe from those sites. Other hosts are not shown.',

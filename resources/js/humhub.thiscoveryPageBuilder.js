@@ -1167,8 +1167,26 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
         layoutStudioPanes();
     };
 
+    var initExclusiveAccordions = function () {
+        $(document).off('toggle.epAccExclusive', '.ep-accordion[data-ep-exclusive] .ep-accordion__item');
+        $(document).on('toggle.epAccExclusive', '.ep-accordion[data-ep-exclusive] .ep-accordion__item', function () {
+            if (!this.open) {
+                return;
+            }
+            var root = this.closest('.ep-accordion');
+            if (!root) {
+                return;
+            }
+            $(root).find('.ep-accordion__item').not(this).each(function () {
+                if (this.open) {
+                    this.open = false;
+                }
+            });
+        });
+    };
+
     var init = function () {
-        // Legacy no-op for data-ui-widget; builder is started via registerJs.
+        initExclusiveAccordions();
     };
 
     var initListPages = function () {

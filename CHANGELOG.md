@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.4 (September 12, 2026)
+
+- Enh: Accordion option to open one item at a time
+- Enh: Sector card styles in accordion bodies; wide pages cap at 1440px
+- Fix: Do not refresh the homepage table schema on every request
+
 ## 1.7.3 (September 11, 2026)
 
 - Enh: Video embed section for YouTube and Vimeo (URL or pasted iframe)

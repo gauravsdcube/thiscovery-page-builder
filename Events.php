@@ -201,7 +201,7 @@ class Events
             return;
         }
         try {
-            if (Yii::$app->db->schema->getTableSchema('thiscovery_page_home', true) === null) {
+            if (Yii::$app->db->schema->getTableSchema('thiscovery_page_home') === null) {
                 return;
             }
         } catch (\Throwable $e) {

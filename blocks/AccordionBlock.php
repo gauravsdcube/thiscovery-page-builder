@@ -43,6 +43,7 @@ class AccordionBlock extends BaseBlock
 
         return [
             'title' => $this->string('title', Yii::t('ThiscoveryPageBuilderModule.base', 'Frequently asked questions')),
+            'exclusive' => !empty($this->settings['exclusive']),
             'items' => $items,
         ];
     }
