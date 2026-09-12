@@ -309,6 +309,16 @@ if ($type === 'phases'): ?>
                value="<?= Html::encode($settings['title'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Frequently asked questions')) ?>"
                data-ep-card-title-source>
     </div>
+    <div class="form-check mb-3">
+        <input type="hidden" name="<?= $namePrefix ?>[settings][exclusive]" value="0">
+        <input class="form-check-input" type="checkbox" value="1"
+               name="<?= $namePrefix ?>[settings][exclusive]"
+               id="ep-acc-exclusive-<?= Html::encode($safeIndex) ?>"
+               <?= !empty($settings['exclusive']) ? 'checked' : '' ?>>
+        <label class="form-check-label" for="ep-acc-exclusive-<?= Html::encode($safeIndex) ?>">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open one item at a time') ?>
+        </label>
+    </div>
     <div class="ep-repeat" data-ep-repeat="accordion">
         <div data-ep-repeat-items>
             <?php

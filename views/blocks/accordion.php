@@ -18,9 +18,10 @@ $items = $settings['items'] ?? [];
 if ($items === []) {
     return;
 }
+$exclusive = !empty($settings['exclusive']);
 $uid = 'ep-acc-' . (int) $page->id . '-' . substr(md5(json_encode($items)), 0, 8);
 ?>
-<section class="ep-block ep-accordion">
+<section class="ep-block ep-accordion"<?php if ($exclusive): ?> data-ep-exclusive="1"<?php endif; ?>>
     <?php if (($settings['title'] ?? '') !== ''): ?>
         <h2><?= Html::encode($settings['title']) ?></h2>
     <?php endif; ?>
@@ -29,8 +30,9 @@ $uid = 'ep-acc-' . (int) $page->id . '-' . substr(md5(json_encode($items)), 0, 8
             <?php
             $itemId = $uid . '-' . $i;
             $heading = ($item['heading'] ?? '') !== '' ? $item['heading'] : Yii::t('ThiscoveryPageBuilderModule.base', 'Details');
+            $open = !$exclusive && $i === 0;
             ?>
-            <details class="ep-accordion__item" <?= $i === 0 ? 'open' : '' ?>>
+            <details class="ep-accordion__item" <?= $open ? 'open' : '' ?>>
                 <summary class="ep-accordion__summary"><?= Html::encode($heading) ?></summary>
                 <div class="ep-accordion__body richtext-output">
                     <?php if (($item['body'] ?? '') !== ''): ?>
