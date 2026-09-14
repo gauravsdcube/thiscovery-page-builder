@@ -18,6 +18,7 @@ use humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\DownloadsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\EventsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\HeroBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\HubspotFormBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\ImageBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\MapEmbedUnavailableBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\OembedBlock;
@@ -67,6 +68,7 @@ class BlockRegistry
             RichTextBlock::TYPE => RichTextBlock::class,
             SurveyCtaBlock::TYPE => SurveyCtaBlock::class,
             PollEmbedBlock::TYPE => PollEmbedBlock::class,
+            HubspotFormBlock::TYPE => HubspotFormBlock::class,
             DownloadsBlock::TYPE => DownloadsBlock::class,
             ContainerBlock::TYPE => ContainerBlock::class,
             PhasesBlock::TYPE => PhasesBlock::class,
@@ -173,6 +175,7 @@ class BlockRegistry
             ['type' => ButtonBlock::TYPE, 'icon' => 'fa-hand-pointer-o', 'group' => 'content'],
             ['type' => SurveyCtaBlock::TYPE, 'icon' => 'fa-wpforms', 'group' => 'engagement'],
             ['type' => PollEmbedBlock::TYPE, 'icon' => 'fa-bar-chart', 'group' => 'engagement'],
+            ['type' => HubspotFormBlock::TYPE, 'icon' => 'fa-wpforms', 'group' => 'engagement'],
             ['type' => PhasesBlock::TYPE, 'icon' => 'fa-road', 'group' => 'engagement'],
             ['type' => EventsBlock::TYPE, 'icon' => 'fa-calendar', 'group' => 'engagement'],
             ['type' => TeamBlock::TYPE, 'icon' => 'fa-users', 'group' => 'engagement'],

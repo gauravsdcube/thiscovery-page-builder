@@ -35,7 +35,7 @@ Use the palette on the left. Drag a block onto a region, or click it to add. Dra
 
 | Type | Use for |
 | --- | --- |
-| Rich text | Body copy (Thiscovery Editor: headings, tables, images, media) |
+| Rich text | Body copy (Thiscovery Editor: headings, tables, images, media). Scripts are removed. |
 | Video embed | A YouTube or Vimeo video (paste the watch URL or embed iframe) |
 | Accordion | Expand/collapse items (FAQs). Optional **Open one item at a time** |
 | Callout | A highlighted note or warning |
@@ -48,6 +48,7 @@ Use the palette on the left. Drag a block onto a region, or click it to add. Dra
 | --- | --- |
 | Survey CTA | Link out to a Thiscovery Form |
 | Quick poll | Embed a Thiscovery Forms poll so people can vote on the page |
+| HubSpot form | Paste a HubSpot form embed (portal, form ID, and region). Rich text cannot run scripts. |
 | Phases | A timeline of stages |
 | Events | A list of events you type in (or upcoming Calendar events on a collection) |
 | Team | People list (name, role, email, phone, bio) |

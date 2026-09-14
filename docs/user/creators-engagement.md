@@ -27,6 +27,12 @@ Use this for “email me about this consultation”, not for Thiscovery Forms pa
 
 Thiscovery Forms must be enabled. Pick the form in the block. Polls should be the **Quick poll** type; longer surveys should use Survey CTA.
 
+## HubSpot form
+
+Paste the embed HubSpot gives you into a **HubSpot form** section. **Rich text strips `<script>` tags**, so the form will not run there.
+
+Only HubSpot form loaders (`*.hsforms.net`) are output. The page nonce is added automatically — you can leave HubSpot’s `RANDOM_NONCE_VALUE` as it is.
+
 ## Space widgets
 
 On **Settings**, choose a **Bound Space**. Then add:

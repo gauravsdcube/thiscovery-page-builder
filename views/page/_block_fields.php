@@ -461,6 +461,55 @@ if ($type === 'phases'): ?>
         </div>
     </div>
 
+<?php elseif ($type === 'hubspot_form'): ?>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][title]"
+               value="<?= Html::encode($settings['title'] ?? '') ?>"
+               data-ep-card-title-source
+               placeholder="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Heading shown above the form') ?>">
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'HubSpot embed code') ?></label>
+        <textarea class="form-control" name="<?= $namePrefix ?>[settings][embed_code]" rows="5"
+                  placeholder="<?= Html::encode('<script src="https://js-eu1.hsforms.net/forms/embed/…js" defer></script>') ?>"></textarea>
+        <div class="ep-hint text-muted">
+            <?= Yii::t(
+                'ThiscoveryPageBuilderModule.base',
+                'Paste the embed from HubSpot. Rich text cannot include scripts, so use this section instead. Only HubSpot form hosts are allowed. Paste again to replace the form.'
+            ) ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Portal ID') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional if you pasted the embed') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][portal_id]"
+               value="<?= Html::encode((string) ($settings['portal_id'] ?? '')) ?>"
+               placeholder="148513049" style="max-width:280px" inputmode="numeric" autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Form ID') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional if you pasted the embed') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][form_id]"
+               value="<?= Html::encode((string) ($settings['form_id'] ?? '')) ?>"
+               placeholder="c2765ef9-9638-4127-9b47-a1e8f5b9c0bd" autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Region') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional if you pasted the embed') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][region]"
+               value="<?= Html::encode((string) ($settings['region'] ?? '')) ?>"
+               placeholder="eu1" style="max-width:160px" autocomplete="off">
+        <div class="ep-hint text-muted">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Use eu1 for HubSpot EU, na1 for US.') ?>
+        </div>
+    </div>
+
 <?php elseif ($type === 'oembed'): ?>
     <div class="form-group">
         <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?>

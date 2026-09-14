@@ -1,6 +1,6 @@
 # Thiscovery Page Builder
 
-**Version 1.8.0**  
+**Version 1.8.1**  
 **Copyright (c) 2026 D Cube Consulting. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 
@@ -30,7 +30,7 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 - **Collections** as top-level URL prefixes (`/collection`) and **standalone** pages (`/about`)
 - Pages nested under a collection: `/collection/page-slug`
 - Configurable slugs with duplicate-slug warnings
-- Drag-and-drop sections including **Button**, Space widgets (stream / tasks / files / gallery / calendar), hero, rich text, **video embed** (YouTube / Vimeo), survey CTA, quick poll, downloads, containers, phases, events, team, **contact card** (photo), contact, updates, comments, accordion, callout, image, collections
+- Drag-and-drop sections including **Button**, Space widgets (stream / tasks / files / gallery / calendar), hero, rich text, **video embed** (YouTube / Vimeo), **HubSpot form**, survey CTA, quick poll, downloads, containers, phases, events, team, **contact card** (photo), contact, updates, comments, accordion, callout, image, collections
 - Bind one **Space** per page for all space widgets
 - **Top menu** entries per page; **site homepage** for guests, logged-in users, and groups (configure here, then disable the Homepage module)
 - Page templates, audience visibility, comments moderation, subscriptions CSV

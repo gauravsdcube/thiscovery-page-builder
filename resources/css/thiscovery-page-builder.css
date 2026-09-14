@@ -1227,6 +1227,17 @@ a.ep-sector-card:focus {
   display: block;
 }
 
+.ep-hubspot-form { margin: 0; }
+.ep-hubspot-form__title {
+  margin: 0 0 12px;
+  color: var(--ep-t-text);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+.ep-hubspot-form .hs-form-frame {
+  min-height: 120px;
+}
+
 .ep-repeat-item { margin-bottom: 8px; }
 
 @media (max-width: 640px) {
