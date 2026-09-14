@@ -31,6 +31,12 @@ class uninstall extends Migration
                 $this->dropTable($table);
             }
         }
+        if ($this->db->schema->getTableSchema('thiscovery_page_folder', true) !== null) {
+            $this->dropTable('thiscovery_page_folder');
+        }
+        if ($this->db->schema->getTableSchema('thiscovery_page_theme', true) !== null) {
+            $this->dropTable('thiscovery_page_theme');
+        }
     }
 
     public function down()

@@ -16,6 +16,7 @@ use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\modules\thiscoveryPageBuilder\models\PageComment;
 use humhub\modules\thiscoveryPageBuilder\models\PageCommentForm;
 use humhub\modules\thiscoveryPageBuilder\models\PageFollow;
+use humhub\modules\thiscoveryPageBuilder\services\PageVersionService;
 use Yii;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -155,6 +156,7 @@ class PublicController extends Controller
             'canManage' => $page->canManage(),
             'publicLayout' => true,
             'isDirectory' => $page->isCollection(),
+            'isPreview' => false,
         ]);
     }
 
@@ -172,6 +174,11 @@ class PublicController extends Controller
             throw new ForbiddenHttpException(Yii::t('ThiscoveryPageBuilderModule.base', 'You do not have permission to view this page.'));
         }
 
+        $isPreview = $this->isPreviewMode($page);
+        if (PageVersionService::isAvailable()) {
+            (new PageVersionService())->applyPublicDefinition($page, $isPreview);
+        }
+
         $this->pageTitle = self::maybeTranslatePageTitle($page);
         $this->view->params['engagementPage'] = $page;
 
@@ -181,7 +188,19 @@ class PublicController extends Controller
             'canManage' => $page->canManage(),
             'publicLayout' => true,
             'isDirectory' => $page->isCollection(),
+            'isPreview' => $isPreview,
         ]);
+    }
+
+    private function isPreviewMode(EngagementPage $page): bool
+    {
+        if (!$page->canManage()) {
+            return false;
+        }
+        $preview = (string) Yii::$app->request->get('preview', '');
+        $revisionId = (int) Yii::$app->request->get('revision_id', 0);
+        $editionId = (int) Yii::$app->request->get('edition_id', 0);
+        return $preview === '1' || $preview === 'true' || $revisionId > 0 || $editionId > 0;
     }
 
     private function commentsBlockSettings(EngagementPage $page): array

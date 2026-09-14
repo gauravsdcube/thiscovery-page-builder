@@ -52,7 +52,7 @@ trait SectionPostParserTrait
             $settings['items'] = array_values(array_filter($settings['items'], 'is_array'));
         }
 
-        if ($type === 'team' && isset($settings['people']) && is_array($settings['people'])) {
+        if (in_array($type, ['team', 'contact_card'], true) && isset($settings['people']) && is_array($settings['people'])) {
             $settings['people'] = array_values(array_filter($settings['people'], 'is_array'));
         }
 

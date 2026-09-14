@@ -32,6 +32,8 @@ class HelpService
                     'creators-getting-started',
                     'creators-builder',
                     'creators-settings',
+                    'creators-appearance',
+                    'creators-versioning',
                     'creators-publishing',
                     'creators-engagement',
                 ],
@@ -54,13 +56,13 @@ class HelpService
             'creators-getting-started' => [
                 'file' => 'creators-getting-started.md',
                 'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Getting started'),
-                'summary' => Yii::t('ThiscoveryPageBuilderModule.base', 'Where pages live, collections, and the studio tabs.'),
+                'summary' => Yii::t('ThiscoveryPageBuilderModule.base', 'Where pages live, folders, collections, and the studio tabs.'),
                 'icon' => 'play-circle',
             ],
             'creators-builder' => [
                 'file' => 'creators-builder.md',
                 'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Builder and sections'),
-                'summary' => Yii::t('ThiscoveryPageBuilderModule.base', 'Layouts, section types, containers, and colours.'),
+                'summary' => Yii::t('ThiscoveryPageBuilderModule.base', 'Layouts, section types, containers, colours, and corner radius.'),
                 'icon' => 'th-large',
             ],
             'creators-settings' => [
@@ -68,6 +70,18 @@ class HelpService
                 'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Page settings'),
                 'summary' => Yii::t('ThiscoveryPageBuilderModule.base', 'Slug, status, audience, bound Space, menu, and homepage.'),
                 'icon' => 'wrench',
+            ],
+            'creators-appearance' => [
+                'file' => 'creators-appearance.md',
+                'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Appearance and CSS'),
+                'summary' => Yii::t('ThiscoveryPageBuilderModule.base', 'Shared themes, page overrides, and custom CSS.'),
+                'icon' => 'paint-brush',
+            ],
+            'creators-versioning' => [
+                'file' => 'creators-versioning.md',
+                'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Versions and publishing'),
+                'summary' => Yii::t('ThiscoveryPageBuilderModule.base', 'Revisions, published editions, restore, and preview.'),
+                'icon' => 'history',
             ],
             'creators-publishing' => [
                 'file' => 'creators-publishing.md',

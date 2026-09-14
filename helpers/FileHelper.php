@@ -40,9 +40,17 @@ class FileHelper
             if (!empty($settings['image_guid'])) {
                 $guids[] = (string) $settings['image_guid'];
             }
-            foreach (($settings['items'] ?? []) as $item) {
-                if (!empty($item['file_guid'])) {
-                    $guids[] = (string) $item['file_guid'];
+            foreach (['items', 'people'] as $listKey) {
+                foreach (($settings[$listKey] ?? []) as $item) {
+                    if (!is_array($item)) {
+                        continue;
+                    }
+                    if (!empty($item['file_guid'])) {
+                        $guids[] = (string) $item['file_guid'];
+                    }
+                    if (!empty($item['image_guid'])) {
+                        $guids[] = (string) $item['image_guid'];
+                    }
                 }
             }
             if (!empty($section['children']) && is_array($section['children'])) {

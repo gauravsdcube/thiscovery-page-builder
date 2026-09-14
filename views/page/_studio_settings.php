@@ -9,39 +9,56 @@ use humhub\helpers\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\modules\thiscoveryPageBuilder\models\PageHome;
+use humhub\modules\thiscoveryPageBuilder\services\PageVersionService;
 use humhub\modules\thiscoveryEditor\widgets\EditorField;
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
 
 /** @var ContentContainerActiveRecord|null $contentContainer */
 /** @var EngagementPage $page */
 /** @var bool $isDirectory */
 /** @var bool $isTemplate */
+/** @var bool $isNew */
 /** @var array $collectionOptions */
 /** @var array $spaceOptions */
 /** @var array $groupOptions */
 /** @var PageHome[] $pageHomes */
 /** @var string $publicPrefix */
 /** @var string|null $parentSlug */
+/** @var string $activeSection */
+/** @var string $shareUrl */
+/** @var array $folderOptions */
 
 $view = $this;
 $guide = static function (string $text) use ($view) {
     return $view->render('_setting_guide', ['text' => $text]);
 };
-?>
-<div class="ep-studio__settings">
-    <p class="ep-studio__hint">
-        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Settings are grouped into collapsible sections. Basics opens first. Use Expand all / Collapse all as needed. Click ? next to a label for a short explanation.') ?>
-    </p>
-    <div class="ep-set-toolbar">
-        <button type="button" class="btn btn-sm btn-light" data-ep-acc-all="open"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Expand all') ?></button>
-        <button type="button" class="btn btn-sm btn-light" data-ep-acc-all="close"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Collapse all') ?></button>
-    </div>
 
-    <details class="ep-set-acc" open>
-        <summary>
-            <span class="ep-set-acc__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Basics') ?></span>
-            <span class="ep-set-acc__summary"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title, URL, summary, status, width') ?></span>
-        </summary>
-        <div class="ep-set-acc__body">
+$isNew = !empty($isNew);
+$activeSection = $activeSection ?? 'basics';
+$shareUrl = $shareUrl ?? '';
+$showBoundSpace = !$isTemplate && $page->hasAttribute('bound_space_id');
+$showNavHome = !$isTemplate && $page->hasAttribute('show_in_top_menu') && $contentContainer === null;
+$showVersions = !$isNew && !$isTemplate && PageVersionService::isAvailable();
+$navManaged = class_exists(\humhub\modules\thiscoveryNavigation\helpers\Navigation::class)
+    && \humhub\modules\thiscoveryNavigation\helpers\Navigation::isActive();
+$pane = static function (string $section, string $title) use ($activeSection): string {
+    $active = $section === $activeSection;
+    return '<section class="ep-settings-pane' . ($active ? ' is-active' : '') . '" data-ep-settings-pane="'
+        . Html::encode($section) . '" role="tabpanel"' . ($active ? '' : ' hidden') . '>'
+        . '<h3 class="ep-settings-pane__title">' . Html::encode($title) . '</h3>';
+};
+?>
+<div class="ep-settings-workspace">
+    <?= $this->render('_studio_rail', [
+        'page' => $page,
+        'isNew' => $isNew,
+        'isTemplate' => $isTemplate,
+        'contentContainer' => $contentContainer,
+        'activeSection' => $activeSection,
+    ]) ?>
+    <div class="ep-settings-main">
+
+<?= $pane('basics', Yii::t('ThiscoveryPageBuilderModule.base', 'Basics')) ?>
             <div class="form-group ep-field">
                 <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?></label>
                 <?= $guide(Yii::t('ThiscoveryPageBuilderModule.base', 'Shown at the top of the public page and in admin lists. Keep it short and clear.')) ?>
@@ -104,6 +121,33 @@ $guide = static function (string $text) use ($view) {
                 <?php endif; ?>
             <?php endif; ?>
 
+            <?php
+            $folderOptions = $folderOptions ?? [];
+            $showFolder = $page->hasAttribute('folder_id') && !$isTemplate
+                && ($page->isCollection() || $page->isTopLevel() || ($isNew && empty($page->parent_id)));
+            ?>
+            <?php if ($showFolder): ?>
+                <div class="form-group ep-field">
+                    <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Folder') ?>
+                        <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+                    </label>
+                    <?= $guide(Yii::t('ThiscoveryPageBuilderModule.base', 'Admin grouping on the page list only. Public URLs stay the same. Leave Unfiled to keep this with top-level pages or unfiled collections.')) ?>
+                    <select class="form-control" name="EngagementPage[folder_id]" style="max-width:420px">
+                        <option value=""><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Unfiled') ?></option>
+                        <?php foreach ($folderOptions as $value => $labelOpt): ?>
+                            <option value="<?= Html::encode($value) ?>" <?= (string) ($page->folder_id ?? '') === (string) $value ? 'selected' : '' ?>>
+                                <?= Html::encode($labelOpt) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php elseif ($page->hasAttribute('folder_id') && !$page->isCollection() && !$page->isTopLevel()): ?>
+                <input type="hidden" name="EngagementPage[folder_id]" value="">
+                <p class="ep-hint text-muted">
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Child pages stay with their collection. File the collection to organise them.') ?>
+                </p>
+            <?php endif; ?>
+
             <div class="form-group ep-field">
                 <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Summary') ?>
                     <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
@@ -146,7 +190,7 @@ $guide = static function (string $text) use ($view) {
                     <label class="ep-label" for="ep-width-select-settings">
                         <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page width') ?>
                     </label>
-                    <?= $guide(Yii::t('ThiscoveryPageBuilderModule.base', 'Controls how wide this page appears publicly. Wide is 1440px; Full uses the browser width with side padding.')) ?>
+                    <?= $guide(Yii::t('ThiscoveryPageBuilderModule.base', 'Controls how wide this page appears publicly. Extra wide is 1600px; Full uses the browser width with side padding.')) ?>
                     <select id="ep-width-select-settings" class="form-control" name="EngagementPage[page_width]"
                             data-ep-page-width>
                         <?php foreach (EngagementPage::pageWidthOptions() as $value => $label): ?>
@@ -172,16 +216,10 @@ $guide = static function (string $text) use ($view) {
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
-    </details>
+        </section>
 
-    <?php if (!$isTemplate && $page->hasAttribute('bound_space_id')): ?>
-    <details class="ep-set-acc">
-        <summary>
-            <span class="ep-set-acc__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Bound Space') ?></span>
-            <span class="ep-set-acc__summary"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Space used by stream, tasks, files, gallery, calendar') ?></span>
-        </summary>
-        <div class="ep-set-acc__body">
+<?php if ($showBoundSpace): ?>
+<?= $pane('space', Yii::t('ThiscoveryPageBuilderModule.base', 'Bound Space')) ?>
             <div class="form-group ep-field mb-0">
                 <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Bound Space') ?></label>
                 <?= $guide(Yii::t('ThiscoveryPageBuilderModule.base', 'Set once for this page. Space stream, tasks, files, gallery, and calendar widgets all use this Space.')) ?>
@@ -193,16 +231,10 @@ $guide = static function (string $text) use ($view) {
                     <?php endforeach; ?>
                 </select>
             </div>
-        </div>
-    </details>
-    <?php endif; ?>
+        </section>
+<?php endif; ?>
 
-    <details class="ep-set-acc">
-        <summary>
-            <span class="ep-set-acc__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Directory listing') ?></span>
-            <span class="ep-set-acc__summary"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Listing, featured, category, closing date') ?></span>
-        </summary>
-        <div class="ep-set-acc__body">
+<?= $pane('directory', Yii::t('ThiscoveryPageBuilderModule.base', 'Directory listing')) ?>
             <?php if ($isTemplate): ?>
                 <input type="hidden" name="EngagementPage[listed]" value="0">
                 <input type="hidden" name="EngagementPage[featured]" value="0">
@@ -262,39 +294,43 @@ $guide = static function (string $text) use ($view) {
                            style="max-width:220px">
                 </div>
             <?php endif; ?>
-        </div>
-    </details>
+        </section>
 
-    <?php if (!$isTemplate && $page->hasAttribute('show_in_top_menu') && $contentContainer === null): ?>
-    <?php $navManaged = class_exists(\humhub\modules\thiscoveryNavigation\helpers\Navigation::class)
-        && \humhub\modules\thiscoveryNavigation\helpers\Navigation::isActive(); ?>
-    <details class="ep-set-acc">
-        <summary>
-            <span class="ep-set-acc__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Navigation') ?></span>
-            <span class="ep-set-acc__summary"><?= $navManaged
-                ? Yii::t('ThiscoveryPageBuilderModule.base', 'Managed in Site navigation')
-                : Yii::t('ThiscoveryPageBuilderModule.base', 'Top menu label, order, and visibility') ?></span>
-        </summary>
-        <div class="ep-set-acc__body">
+<?php if ($showNavHome): ?>
+<?= $pane('navigation', Yii::t('ThiscoveryPageBuilderModule.base', 'Navigation')) ?>
+            <?php
+            $isCollectionPage = $page->isCollection();
+            $isChildPage = !$isCollectionPage && !$page->isTopLevel();
+            if ($isCollectionPage) {
+                $navCheckLabel = Yii::t('ThiscoveryPageBuilderModule.base', 'Show this collection in the top bar');
+                $navCheckGuide = Yii::t('ThiscoveryPageBuilderModule.base', 'Adds the collection as a top-bar item. Child pages you mark below appear in its dropdown.');
+            } elseif ($isChildPage) {
+                $navCheckLabel = Yii::t('ThiscoveryPageBuilderModule.base', 'Show under the collection in the top bar');
+                $navCheckGuide = Yii::t('ThiscoveryPageBuilderModule.base', 'Adds this page to the collection’s dropdown. The collection must also be shown in the top bar.');
+            } else {
+                $navCheckLabel = Yii::t('ThiscoveryPageBuilderModule.base', 'Show in top bar');
+                $navCheckGuide = Yii::t('ThiscoveryPageBuilderModule.base', 'Adds this page to the site top navigation when enabled.');
+            }
+            ?>
             <?php if ($navManaged): ?>
-                <p class="help-block mb-0">
+                <p class="help-block">
                     <?= Yii::t(
                         'ThiscoveryPageBuilderModule.base',
-                        'This page can be added to the site top bar in <a href="{url}">Site navigation</a>.',
+                        'Collections and their child pages are added to <a href="{url}">Site navigation</a> automatically. Use the option below for the live top bar.',
                         ['url' => \yii\helpers\Url::to(['/thiscovery-navigation/admin/index'])]
                     ) ?>
                 </p>
-            <?php else: ?>
+            <?php endif; ?>
             <div class="ep-check-setting">
                 <div>
                     <input type="hidden" name="EngagementPage[show_in_top_menu]" value="0">
                     <label class="form-check-label">
                         <input class="form-check-input" type="checkbox" value="1" name="EngagementPage[show_in_top_menu]" id="ep-top-menu"
                             <?= !empty($page->show_in_top_menu) ? 'checked' : '' ?>>
-                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Show in top menu') ?>
+                        <?= Html::encode($navCheckLabel) ?>
                     </label>
                 </div>
-                <?= $guide(Yii::t('ThiscoveryPageBuilderModule.base', 'Adds this page to the site top navigation when enabled.')) ?>
+                <?= $guide($navCheckGuide) ?>
             </div>
             <div class="form-group ep-field">
                 <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Menu label') ?></label>
@@ -320,16 +356,9 @@ $guide = static function (string $text) use ($view) {
                     <?php endforeach; ?>
                 </select>
             </div>
-            <?php endif; ?>
-        </div>
-    </details>
+        </section>
 
-    <details class="ep-set-acc">
-        <summary>
-            <span class="ep-set-acc__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Site homepage') ?></span>
-            <span class="ep-set-acc__summary"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Guest, logged-in, and group homepage targets') ?></span>
-        </summary>
-        <div class="ep-set-acc__body">
+<?= $pane('homepage', Yii::t('ThiscoveryPageBuilderModule.base', 'Site homepage')) ?>
             <p class="ep-set-acc__intro">
                 <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Use these assignments instead of the Homepage module. Disable Homepage after configuring here.') ?>
             </p>
@@ -409,7 +438,77 @@ $guide = static function (string $text) use ($view) {
                            placeholder="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Priority') ?>">
                 </div>
             <?php endforeach; ?>
-        </div>
-    </details>
-    <?php endif; ?>
+        </section>
+<?php endif; ?>
+
+<?= $pane('css', Yii::t('ThiscoveryPageBuilderModule.base', 'CSS')) ?>
+            <?= $this->render('_studio_css', ['page' => $page]) ?>
+        </section>
+
+<?= $pane('share', Yii::t('ThiscoveryPageBuilderModule.base', 'Share')) ?>
+            <h5 class="ep-section__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public URL') ?></h5>
+            <?php if ($isNew): ?>
+                <p class="ep-hint text-muted">
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Save the page first to generate a shareable link.') ?>
+                </p>
+            <?php else: ?>
+                <div class="form-group">
+                    <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public link') ?></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" readonly value="<?= Html::encode($shareUrl) ?>" data-ep-share-url>
+                        <button type="button" class="btn btn-primary" data-ep-copy-url>
+                            <i class="fa fa-clipboard"></i>
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Copy link') ?>
+                        </button>
+                    </div>
+                    <div class="ep-copy-feedback text-success d-none" data-ep-copy-feedback>
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Copied!') ?>
+                    </div>
+                </div>
+                <p>
+                    <a href="<?= Html::encode(Url::toPublic($page)) ?>" target="_blank" rel="noopener">
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open public page') ?>
+                        <i class="fa fa-external-link"></i>
+                    </a>
+                </p>
+                <?php if (!$isTemplate && PageVersionService::isAvailable()): ?>
+                    <hr>
+                    <h5 class="ep-section__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Publish') ?></h5>
+                    <p class="ep-hint text-muted">
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Visitors use the published edition. Publish current draft saves your latest studio changes first, then freezes that edition for the live page.') ?>
+                    </p>
+                    <?php $hasEdition = (new PageVersionService())->hasPublishedEdition($page); ?>
+                    <button type="submit" name="after_save" value="publish" class="btn btn-primary btn-sm">
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Publish current draft') ?>
+                    </button>
+                    <?php if (!$hasEdition): ?>
+                        <div class="alert alert-warning" style="margin-top:12px">
+                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'No edition published yet. The public URL shows the working draft until you publish.') ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php if (!$isTemplate): ?>
+                    <hr>
+                    <h5 class="ep-section__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Preview') ?></h5>
+                    <p class="ep-hint text-muted">
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Preview saves your latest work, then opens the working draft. Visitors still see the published edition until you publish.') ?>
+                    </p>
+                    <?php $previewUrl = Url::toPreview($page, true); ?>
+                    <div class="form-group">
+                        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Preview URL') ?></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly value="<?= Html::encode($previewUrl) ?>">
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+        </section>
+
+<?php if ($showVersions): ?>
+<?= $pane('versions', Yii::t('ThiscoveryPageBuilderModule.base', 'Versions')) ?>
+            <?= $this->render('_studio_versions', ['page' => $page]) ?>
+        </section>
+<?php endif; ?>
+
+    </div>
 </div>

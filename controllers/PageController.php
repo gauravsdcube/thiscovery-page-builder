@@ -12,6 +12,7 @@ use humhub\modules\thiscoveryPageBuilder\assets\ThiscoveryPageBuilderAsset;
 use humhub\modules\thiscoveryPageBuilder\helpers\Url;
 use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\services\PageFolderService;
 use humhub\modules\space\models\Space;
 use humhub\modules\thiscoveryForms\models\CustomForm;
 use Yii;
@@ -23,6 +24,9 @@ class PageController extends ContentContainerController
 {
     use SectionPostParserTrait;
     use HelpTrait;
+    use VersioningTrait;
+    use PageStudioSaveTrait;
+    use FolderTrait;
 
     public $validContentContainerClasses = [Space::class];
 
@@ -41,6 +45,11 @@ class PageController extends ContentContainerController
                 'actions' => [
                     'delete' => ['POST'],
                     'save-template' => ['POST'],
+                    'publish-version' => ['POST'],
+                    'restore-version' => ['POST'],
+                    'delete-revision' => ['POST'],
+                    'delete-edition' => ['POST'],
+                    'folder-delete' => ['POST'],
                 ],
             ],
         ];
@@ -71,6 +80,8 @@ class PageController extends ContentContainerController
             'templates' => $templates,
             'canCreate' => $probe->canCreate(),
             'canViewHelp' => $this->canViewHelp(),
+            'foldersReady' => PageFolderService::tablesReady(),
+            'canManageFolders' => $probe->canCreate() || $probe->canManage(),
         ]);
     }
 
@@ -116,6 +127,8 @@ class PageController extends ContentContainerController
                 $template->applyTemplateTo($page);
             }
         }
+
+        $this->applyFolderFromRequest($page);
 
         return $this->handleEdit($page, true);
     }
@@ -221,7 +234,9 @@ class PageController extends ContentContainerController
                 $page->bound_space_id = ($bound === '' || $bound === null) ? null : (int) $bound;
             }
             $page->sections = $this->parseSectionsFromPost();
+            $this->applyPostedAppearance($page);
             if ($page->save()) {
+                $this->recordPageVersion($page);
                 return $this->redirectAfterStudioSave($page);
             }
         }
@@ -242,6 +257,9 @@ class PageController extends ContentContainerController
             'pageOptions' => EngagementPage::publishedPageOptions($page->id),
             'groupOptions' => [],
             'pageHomes' => [],
+            'folderOptions' => PageFolderService::tablesReady()
+                ? PageFolderService::treeOptions($this->contentContainer)
+                : [],
         ]);
     }
 
@@ -273,35 +291,6 @@ class PageController extends ContentContainerController
             return $options;
         }
         return $options + \humhub\modules\thiscoveryMapping\models\Map::pickerOptions($this->contentContainer);
-    }
-
-    /**
-     * Stay in the studio after save, or open the public preview.
-     */
-    protected function redirectAfterStudioSave(EngagementPage $page)
-    {
-        $after = (string) Yii::$app->request->post('after_save', 'stay');
-        if ($after === 'preview') {
-            if ($page->isTemplate()) {
-                Yii::$app->session->setFlash(
-                    'info',
-                    Yii::t('ThiscoveryPageBuilderModule.base', 'Templates cannot be previewed publicly. Open the page builder Share tab after creating a page from this template.')
-                );
-                return $this->redirect(Url::toEdit($page));
-            }
-            return $this->redirect(Url::toPublic($page));
-        }
-
-        $tab = trim((string) Yii::$app->request->post('studio_tab', ''));
-        $url = Url::toEdit($page);
-        if ($tab !== '' && $tab !== 'builder') {
-            $url .= (str_contains($url, '?') ? '&' : '?') . 'tab=' . rawurlencode($tab);
-        }
-        Yii::$app->session->setFlash(
-            'success',
-            Yii::t('ThiscoveryPageBuilderModule.base', 'Page saved.')
-        );
-        return $this->redirect($url);
     }
 
     protected function findPage($id): EngagementPage

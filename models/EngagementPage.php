@@ -18,6 +18,7 @@ use humhub\modules\thiscoveryPageBuilder\permissions\CreatePage;
 use humhub\modules\thiscoveryPageBuilder\permissions\ManageGlobalPage;
 use humhub\modules\thiscoveryPageBuilder\permissions\ManagePages;
 use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\services\PageStyleService;
 use humhub\modules\search\interfaces\Searchable;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\components\PermissionManager;
@@ -51,9 +52,15 @@ use yii\helpers\Json;
  * @property int|null $created_by
  * @property string|null $updated_at
  * @property int|null $updated_by
+ * @property int|null $theme_id
+ * @property string|null $style_json
+ * @property string|null $custom_css
+ * @property int|null $current_edition_id
  *
+ * @property int|null $folder_id
  * @property-read EngagementPage|null $parent
  * @property-read EngagementPage[] $children
+ * @property-read PageFolder|null $folder
  */
 class EngagementPage extends ContentActiveRecord implements Searchable
 {
@@ -75,6 +82,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     public const WIDTH_STANDARD = 'standard';
     public const WIDTH_COMFORTABLE = 'comfortable';
     public const WIDTH_WIDE = 'wide';
+    public const WIDTH_EXTRA_WIDE = 'extra_wide';
     public const WIDTH_FULL = 'full';
 
     public const AUDIENCE_PUBLIC = 'public';
@@ -90,6 +98,9 @@ class EngagementPage extends ContentActiveRecord implements Searchable
 
     /** @var array|null decoded sections for form binding */
     public $sections = null;
+
+    /** @var array decoded style tokens for form binding */
+    public $style = [];
 
     public static function tableName()
     {
@@ -121,6 +132,16 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         if ($this->hasAttribute('listed') && $this->getAttribute('listed') === null) {
             $this->listed = true;
         }
+        if ($this->isNewRecord && $this->hasAttribute('theme_id') && $this->getAttribute('theme_id') === null) {
+            try {
+                $default = PageTheme::findDefault();
+                if ($default) {
+                    $this->theme_id = (int) $default->id;
+                }
+            } catch (\Throwable $e) {
+                // Theme table may not exist yet.
+            }
+        }
     }
 
     public function rules()
@@ -144,7 +165,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             [['layout'], 'in', 'range' => array_keys(BlockRegistry::layoutOptions())],
             [['page_width'], 'in', 'range' => array_keys(self::pageWidthOptions())],
             [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED, self::STATUS_ARCHIVED]],
-            [['sections'], 'safe'],
+            [['sections', 'style'], 'safe'],
         ];
 
         if ($this->hasAttribute('audience')) {
@@ -158,6 +179,10 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $rules[] = [['parent_id'], 'integer'];
             $rules[] = [['parent_id'], 'validateParent'];
         }
+        if ($this->hasAttribute('folder_id')) {
+            $rules[] = [['folder_id'], 'integer'];
+            $rules[] = [['folder_id'], 'validateFolder'];
+        }
         if ($this->hasAttribute('bound_space_id')) {
             $rules[] = [['bound_space_id'], 'integer'];
             $rules[] = [['bound_space_id'], 'exist', 'skipOnEmpty' => true,
@@ -168,6 +193,17 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $rules[] = [['top_menu_label'], 'string', 'max' => 64];
             $rules[] = [['top_menu_sort_order'], 'integer'];
             $rules[] = [['top_menu_visibility'], 'in', 'range' => array_keys(self::topMenuVisibilityOptions())];
+        }
+        if ($this->hasAttribute('theme_id')) {
+            $rules[] = [['theme_id'], 'integer'];
+            $rules[] = [['theme_id'], 'exist', 'skipOnEmpty' => true,
+                'targetClass' => PageTheme::class, 'targetAttribute' => ['theme_id' => 'id']];
+        }
+        if ($this->hasAttribute('custom_css')) {
+            $rules[] = [['custom_css'], 'string'];
+        }
+        if ($this->hasAttribute('style_json')) {
+            $rules[] = [['style_json'], 'string'];
         }
 
         return $rules;
@@ -188,6 +224,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             'is_template' => Yii::t('ThiscoveryPageBuilderModule.base', 'Page template'),
             'is_collection' => Yii::t('ThiscoveryPageBuilderModule.base', 'Collection'),
             'parent_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Collection'),
+            'folder_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Folder'),
             'bound_space_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Bound Space'),
             'show_in_top_menu' => Yii::t('ThiscoveryPageBuilderModule.base', 'Show in top menu'),
             'top_menu_label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Top menu label'),
@@ -195,6 +232,8 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             'top_menu_visibility' => Yii::t('ThiscoveryPageBuilderModule.base', 'Top menu visibility'),
             'category' => Yii::t('ThiscoveryPageBuilderModule.base', 'Category'),
             'closes_at' => Yii::t('ThiscoveryPageBuilderModule.base', 'Closes at'),
+            'theme_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Theme'),
+            'custom_css' => Yii::t('ThiscoveryPageBuilderModule.base', 'Custom CSS'),
         ];
     }
 
@@ -274,6 +313,23 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         }
     }
 
+    public function validateFolder($attribute): void
+    {
+        if ($this->folder_id === '' || $this->folder_id === null || (int) $this->folder_id === 0) {
+            $this->folder_id = null;
+            return;
+        }
+        $folder = PageFolder::findOne((int) $this->folder_id);
+        if ($folder === null) {
+            $this->addError($attribute, Yii::t('ThiscoveryPageBuilderModule.base', 'Folder not found.'));
+            return;
+        }
+        $containerId = $this->content->contentcontainer_id ?? null;
+        if ((int) $folder->contentcontainer_id !== (int) $containerId) {
+            $this->addError($attribute, Yii::t('ThiscoveryPageBuilderModule.base', 'Folders must stay in the same space.'));
+        }
+    }
+
     /**
      * First URL segment of the legacy primary collection (directory homepage).
      */
@@ -336,6 +392,9 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $this->sections = BlockRegistry::normalizeSections($this->sections);
             $this->sections_json = Json::encode($this->sections);
         }
+        if (is_array($this->style) && $this->hasAttribute('style_json')) {
+            $this->style_json = Json::encode((new PageStyleService())->normalize($this->style), JSON_UNESCAPED_UNICODE);
+        }
         return parent::beforeValidate();
     }
 
@@ -346,6 +405,14 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $this->sections_json = Json::encode($this->sections);
         } elseif ($this->sections_json === null) {
             $this->sections_json = '[]';
+        }
+
+        if (is_array($this->style) && $this->hasAttribute('style_json')) {
+            $this->style_json = Json::encode((new PageStyleService())->normalize($this->style), JSON_UNESCAPED_UNICODE);
+        }
+
+        if ($this->hasAttribute('theme_id') && ($this->theme_id === '' || $this->theme_id === 0)) {
+            $this->theme_id = null;
         }
 
         if ($this->content) {
@@ -397,6 +464,15 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $this->status = self::STATUS_DRAFT;
         }
 
+        if ($this->hasAttribute('folder_id')) {
+            if ($this->folder_id === '' || $this->folder_id === 0) {
+                $this->folder_id = null;
+            }
+            if ($this->isTemplate() || (!$this->isCollection() && !empty($this->parent_id))) {
+                $this->folder_id = null;
+            }
+        }
+
         return parent::beforeSave($insert);
     }
 
@@ -404,6 +480,59 @@ class EngagementPage extends ContentActiveRecord implements Searchable
     {
         parent::afterFind();
         $this->sections = $this->getSections();
+        $decoded = [];
+        if ($this->hasAttribute('style_json') && $this->style_json) {
+            $parsed = json_decode((string) $this->style_json, true);
+            $decoded = is_array($parsed) ? $parsed : [];
+        }
+        $this->style = $decoded;
+    }
+
+    public function getStyle(): array
+    {
+        return is_array($this->style) ? $this->style : [];
+    }
+
+    public function setStyle(array $style): void
+    {
+        $normalized = (new PageStyleService())->normalize($style);
+        $this->style = $normalized;
+        if ($this->hasAttribute('style_json')) {
+            $this->style_json = json_encode($normalized, JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function resolveTheme(): ?PageTheme
+    {
+        if (!$this->hasAttribute('theme_id') || !$this->theme_id) {
+            return null;
+        }
+        try {
+            return PageTheme::findOne((int) $this->theme_id);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Compiled theme tokens plus page overrides and custom CSS, sanitized for inline <style>.
+     */
+    public function getSafeCustomCss(): string
+    {
+        $theme = $this->resolveTheme();
+        $baseStyle = $theme ? $theme->getStyle() : [];
+        $pageStyle = $this->getStyle();
+        $svc = new PageStyleService();
+        $merged = $svc->mergeStyles($baseStyle, $pageStyle);
+        $chunks = [$svc->compile($merged)];
+        if ($theme && trim((string) $theme->custom_css) !== '') {
+            $chunks[] = (string) $theme->custom_css;
+        }
+        if ($this->hasAttribute('custom_css')) {
+            $chunks[] = (string) $this->custom_css;
+        }
+        $css = trim(implode("\n", array_filter(array_map('trim', $chunks))));
+        return PageStyleService::sanitizeCustomCss($css);
     }
 
     public function getSections(): array
@@ -473,9 +602,8 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             self::WIDTH_NARROW => '720px',
             self::WIDTH_STANDARD => '960px',
             self::WIDTH_COMFORTABLE => '1100px',
-            // Fixed 1440 — must stay below typical theme max (often 1600–2000)
-            // so "Wide" and "Full" remain visually distinct.
             self::WIDTH_WIDE => '1440px',
+            self::WIDTH_EXTRA_WIDE => '1600px',
             default => null,
         };
     }
@@ -487,6 +615,7 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             self::WIDTH_STANDARD => Yii::t('ThiscoveryPageBuilderModule.base', 'Standard (960px)'),
             self::WIDTH_COMFORTABLE => Yii::t('ThiscoveryPageBuilderModule.base', 'Comfortable (1100px)'),
             self::WIDTH_WIDE => Yii::t('ThiscoveryPageBuilderModule.base', 'Wide (1440px)'),
+            self::WIDTH_EXTRA_WIDE => Yii::t('ThiscoveryPageBuilderModule.base', 'Extra wide (1600px)'),
             self::WIDTH_FULL => Yii::t('ThiscoveryPageBuilderModule.base', 'Full browser width'),
         ];
     }
@@ -627,6 +756,14 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             } catch (\Throwable $e) {
             }
         }
+
+        \humhub\modules\thiscoveryPageBuilder\services\PageNavigationSync::sync($this, $changedAttributes);
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        \humhub\modules\thiscoveryPageBuilder\services\PageNavigationSync::remove($this);
     }
 
     public function isGlobal(): bool
@@ -734,6 +871,11 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         return $this->hasMany(self::class, ['parent_id' => 'id'])
             ->andWhere(['is_template' => false])
             ->orderBy(['title' => SORT_ASC, 'id' => SORT_ASC]);
+    }
+
+    public function getFolder()
+    {
+        return $this->hasOne(PageFolder::class, ['id' => 'folder_id']);
     }
 
     public function getPageHomes()
@@ -1018,6 +1160,15 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         $tpl->category = $this->category;
         $tpl->closes_at = null;
         $tpl->sections = $this->getSections();
+        if ($tpl->hasAttribute('theme_id') && $this->hasAttribute('theme_id')) {
+            $tpl->theme_id = $this->theme_id;
+        }
+        if ($tpl->hasAttribute('style_json') && $this->hasAttribute('style_json')) {
+            $tpl->setStyle($this->getStyle());
+        }
+        if ($tpl->hasAttribute('custom_css') && $this->hasAttribute('custom_css')) {
+            $tpl->custom_css = $this->custom_css;
+        }
         if ($tpl->content) {
             $tpl->content->visibility = Content::VISIBILITY_PRIVATE;
         }
@@ -1042,6 +1193,15 @@ class EngagementPage extends ContentActiveRecord implements Searchable
             $page->audience = $this->getAudienceKey();
         }
         $page->sections = $this->getSections();
+        if ($page->hasAttribute('theme_id') && $this->hasAttribute('theme_id')) {
+            $page->theme_id = $this->theme_id;
+        }
+        if ($page->hasAttribute('style_json') && $this->hasAttribute('style_json')) {
+            $page->setStyle($this->getStyle());
+        }
+        if ($page->hasAttribute('custom_css') && $this->hasAttribute('custom_css')) {
+            $page->custom_css = $this->custom_css;
+        }
         if ($page->title === '' || $page->title === null) {
             $page->title = $this->title;
         }

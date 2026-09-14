@@ -6,7 +6,7 @@
  */
 
 /**
- * Shared background / text / border colour fields for section cards.
+ * Shared appearance fields (colours and corner radius) for section cards.
  *
  * @var array $settings
  * @var string $namePrefix
@@ -26,9 +26,13 @@ $fgPicker = $fg !== '' ? $fg : ($type === 'hero' ? '#ffffff' : '#0b0c0c');
 $borderPicker = $border !== '' ? $border : '#b1b4b6';
 $presets = BaseBlock::colorPresets();
 $isHero = ($type === 'hero');
+$radius = array_key_exists('border_radius', $settings) && $settings['border_radius'] !== '' && $settings['border_radius'] !== null
+    ? (string) (int) $settings['border_radius']
+    : '';
+$radiusPresets = [0, 4, 8, 12, 16, 24];
 ?>
 <div class="ep-color-fields">
-    <div class="ep-color-fields__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Colours') ?></div>
+    <div class="ep-color-fields__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Appearance') ?></div>
     <p class="ep-hint text-muted mb-2">
         <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Leave blank to use the default theme colours for this section.') ?>
     </p>
@@ -140,5 +144,47 @@ $isHero = ($type === 'hero');
                 </div>
             </div>
         <?php endif; ?>
+    </div>
+    <div class="form-group mb-0 mt-2">
+        <label class="ep-label" for="ep-radius-<?= Html::encode($safeIndex) ?>">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Corner radius') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+        </label>
+        <div class="ep-radius-input" data-ep-radius-field>
+            <input type="number"
+                   class="form-control ep-radius-input__number"
+                   id="ep-radius-<?= Html::encode($safeIndex) ?>"
+                   name="<?= $namePrefix ?>[settings][border_radius]"
+                   value="<?= Html::encode($radius) ?>"
+                   min="<?= (int) BaseBlock::RADIUS_MIN ?>"
+                   max="<?= (int) BaseBlock::RADIUS_MAX ?>"
+                   step="1"
+                   inputmode="numeric"
+                   placeholder="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Default') ?>"
+                   data-ep-radius-text
+                   autocomplete="off">
+            <span class="ep-radius-input__unit"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'px') ?></span>
+            <button type="button" class="btn btn-sm btn-light" data-ep-radius-clear
+                    title="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reset to default') ?>">
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Reset') ?>
+            </button>
+        </div>
+        <div class="ep-radius-presets" role="list" aria-label="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Corner radius presets') ?>">
+            <?php foreach ($radiusPresets as $preset): ?>
+                <button type="button"
+                        class="ep-radius-presets__chip"
+                        data-ep-radius-preset="<?= (int) $preset ?>"
+                        title="<?= $preset === 0
+                            ? Yii::t('ThiscoveryPageBuilderModule.base', 'Square')
+                            : ((int) $preset . 'px') ?>">
+                    <?= $preset === 0
+                        ? Yii::t('ThiscoveryPageBuilderModule.base', 'Square')
+                        : ((int) $preset . 'px') ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+        <div class="ep-hint text-muted mt-1">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Leave blank for the theme default. 0 is square corners. Applies to this section and its cards.') ?>
+        </div>
     </div>
 </div>

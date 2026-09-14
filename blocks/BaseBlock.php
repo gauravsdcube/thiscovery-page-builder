@@ -17,6 +17,10 @@ abstract class BaseBlock extends BaseObject
     public const ALIGN_CENTER = 'center';
     public const ALIGN_END = 'end';
 
+    public const RADIUS_MIN = 0;
+
+    public const RADIUS_MAX = 64;
+
     public array $settings = [];
 
     public function __construct(array $settings = [], array $config = [])
@@ -69,6 +73,7 @@ abstract class BaseBlock extends BaseObject
             'text_color' => $this->getTextColor(),
             'border_color' => $this->getBorderColor(),
             'show_border' => $this->getShowBorder(),
+            'border_radius' => $this->getBorderRadius(),
         ]);
     }
 
@@ -120,9 +125,48 @@ abstract class BaseBlock extends BaseObject
     }
 
     /**
+     * Optional corner radius in pixels. Null = theme default.
+     */
+    public function getBorderRadius(): ?int
+    {
+        if (!array_key_exists('border_radius', $this->settings)
+            || $this->settings['border_radius'] === ''
+            || $this->settings['border_radius'] === null) {
+            return null;
+        }
+        if (!is_numeric($this->settings['border_radius'])) {
+            return null;
+        }
+        $n = (int) $this->settings['border_radius'];
+        if ($n < self::RADIUS_MIN) {
+            return self::RADIUS_MIN;
+        }
+        if ($n > self::RADIUS_MAX) {
+            return self::RADIUS_MAX;
+        }
+        return $n;
+    }
+
+    public function hasCustomColors(): bool
+    {
+        if ($this->getBackgroundColor() !== '' || $this->getTextColor() !== '') {
+            return true;
+        }
+        if ($this->getType() === 'hero' && !$this->getShowBorder()) {
+            return true;
+        }
+        return $this->getBorderColor() !== '';
+    }
+
+    /**
      * Inline CSS variables applied to the block wrapper.
      */
     public function colorStyleAttribute(): string
+    {
+        return $this->wrapperStyleAttribute();
+    }
+
+    public function wrapperStyleAttribute(): string
     {
         $parts = [];
         $bg = $this->getBackgroundColor();
@@ -140,6 +184,10 @@ abstract class BaseBlock extends BaseObject
         } elseif ($border !== '') {
             $parts[] = '--ep-border:' . $border;
             $parts[] = '--ep-border-width:2px';
+        }
+        $radius = $this->getBorderRadius();
+        if ($radius !== null) {
+            $parts[] = '--ep-t-radius:' . $radius . 'px';
         }
         return implode(';', $parts);
     }
@@ -232,12 +280,18 @@ abstract class BaseBlock extends BaseObject
     protected function wrapAligned(string $html): string
     {
         $align = $this->getAlign();
-        $style = $this->colorStyleAttribute();
+        $style = $this->wrapperStyleAttribute();
+        $radius = $this->getBorderRadius();
         $attrs = 'class="ep-align ep-align--' . htmlspecialchars($align, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"'
             . ' data-ep-align="' . htmlspecialchars($align, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
         if ($style !== '') {
-            $attrs .= ' style="' . htmlspecialchars($style, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"'
-                . ' data-ep-colored="1"';
+            $attrs .= ' style="' . htmlspecialchars($style, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
+        }
+        if ($this->hasCustomColors()) {
+            $attrs .= ' data-ep-colored="1"';
+        }
+        if ($radius !== null) {
+            $attrs .= ' data-ep-radius="' . (int) $radius . '"';
         }
         return '<div ' . $attrs . '>' . $html . '</div>';
     }
