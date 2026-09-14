@@ -403,6 +403,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
             'callout' => ['tone' => 'info'],
             'image' => [],
             'oembed' => [],
+            'hubspot_form' => [],
             'directory' => [
                 'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback'),
                 'source' => 'pages',

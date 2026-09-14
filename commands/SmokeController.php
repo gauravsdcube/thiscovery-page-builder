@@ -50,6 +50,13 @@ class SmokeController extends Controller
                     ],
                 ],
             ],
+            [
+                'type' => 'hubspot_form',
+                'settings' => [
+                    'embed_code' => '<script src="https://js-eu1.hsforms.net/forms/embed/148513049.js" defer nonce="RANDOM_NONCE_VALUE"></script>'
+                        . '<div class="hs-form-frame" data-region="eu1" data-form-id="c2765ef9-9638-4127-9b47-a1e8f5b9c0bd" data-portal-id="148513049"></div>',
+                ],
+            ],
         ];
 
         if (!$page->validate(['title', 'slug', 'status', 'sections'])) {
@@ -72,6 +79,39 @@ class SmokeController extends Controller
             return ExitCode::DATAERR;
         }
         $this->stdout("contact_card=ok\n", Console::FG_GREEN);
+
+        $hubspot = null;
+        foreach ($page->getSections() as $section) {
+            if (($section['type'] ?? '') === 'hubspot_form') {
+                $hubspot = $section['settings'] ?? [];
+                break;
+            }
+        }
+        if ($hubspot === null) {
+            $this->stderr("hubspot_form missing after normalize\n", Console::FG_RED);
+            return ExitCode::DATAERR;
+        }
+        if (($hubspot['portal_id'] ?? '') !== '148513049'
+            || ($hubspot['form_id'] ?? '') !== 'c2765ef9-9638-4127-9b47-a1e8f5b9c0bd'
+            || ($hubspot['region'] ?? '') !== 'eu1'
+            || isset($hubspot['embed_code'])) {
+            $this->stderr("hubspot_form settings not parsed\n", Console::FG_RED);
+            print_r($hubspot);
+            return ExitCode::DATAERR;
+        }
+        $this->stdout("hubspot_form=ok\n", Console::FG_GREEN);
+
+        $hsBlock = BlockRegistry::create('hubspot_form', $hubspot);
+        $hsHtml = $hsBlock->render($page);
+        if (!str_contains($hsHtml, 'js-eu1.hsforms.net/forms/embed/148513049.js')
+            || !str_contains($hsHtml, 'c2765ef9-9638-4127-9b47-a1e8f5b9c0bd')
+            || str_contains($hsHtml, 'RANDOM_NONCE_VALUE')
+            || str_contains($hsHtml, 'embed_code')) {
+            $this->stderr("hubspot_form render unexpected\n", Console::FG_RED);
+            $this->stderr($hsHtml . "\n");
+            return ExitCode::DATAERR;
+        }
+        $this->stdout("hubspot_form_render=ok\n", Console::FG_GREEN);
 
         $hero = $page->getSections()[0]['settings'] ?? [];
         if (($hero['border_radius'] ?? null) !== 16) {

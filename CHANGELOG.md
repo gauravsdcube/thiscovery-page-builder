@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.1 (September 14, 2026)
+
+- Enh: HubSpot form section — paste the HubSpot embed (scripts are not allowed in rich text)
+
 ## 1.8.0 (September 14, 2026)
 
 - Enh: Studio Settings tab matches Forms (left section rail and one pane at a time), including CSS, Share, and Versions
