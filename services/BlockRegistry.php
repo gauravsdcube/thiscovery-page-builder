@@ -13,6 +13,7 @@ use humhub\modules\thiscoveryPageBuilder\blocks\CalloutBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\CollectionBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\CommentsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\ContactBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\ContactCardBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\DownloadsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\EventsBlock;
@@ -71,6 +72,7 @@ class BlockRegistry
             PhasesBlock::TYPE => PhasesBlock::class,
             EventsBlock::TYPE => EventsBlock::class,
             TeamBlock::TYPE => TeamBlock::class,
+            ContactCardBlock::TYPE => ContactCardBlock::class,
             ContactBlock::TYPE => ContactBlock::class,
             UpdatesBlock::TYPE => UpdatesBlock::class,
             CommentsBlock::TYPE => CommentsBlock::class,
@@ -174,6 +176,7 @@ class BlockRegistry
             ['type' => PhasesBlock::TYPE, 'icon' => 'fa-road', 'group' => 'engagement'],
             ['type' => EventsBlock::TYPE, 'icon' => 'fa-calendar', 'group' => 'engagement'],
             ['type' => TeamBlock::TYPE, 'icon' => 'fa-users', 'group' => 'engagement'],
+            ['type' => ContactCardBlock::TYPE, 'icon' => 'fa-id-badge', 'group' => 'engagement'],
             ['type' => ContactBlock::TYPE, 'icon' => 'fa-address-card', 'group' => 'engagement'],
             ['type' => UpdatesBlock::TYPE, 'icon' => 'fa-envelope-o', 'group' => 'engagement'],
             ['type' => CommentsBlock::TYPE, 'icon' => 'fa-comments', 'group' => 'engagement'],

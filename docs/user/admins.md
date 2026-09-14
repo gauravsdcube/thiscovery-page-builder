@@ -50,6 +50,16 @@ Network pages can become the site home:
 
 Draft pages do not act as the homepage until they are published.
 
+## Appearance themes
+
+Network administrators (or people with **Manage Modules**) open **Themes** from the page list. Named themes are applied on each page’s **CSS** tab. The default theme is assigned to new pages. Updating a theme updates every page that still uses it; page-level overrides still win.
+
+## Versioning
+
+Page Builder uses **Thiscovery Versioning** for draft revisions and published editions (same idea as Thiscovery Forms). Turn **Enable versioning for Page Builder** on under **Administration → Modules → Thiscovery Versioning**. Studio **Save** writes a revision; **Publish current draft** freezes the edition visitors see.
+
+Existing published pages are backfilled as edition #1 so public URLs keep their current content.
+
 ## Related modules
 
 | Module | Why |

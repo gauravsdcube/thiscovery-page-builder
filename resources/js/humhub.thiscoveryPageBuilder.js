@@ -14,12 +14,17 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
         var REGION_ORDER = ['full', 'left', 'main', 'right'];
 
         var layoutStudioPanes = function () {
-            var $workspace = $root.find('.ep-studio__workspace');
-            if (!$workspace.length) {
+            var $targets = $root.find('.ep-studio__workspace, .ep-settings-workspace');
+            if (!$targets.length) {
                 return;
             }
-            $workspace.css('height', '');
-            if (!$root.find('[data-ep-panel="builder"]').hasClass('is-active')) {
+            $targets.css('height', '');
+            var builderOn = $root.find('[data-ep-panel="builder"]').hasClass('is-active');
+            var settingsOn = $root.find('[data-ep-panel="settings"]').hasClass('is-active');
+            var $workspace = builderOn
+                ? $root.find('.ep-studio__workspace')
+                : (settingsOn ? $root.find('.ep-settings-workspace') : $());
+            if (!$workspace.length) {
                 return;
             }
             if (window.matchMedia && window.matchMedia('(max-width: 991px)').matches) {
@@ -37,6 +42,57 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
                 height = 280;
             }
             $workspace.css('height', height + 'px');
+        };
+
+        var extraHelpKeys = { css: 1, share: 1, versions: 1 };
+
+        var activateSettingsSection = function (section) {
+            section = String(section || 'basics');
+            $root.find('[data-ep-tab]').removeClass('is-active').attr('aria-selected', 'false');
+            $root.find('[data-ep-tab="settings"]').addClass('is-active').attr('aria-selected', 'true');
+            $root.find('[data-ep-panel]').removeClass('is-active');
+            $root.find('[data-ep-panel="settings"]').addClass('is-active');
+
+            var $rail = $root.find('[data-ep-settings-rail]');
+            $rail.find('[data-ep-settings-nav]').removeClass('is-active').attr('aria-selected', 'false');
+            $rail.find('[data-ep-settings-nav="' + section + '"]').addClass('is-active').attr('aria-selected', 'true');
+
+            $root.find('[data-ep-settings-pane]').removeClass('is-active').attr('hidden', true);
+            var $pane = $root.find('[data-ep-settings-pane="' + section + '"]');
+            if (!$pane.length) {
+                section = 'basics';
+                $pane = $root.find('[data-ep-settings-pane="basics"]');
+                $rail.find('[data-ep-settings-nav="basics"]').addClass('is-active').attr('aria-selected', 'true');
+            }
+            $pane.addClass('is-active').removeAttr('hidden');
+
+            $root.find('[data-ep-studio-tab]').val('settings');
+            $root.find('[data-ep-studio-section-input]').val(section);
+
+            var $help = $root.find('[data-ep-studio-help]');
+            if ($help.length) {
+                var pages = {};
+                try {
+                    pages = JSON.parse($help.attr('data-ep-help-pages') || '{}');
+                } catch (err) {}
+                var helpKey = extraHelpKeys[section] && pages[section] ? section : 'settings';
+                if (pages[helpKey]) {
+                    $help.attr('href', pages[helpKey]);
+                }
+            }
+
+            try {
+                var url = new URL(window.location.href);
+                url.searchParams.set('tab', 'settings');
+                url.searchParams.set('section', section);
+                window.history.replaceState({}, '', url.toString());
+            } catch (err) {}
+
+            setTimeout(function () {
+                destroyTinyMce($pane);
+                initRichEditors($pane);
+                layoutStudioPanes();
+            }, 30);
         };
 
         var applyLayoutVisibility = function () {
@@ -175,7 +231,7 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
                 // Re-index repeatable nested rows (phases / events / team / accordion)
                 $card.find('[data-ep-repeat]').each(function () {
                     var kind = $(this).attr('data-ep-repeat');
-                    var key = kind === 'team' ? 'people' : 'items';
+                    var key = (kind === 'team' || kind === 'contact_card') ? 'people' : 'items';
                     $(this).find('[data-ep-repeat-items] > [data-ep-repeat-item]').each(function (k) {
                         $(this).find('[name*="[settings][' + key + ']["]').each(function () {
                             var n = $(this).attr('name');
@@ -522,6 +578,11 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
         $root.on('click', '[data-ep-tab]', function (e) {
             e.preventDefault();
             var tab = $(this).data('ep-tab');
+            if (tab === 'settings') {
+                var section = $root.find('[data-ep-studio-section-input]').val() || 'basics';
+                activateSettingsSection(section);
+                return;
+            }
             $root.find('[data-ep-tab]').removeClass('is-active').attr('aria-selected', 'false');
             $(this).addClass('is-active').attr('aria-selected', 'true');
             $root.find('[data-ep-panel]').removeClass('is-active');
@@ -530,6 +591,7 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
             if ($hidden.length) {
                 $hidden.val(tab);
             }
+            $root.find('[data-ep-studio-section-input]').val('');
             var $help = $root.find('[data-ep-studio-help]');
             if ($help.length) {
                 var pages = {};
@@ -543,18 +605,17 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
             try {
                 var url = new URL(window.location.href);
                 url.searchParams.set('tab', tab);
+                url.searchParams.delete('section');
                 window.history.replaceState({}, '', url.toString());
             } catch (err) {}
-            if (tab === 'settings' || tab === 'builder') {
-                setTimeout(function () {
-                    var $panel = $root.find('[data-ep-panel="' + tab + '"]');
-                    if (tab === 'settings') {
-                        destroyTinyMce($panel);
-                    }
-                    initRichEditors($panel);
-                    layoutStudioPanes();
-                }, 30);
-            }
+            setTimeout(function () {
+                layoutStudioPanes();
+            }, 30);
+        });
+
+        $root.on('click', '[data-ep-settings-nav]', function (e) {
+            e.preventDefault();
+            activateSettingsSection($(this).attr('data-ep-settings-nav'));
         });
 
         $root.on('click', '[data-ep-guide-toggle]', function (e) {
@@ -567,15 +628,17 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
             $panel.prop('hidden', !next);
         });
 
-        $root.on('click', '[data-ep-acc-all]', function () {
-            var open = $(this).attr('data-ep-acc-all') === 'open';
-            $root.find('[data-ep-panel="settings"] details.ep-set-acc').prop('open', open);
-        });
-
         try {
             var params = new URLSearchParams(window.location.search);
-            var openTab = params.get('tab');
-            if (openTab) {
+            var openTab = params.get('tab') || '';
+            var openSection = params.get('section') || '';
+            if (openTab === 'css' || openTab === 'share' || openTab === 'versions') {
+                openSection = openTab;
+                openTab = 'settings';
+            }
+            if (openTab === 'settings') {
+                activateSettingsSection(openSection || 'basics');
+            } else if (openTab && openTab !== 'builder') {
                 $root.find('[data-ep-tab="' + openTab + '"]').trigger('click');
             }
         } catch (e) {}
@@ -648,6 +711,20 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
             $(this).closest('.ep-color-fields').find('[data-ep-border-color-wrap]').prop('hidden', !on);
         });
 
+        $root.on('click', '[data-ep-radius-clear]', function (e) {
+            e.preventDefault();
+            $(this).closest('[data-ep-radius-field]').find('[data-ep-radius-text]').val('');
+        });
+
+        $root.on('click', '[data-ep-radius-preset]', function (e) {
+            e.preventDefault();
+            var val = $(this).attr('data-ep-radius-preset');
+            var $field = $(this).closest('.ep-color-fields').find('[data-ep-radius-text]').first();
+            if ($field.length) {
+                $field.val(val);
+            }
+        });
+
         $root.on('change', '[data-ep-card-image]', function () {
             if (!this.checked) {
                 return;
@@ -704,7 +781,7 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
             }
             if (missing.length) {
                 e.preventDefault();
-                $root.find('[data-ep-tab="settings"]').trigger('click');
+                activateSettingsSection('basics');
                 setTimeout(function () {
                     var $focus = !title
                         ? $form.find('[name="EngagementPage[title]"]')
@@ -1066,7 +1143,11 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
             $wrap.find('[data-ep-repeat-items]').first().append($row);
             refreshIndexes();
             setTimeout(function () {
+                try {
+                    require('ui.additions').applyTo($row);
+                } catch (err) {}
                 initRichEditors($row);
+                bindUploadFields($row);
             }, 40);
         });
 
@@ -1155,16 +1236,84 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
         // Only init rich editors that are already visible (settings tab / expanded).
         // Collapsed column cards are remounted when opened in the edit stage.
         setTimeout(function () {
-            initRichEditors($root.find('[data-ep-panel="settings"]'));
+            initRichEditors($root.find('[data-ep-settings-pane].is-active'));
             bindUploadFields($root);
         }, 80);
 
         if ($root.find('[data-ep-form-errors]').length) {
-            $root.find('[data-ep-tab="settings"]').trigger('click');
+            activateSettingsSection('basics');
         }
 
         $(window).off('resize.epStudioPanes').on('resize.epStudioPanes', layoutStudioPanes);
         layoutStudioPanes();
+        initStyleFields($root);
+        initExclusiveAccordions();
+    };
+
+    var initExclusiveAccordions = function () {
+        $(document).off('toggle.epAccExclusive', '.ep-accordion[data-ep-exclusive] .ep-accordion__item');
+        $(document).on('toggle.epAccExclusive', '.ep-accordion[data-ep-exclusive] .ep-accordion__item', function () {
+            if (!this.open) {
+                return;
+            }
+            var root = this.closest('.ep-accordion');
+            if (!root) {
+                return;
+            }
+            $(root).find('.ep-accordion__item').not(this).each(function () {
+                if (this.open) {
+                    this.open = false;
+                }
+            });
+        });
+    };
+
+    var initStyleFields = function (root) {
+        var $root = $(root);
+        if (!$root.length) {
+            return;
+        }
+        $root.off('.epStyle');
+        $root.on('input.epStyle change.epStyle', '[data-ep-style-swatch]', function () {
+            var $wrap = $(this).closest('[data-ep-style-color]');
+            $wrap.find('[data-ep-style-text]').val(this.value);
+        });
+        $root.on('input.epStyle change.epStyle', '[data-ep-style-text]', function () {
+            var v = String(this.value || '').trim();
+            var $swatch = $(this).closest('[data-ep-style-color]').find('[data-ep-style-swatch]');
+            if (/^#([0-9a-f]{3})$/i.test(v)) {
+                var h = v.slice(1);
+                $swatch.val('#' + h[0] + h[0] + h[1] + h[1] + h[2] + h[2]);
+            } else if (/^#([0-9a-f]{6})$/i.test(v)) {
+                $swatch.val(v);
+            }
+        });
+        $root.on('change.epStyle', '[data-ep-theme-select]', function () {
+            var $sel = $(this);
+            var val = String($sel.val() || '');
+            if (val !== '') {
+                return;
+            }
+            var raw = $sel.attr('data-ep-default-theme-style') || '{}';
+            var css = $sel.attr('data-ep-default-theme-css') || '';
+            var style = {};
+            try {
+                style = JSON.parse(raw) || {};
+            } catch (err) {
+                style = {};
+            }
+            Object.keys(style).forEach(function (groupId) {
+                var group = style[groupId] || {};
+                Object.keys(group).forEach(function (name) {
+                    var $input = $root.find('[name="EngagementPage[style][' + groupId + '][' + name + ']"]');
+                    if ($input.length) {
+                        $input.val(group[name]);
+                        $input.trigger('change');
+                    }
+                });
+            });
+            $root.find('[name="EngagementPage[custom_css]"]').val(css);
+        });
     };
 
     var initExclusiveAccordions = function () {
@@ -1202,6 +1351,7 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
         init: init,
         initBuilder: initBuilder,
         initListPages: initListPages,
+        initStyleFields: initStyleFields,
         initOnAjaxLoad: true
     });
 });

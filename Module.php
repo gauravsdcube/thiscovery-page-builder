@@ -29,6 +29,13 @@ class Module extends ContentContainerModule
         if (Yii::$app instanceof ConsoleApplication) {
             $this->controllerNamespace = 'humhub\modules\thiscoveryPageBuilder\commands';
         }
+
+        if (Yii::$app->hasModule('thiscovery-versioning')
+            && class_exists(\humhub\modules\thiscoveryVersioning\Module::class)) {
+            \humhub\modules\thiscoveryVersioning\Module::registerAdapter(
+                new \humhub\modules\thiscoveryPageBuilder\services\PageVersionAdapter()
+            );
+        }
     }
 
     /**

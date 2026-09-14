@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.8.0 (September 14, 2026)
+
+- Enh: Studio Settings tab matches Forms (left section rail and one pane at a time), including CSS, Share, and Versions
+- Enh: Page list uses a folder sidebar: top-level pages, admin folders, then unfiled collections
+- Enh: Nested admin folders to organise collections and standalone pages (public URLs unchanged)
+- Enh: Collections and child pages are added to Thiscovery Navigation automatically; studio options control the live top bar and collection dropdown
+- Enh: Named appearance themes in module configuration; each page can use the site default, another theme, or a detached custom style, with token overrides and custom CSS
+- Enh: Draft revisions and published editions (same model as Thiscovery Forms); public URLs serve the published edition until you publish again
+- Enh: Studio CSS and Versions tabs, Share “Publish current draft”, and manager preview (`?preview=1`)
+- Enh: Extra wide page width (1600px) between Wide and Full
+- Enh: Contact card section — portrait cards with optional photo upload, role, organisation, and email
+- Enh: Corner radius setting on every section (theme default, square, or 0–64px)
+- Fix: Contact cards no longer sit inside an extra background panel; radius applies to the cards themselves
+
 ## 1.7.4 (September 12, 2026)
 
 - Enh: Accordion option to open one item at a time

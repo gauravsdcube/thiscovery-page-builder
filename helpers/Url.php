@@ -23,6 +23,26 @@ class Url
         return $scheme ? self::ensureHttps($url) : $url;
     }
 
+    /**
+     * Manager preview of the working draft (or a historical revision/edition).
+     */
+    public static function toPreview(
+        EngagementPage $page,
+        $scheme = false,
+        ?int $revisionId = null,
+        ?int $editionId = null
+    ): string {
+        $url = self::toPublic($page, $scheme);
+        $params = ['preview' => 1];
+        if ($editionId) {
+            $params['edition_id'] = $editionId;
+        } elseif ($revisionId) {
+            $params['revision_id'] = $revisionId;
+        }
+        $sep = str_contains($url, '?') ? '&' : '?';
+        return $url . $sep . http_build_query($params);
+    }
+
     public static function toDirectory($scheme = false): string
     {
         $home = EngagementPage::findDirectoryHome();
@@ -37,7 +57,36 @@ class Url
         return BaseUrl::to(['/thiscovery-page-builder/global/index']);
     }
 
-    public static function toGlobalCreate(?int $templateId = null, ?int $parentId = null, bool $asCollection = false): string
+    public static function toThemes(): string
+    {
+        return BaseUrl::to(['/thiscovery-page-builder/global/themes']);
+    }
+
+    public static function toThemeEdit(?int $id = null): string
+    {
+        $params = ['/thiscovery-page-builder/global/theme-edit'];
+        if ($id) {
+            $params['id'] = $id;
+        }
+        return BaseUrl::to($params);
+    }
+
+    public static function toThemeImport(): string
+    {
+        return BaseUrl::to(['/thiscovery-page-builder/global/theme-import']);
+    }
+
+    public static function toThemeExport(int $id): string
+    {
+        return BaseUrl::to(['/thiscovery-page-builder/global/theme-export', 'id' => $id]);
+    }
+
+    public static function toThemeDelete(int $id): string
+    {
+        return BaseUrl::to(['/thiscovery-page-builder/global/theme-delete', 'id' => $id]);
+    }
+
+    public static function toGlobalCreate(?int $templateId = null, ?int $parentId = null, bool $asCollection = false, ?int $folderId = null): string
     {
         $params = ['/thiscovery-page-builder/global/create'];
         if ($templateId) {
@@ -48,6 +97,9 @@ class Url
         }
         if ($asCollection) {
             $params['collection'] = 1;
+        }
+        if ($folderId) {
+            $params['folder_id'] = $folderId;
         }
         return BaseUrl::to($params);
     }
@@ -137,10 +189,10 @@ class Url
         return $page->content->container->createUrl('/thiscovery-page-builder/page/save-template', ['id' => $page->id]);
     }
 
-    public static function toCreate($container = null, ?int $templateId = null, ?int $parentId = null, bool $asCollection = false): string
+    public static function toCreate($container = null, ?int $templateId = null, ?int $parentId = null, bool $asCollection = false, ?int $folderId = null): string
     {
         if ($container === null) {
-            return self::toGlobalCreate($templateId, $parentId, $asCollection);
+            return self::toGlobalCreate($templateId, $parentId, $asCollection, $folderId);
         }
         $params = ['/thiscovery-page-builder/page/create'];
         if ($templateId) {
@@ -152,7 +204,30 @@ class Url
         if ($asCollection) {
             $params['collection'] = 1;
         }
+        if ($folderId) {
+            $params['folder_id'] = $folderId;
+        }
         return $container->createUrl($params);
+    }
+
+    public static function toFolderEdit($container = null, $folderId = null, array $params = []): string
+    {
+        if ($folderId) {
+            $params['id'] = (int) $folderId;
+        }
+        if ($container === null) {
+            return BaseUrl::to(array_merge(['/thiscovery-page-builder/global/folder-edit'], $params));
+        }
+        return $container->createUrl(array_merge(['/thiscovery-page-builder/page/folder-edit'], $params));
+    }
+
+    public static function toFolderDelete($container = null, int $folderId): string
+    {
+        $params = ['id' => $folderId];
+        if ($container === null) {
+            return BaseUrl::to(array_merge(['/thiscovery-page-builder/global/folder-delete'], $params));
+        }
+        return $container->createUrl(array_merge(['/thiscovery-page-builder/page/folder-delete'], $params));
     }
 
     public static function toHelp($container = null, ?string $page = null): string

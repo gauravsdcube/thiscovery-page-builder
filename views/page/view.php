@@ -17,11 +17,14 @@ use humhub\widgets\bootstrap\Button;
 /** @var bool $canManage */
 /** @var bool $publicLayout */
 /** @var bool $isDirectory */
+/** @var bool $isPreview */
 
 $this->title = $page->title;
 $layout = $page->getLayoutKey();
 $grouped = BlockRegistry::groupByRegion($page->getSections());
 $isDirectory = $isDirectory ?? $page->isDirectoryHome();
+$isPreview = !empty($isPreview);
+$customCss = method_exists($page, 'getSafeCustomCss') ? $page->getSafeCustomCss() : '';
 
 $renderRegionSections = static function (array $sections) use ($page): string {
     $html = '';
@@ -38,8 +41,17 @@ $showLeft = in_array($layout, [BlockRegistry::LAYOUT_LEFT, BlockRegistry::LAYOUT
 $showRight = in_array($layout, [BlockRegistry::LAYOUT_RIGHT, BlockRegistry::LAYOUT_BOTH], true);
 ?>
 
-<article class="engagement-page<?= $publicLayout ? ' engagement-page--public' : '' ?> engagement-page--layout-<?= Html::encode($layout) ?><?= $isDirectory ? ' engagement-page--directory' : '' ?>"
+<?php if ($customCss !== ''): ?>
+    <style id="ep-page-css"><?= $customCss ?></style>
+<?php endif; ?>
+
+<article id="ep-page" class="engagement-page<?= $publicLayout ? ' engagement-page--public' : '' ?> engagement-page--layout-<?= Html::encode($layout) ?><?= $isDirectory ? ' engagement-page--directory' : '' ?>"
      data-ep-width="<?= Html::encode($page->getPageWidthKey()) ?>">
+    <?php if ($isPreview): ?>
+        <div class="alert alert-info ep-preview-banner" role="status">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Preview: visitors still see the last published edition until you publish this draft.') ?>
+        </div>
+    <?php endif; ?>
     <?php if ($canManage): ?>
         <div class="engagement-page-toolbar">
             <?= Button::defaultType(Yii::t('ThiscoveryPageBuilderModule.base', 'Thiscovery Page Builder'))

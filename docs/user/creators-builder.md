@@ -37,7 +37,7 @@ Use the palette on the left. Drag a block onto a region, or click it to add. Dra
 | --- | --- |
 | Rich text | Body copy (Thiscovery Editor: headings, tables, images, media) |
 | Video embed | A YouTube or Vimeo video (paste the watch URL or embed iframe) |
-| Accordion | Expand/collapse items (FAQs) |
+| Accordion | Expand/collapse items (FAQs). Optional **Open one item at a time** |
 | Callout | A highlighted note or warning |
 | Downloads | Files people can save |
 | Button | A call-to-action. Presets include link, page, form, space, login/register, mailto/tel, scroll, or a custom URL |
@@ -50,8 +50,9 @@ Use the palette on the left. Drag a block onto a region, or click it to add. Dra
 | Quick poll | Embed a Thiscovery Forms poll so people can vote on the page |
 | Phases | A timeline of stages |
 | Events | A list of events you type in (or upcoming Calendar events on a collection) |
-| Team | People cards |
-| Contact | Contact cards (email button) |
+| Team | People list (name, role, email, phone, bio) |
+| Contact card | Portrait cards with optional photo, role, organisation, and email |
+| Contact | Single enquiry card (email button) |
 | Updates | “Get updates” email signup |
 | Comments | Public or member comments (moderation) |
 | Collection | List other pages, forms, or spaces as cards |
@@ -62,9 +63,9 @@ These need a **Bound Space** on Settings. They show that space’s stream, tasks
 
 When the page-builder module is enabled on a space, ordinary members do not use the default space stream; put a **Space stream** block on a page instead.
 
-## Colours
+## Appearance
 
-Each section can override background and text colour. Page blocks otherwise follow the Thiscovery theme.
+Each section can override background colour, text colour, and **corner radius**. Leave radius blank for the theme default; **0** is square corners. Page blocks otherwise follow the Thiscovery theme.
 
 ## Next
 

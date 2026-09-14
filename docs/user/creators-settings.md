@@ -1,6 +1,8 @@
 # Page settings
 
-The **Settings** tab is grouped into collapsible sections. **Basics** is open first; the others start closed. Use **Expand all** / **Collapse all**. Each field has a **?** control for a short in-product explanation.
+The **Settings** tab uses the same studio layout as Forms: a **left rail** of sections, and one pane at a time. **Basics** opens first. Each field has a **?** control for a short in-product explanation.
+
+CSS, Share, and Versions are also in this rail (not separate top tabs).
 
 ## Basics
 
@@ -9,9 +11,10 @@ The **Settings** tab is grouped into collapsible sections. **Basics** is open fi
 | Title | Name on the public page and in lists |
 | URL slug | Public path. Top-level pages and collections are `/{slug}`. Nested pages are `/{collection}/{slug}` |
 | Parent collection | Nest this page under a collection, or leave empty for a top-level page |
+| Folder | Admin grouping on the page list. Does not change the public URL. Leave **Unfiled** for top-level pages or unfiled collections. Child pages stay with their collection. |
 | Summary | Short text for directory cards |
 | Status | Draft, Published, or Archived |
-| Page width | How wide the public page is (including Wide and Full) |
+| Page width | How wide the public page is: Narrow 720, Standard 960, Comfortable 1100, Wide 1440, Extra wide 1600, or Full browser width |
 | Who can view | Public guests, or community members only (sign-in) |
 
 Draft is for managers and preview. **Published** is what visitors see. **Archived** hides the page from the public site. Templates always stay as drafts.
@@ -35,14 +38,18 @@ A collection homepage is never listed as a card on itself. Add a **Collection** 
 
 ## Navigation (network pages)
 
+When **Thiscovery Navigation** is enabled, saving a **collection** (and each child page) adds it to **Administration → Thiscovery Navigation**. That is the site tree, not automatically the live top bar.
+
 | Setting | What it does |
 | --- | --- |
-| Show in top menu | Adds the page to the site top navigation |
+| Show this collection in the top bar | Collection appears as a top-bar item (must be **Published**) |
+| Show under the collection in the top bar | Child page appears in that collection’s dropdown |
+| Show in top bar | Standalone top-level pages |
 | Menu label | Text in the menu (defaults to the title) |
 | Menu order | Lower numbers appear first |
 | Menu visibility | Guests, members, or everyone |
 
-The page must be **Published** and the visitor must be allowed to view it.
+Child pages only show in the live dropdown if the **collection** is also shown in the top bar. You can still rearrange items in Site navigation.
 
 ## Site homepage (network pages)
 

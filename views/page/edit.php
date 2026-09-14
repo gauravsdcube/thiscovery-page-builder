@@ -26,6 +26,7 @@ use humhub\widgets\bootstrap\Button;
 /** @var array $pageOptions */
 /** @var array $groupOptions */
 /** @var \humhub\modules\thiscoveryPageBuilder\models\PageHome[] $pageHomes */
+/** @var array $folderOptions */
 
 ThiscoveryPageBuilderAsset::register($this);
 
@@ -38,6 +39,7 @@ $collectionOptions = $collectionOptions ?? EngagementPage::collectionOptions(nul
 $spaceOptions = $spaceOptions ?? EngagementPage::spaceOptions();
 $pageOptions = $pageOptions ?? EngagementPage::publishedPageOptions($page->id);
 $groupOptions = $groupOptions ?? [];
+$folderOptions = $folderOptions ?? [];
 $pageHomes = $pageHomes ?? [];
 $publicPrefix = EngagementPage::publicPrefix();
 $parentSlug = $page->getParentUrlSlug();
@@ -78,7 +80,22 @@ $this->registerJsConfig('thiscoveryPageBuilder', [
 $this->registerJs('humhub.require("thiscoveryPageBuilder").initBuilder("#ep-builder");', \yii\web\View::POS_READY);
 
 $activeTab = (string) Yii::$app->request->get('tab', 'builder');
-if (!in_array($activeTab, ['builder', 'settings', 'share'], true)) {
+$activeSection = (string) Yii::$app->request->get('section', 'basics');
+$settingsSections = ['basics', 'space', 'directory', 'navigation', 'homepage', 'css', 'share', 'versions'];
+if (in_array($activeTab, ['css', 'share', 'versions'], true)) {
+    $activeSection = $activeTab;
+    $activeTab = 'settings';
+}
+if ($activeTab !== 'builder' && $activeTab !== 'settings') {
+    if (in_array($activeTab, $settingsSections, true)) {
+        $activeSection = $activeTab;
+    }
+    $activeTab = 'settings';
+}
+if ($activeTab === 'settings' && !in_array($activeSection, $settingsSections, true)) {
+    $activeSection = 'basics';
+}
+if ($activeTab === '') {
     $activeTab = 'builder';
 }
 $navTitle = $isNew
@@ -87,10 +104,20 @@ $navTitle = $isNew
 $saveLabel = Yii::t('ThiscoveryPageBuilderModule.base', $isTemplate ? 'Save template' : 'Save page');
 $backParams = [];
 $parentId = (int) ($page->parent_id ?: Yii::$app->request->get('parent_id', 0));
+$folderId = (int) ($page->folder_id ?: Yii::$app->request->get('folder_id', 0));
 if ($parentId > 0) {
     $backParams['collection'] = $parentId;
+    $parentPage = $page->parent;
+    if ($parentPage && (int) ($parentPage->folder_id ?? 0) > 0) {
+        $backParams['folder'] = (int) $parentPage->folder_id;
+    }
 } elseif (!$isNew && $page->isCollection()) {
     $backParams['collection'] = (int) $page->id;
+    if ($folderId > 0) {
+        $backParams['folder'] = $folderId;
+    }
+} elseif ($folderId > 0) {
+    $backParams['folder'] = $folderId;
 }
 $backUrl = Url::toIndex($contentContainer, $backParams);
 ?>
@@ -129,6 +156,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
     ]) ?>
     <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
     <?= Html::hiddenInput('studio_tab', $activeTab, ['data-ep-studio-tab' => true]) ?>
+    <?= Html::hiddenInput('studio_section', $activeTab === 'settings' ? $activeSection : '', ['data-ep-studio-section-input' => true]) ?>
 
     <?php if ($page->hasErrors()): ?>
         <div class="alert alert-danger ep-studio__errors" role="alert" data-ep-form-errors>
@@ -150,17 +178,16 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
         <button type="button" class="ep-studio__tab <?= $activeTab === 'settings' ? 'is-active' : '' ?>" data-ep-tab="settings" role="tab" aria-selected="<?= $activeTab === 'settings' ? 'true' : 'false' ?>">
             <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Settings') ?>
         </button>
-        <button type="button" class="ep-studio__tab <?= $activeTab === 'share' ? 'is-active' : '' ?>" data-ep-tab="share" role="tab" aria-selected="<?= $activeTab === 'share' ? 'true' : 'false' ?>">
-            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Share') ?>
-        </button>
         <a class="ep-studio__help-link"
-           href="<?= Html::encode(Url::toHelp($contentContainer, 'creators-builder')) ?>"
+           href="<?= Html::encode(Url::toHelp($contentContainer, $activeTab === 'settings' ? 'creators-settings' : 'creators-builder')) ?>"
            target="_blank"
            rel="noopener"
            data-ep-studio-help
            data-ep-help-pages="<?= Html::encode(json_encode([
                'builder' => Url::toHelp($contentContainer, 'creators-builder'),
                'settings' => Url::toHelp($contentContainer, 'creators-settings'),
+               'css' => Url::toHelp($contentContainer, 'creators-appearance'),
+               'versions' => Url::toHelp($contentContainer, 'creators-versioning'),
                'share' => Url::toHelp($contentContainer, 'creators-publishing'),
            ])) ?>">
             <i class="fa fa-question-circle" aria-hidden="true"></i>
@@ -321,44 +348,17 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
             'page' => $page,
             'isDirectory' => $isDirectory,
             'isTemplate' => $isTemplate,
+            'isNew' => $isNew,
             'collectionOptions' => $collectionOptions,
             'spaceOptions' => $spaceOptions,
             'groupOptions' => $groupOptions,
             'pageHomes' => $pageHomes,
             'publicPrefix' => $publicPrefix,
             'parentSlug' => $parentSlug,
+            'activeSection' => $activeSection,
+            'shareUrl' => $shareUrl,
+            'folderOptions' => $folderOptions ?? [],
         ]) ?>
-    </div>
-
-    <div class="ep-studio__panel <?= $activeTab === 'share' ? 'is-active' : '' ?>" data-ep-panel="share">
-        <div class="ep-studio__settings">
-            <h5 class="ep-section__title"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public URL') ?></h5>
-            <?php if ($isNew): ?>
-                <p class="ep-hint text-muted">
-                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Save the page first to generate a shareable link.') ?>
-                </p>
-            <?php else: ?>
-                <div class="form-group">
-                    <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Public link') ?></label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" readonly value="<?= Html::encode($shareUrl) ?>" data-ep-share-url>
-                        <button type="button" class="btn btn-primary" data-ep-copy-url>
-                            <i class="fa fa-clipboard"></i>
-                            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Copy link') ?>
-                        </button>
-                    </div>
-                    <div class="ep-copy-feedback text-success d-none" data-ep-copy-feedback>
-                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Copied!') ?>
-                    </div>
-                </div>
-                <p>
-                    <a href="<?= Html::encode(Url::toPublic($page)) ?>" target="_blank" rel="noopener">
-                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open public page') ?>
-                        <i class="fa fa-external-link"></i>
-                    </a>
-                </p>
-            <?php endif; ?>
-        </div>
     </div>
 
     <script type="text/template" id="ep-section-template">
@@ -388,6 +388,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
             'phases' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Project phases'), 'style' => 'linear', 'items' => [['label' => '', 'description' => '', 'status' => 'upcoming']]],
             'events' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Upcoming events'), 'items' => [['title' => '', 'date' => '', 'time' => '', 'location' => '', 'url' => '', 'cta_label' => Yii::t('ThiscoveryPageBuilderModule.base', 'Register')]]],
             'team' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Meet the team'), 'people' => [['name' => '', 'role' => '', 'email' => '', 'phone' => '', 'bio' => '']]],
+            'contact_card' => ['people' => [['name' => '', 'role' => '', 'organisation' => '', 'email' => '', 'image_guid' => '']]],
             'contact' => ['title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Contact us'), 'show_email_link' => true],
             'updates' => [],
             'comments' => [
@@ -476,6 +477,14 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
         <?= $this->render('_item_person', [
             'namePrefix' => 'sections[__SEC__][settings][people][__ROW__]',
             'item' => ['name' => '', 'role' => '', 'email' => '', 'phone' => '', 'bio' => ''],
+        ]) ?>
+    </script>
+    <script type="text/template" id="ep-repeat-template-contact_card">
+        <?= $this->render('_item_contact_card', [
+            'namePrefix' => 'sections[__SEC__][settings][people][__ROW__]',
+            'item' => ['name' => '', 'role' => '', 'organisation' => '', 'email' => '', 'image_guid' => ''],
+            'widgetId' => 'ep-cc-__SEC__-__ROW__',
+            'page' => $page,
         ]) ?>
     </script>
     <script type="text/template" id="ep-repeat-template-accordion">

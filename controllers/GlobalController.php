@@ -17,6 +17,7 @@ use humhub\modules\thiscoveryPageBuilder\models\PageFollow;
 use humhub\modules\thiscoveryPageBuilder\permissions\CreateGlobalPage;
 use humhub\modules\thiscoveryPageBuilder\permissions\ManageGlobalPage;
 use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
+use humhub\modules\thiscoveryPageBuilder\services\PageFolderService;
 use humhub\modules\thiscoveryForms\models\CustomForm;
 use Yii;
 use yii\filters\VerbFilter;
@@ -32,6 +33,10 @@ class GlobalController extends Controller
 {
     use SectionPostParserTrait;
     use HelpTrait;
+    use ThemeAdminTrait;
+    use VersioningTrait;
+    use PageStudioSaveTrait;
+    use FolderTrait;
 
     /**
      * @inheritdoc
@@ -55,6 +60,12 @@ class GlobalController extends Controller
                     'save-template' => ['POST'],
                     'moderate-comment' => ['POST'],
                     'delete-subscription' => ['POST'],
+                    'theme-delete' => ['POST'],
+                    'publish-version' => ['POST'],
+                    'restore-version' => ['POST'],
+                    'delete-revision' => ['POST'],
+                    'delete-edition' => ['POST'],
+                    'folder-delete' => ['POST'],
                 ],
             ],
         ]);
@@ -99,6 +110,8 @@ class GlobalController extends Controller
             'canCreate' => Yii::$app->user->can(CreateGlobalPage::class) || Yii::$app->user->isAdmin(),
             'contentContainer' => null,
             'canViewHelp' => $this->canViewHelp(),
+            'foldersReady' => PageFolderService::tablesReady(),
+            'canManageFolders' => $canManage,
         ]);
     }
 
@@ -312,6 +325,8 @@ class GlobalController extends Controller
             }
         }
 
+        $this->applyFolderFromRequest($page);
+
         return $this->handleEdit($page, true);
     }
 
@@ -422,11 +437,13 @@ class GlobalController extends Controller
                 $page->bound_space_id = ($bound === '' || $bound === null) ? null : (int) $bound;
             }
             $page->sections = $this->parseSectionsFromPost();
+            $this->applyPostedAppearance($page);
             $page->content->visibility = ((int) $page->status === EngagementPage::STATUS_PUBLISHED)
                 ? Content::VISIBILITY_PUBLIC
                 : Content::VISIBILITY_PRIVATE;
 
             if ($page->save()) {
+                $this->recordPageVersion($page);
                 $this->syncPageHomes($page);
                 $postedHomes = Yii::$app->request->post('PageHome', []);
                 $homeEnabled = false;
@@ -465,6 +482,9 @@ class GlobalController extends Controller
             'pageOptions' => EngagementPage::publishedPageOptions($page->id),
             'groupOptions' => $this->groupOptions(),
             'pageHomes' => $page->isNewRecord ? [] : $page->pageHomes,
+            'folderOptions' => PageFolderService::tablesReady()
+                ? PageFolderService::treeOptions(null)
+                : [],
         ]);
     }
 
@@ -478,35 +498,6 @@ class GlobalController extends Controller
             $posted = [];
         }
         \humhub\modules\thiscoveryPageBuilder\models\PageHome::syncForPage($page, $posted);
-    }
-
-    /**
-     * Stay in the studio after save, or open the public preview.
-     */
-    protected function redirectAfterStudioSave(EngagementPage $page)
-    {
-        $after = (string) Yii::$app->request->post('after_save', 'stay');
-        if ($after === 'preview') {
-            if ($page->isTemplate()) {
-                Yii::$app->session->setFlash(
-                    'info',
-                    Yii::t('ThiscoveryPageBuilderModule.base', 'Templates cannot be previewed publicly. Open the page builder Share tab after creating a page from this template.')
-                );
-                return $this->redirect(Url::toEdit($page));
-            }
-            return $this->redirect(Url::toPublic($page));
-        }
-
-        $tab = trim((string) Yii::$app->request->post('studio_tab', ''));
-        $url = Url::toEdit($page);
-        if ($tab !== '' && $tab !== 'builder') {
-            $url .= (str_contains($url, '?') ? '&' : '?') . 'tab=' . rawurlencode($tab);
-        }
-        Yii::$app->session->setFlash(
-            'success',
-            Yii::t('ThiscoveryPageBuilderModule.base', 'Page saved.')
-        );
-        return $this->redirect($url);
     }
 
     protected function groupOptions(): array

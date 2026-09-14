@@ -132,6 +132,47 @@ if ($type === 'phases'): ?>
         </button>
     </div>
 
+<?php elseif ($type === 'contact_card'): ?>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Section title') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][title]"
+               value="<?= Html::encode($settings['title'] ?? '') ?>"
+               data-ep-card-title-source>
+        <div class="ep-hint text-muted">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Portrait cards with an optional photo, role, organisation, and email. Add several people for a row of cards.') ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Intro') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][intro]"
+               value="<?= Html::encode($settings['intro'] ?? '') ?>">
+    </div>
+    <div class="ep-repeat" data-ep-repeat="contact_card">
+        <div data-ep-repeat-items>
+            <?php
+            $people = $settings['people'] ?? [['name' => '', 'role' => '', 'organisation' => '', 'email' => '', 'image_guid' => '']];
+            if ($people === []) {
+                $people = [['name' => '', 'role' => '', 'organisation' => '', 'email' => '', 'image_guid' => '']];
+            }
+            foreach ($people as $j => $person) {
+                echo $this->render('_item_contact_card', [
+                    'namePrefix' => $namePrefix . '[settings][people][' . $j . ']',
+                    'item' => $person,
+                    'widgetId' => 'ep-cc-' . $safeIndex . '-' . $j,
+                    'page' => $page,
+                ]);
+            }
+            ?>
+        </div>
+        <button type="button" class="btn btn-sm btn-light" data-ep-repeat-add="contact_card">
+            <i class="fa fa-plus"></i> <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Add person') ?>
+        </button>
+    </div>
+
 <?php elseif ($type === 'contact'): ?>
     <div class="form-group">
         <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Section title') ?></label>
