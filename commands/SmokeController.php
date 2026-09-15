@@ -7,8 +7,10 @@
 
 namespace humhub\modules\thiscoveryPageBuilder\commands;
 
+use humhub\modules\thiscoveryPageBuilder\helpers\Url;
 use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
+use humhub\modules\space\models\Space;
 use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -131,6 +133,24 @@ class SmokeController extends Controller
                 return ExitCode::DATAERR;
             }
             $this->stdout("style_compile=ok\n", Console::FG_GREEN);
+        }
+
+        $space = Space::find()->one();
+        if ($space) {
+            try {
+                $spaceIndex = Url::toIndex($space);
+                $spaceFolder = Url::toIndex($space, ['folder' => 1]);
+                $spaceCreate = Url::toCreate($space, null, null, false, 1);
+                $spaceHelp = Url::toHelp($space, 'creators-builder');
+            } catch (\Throwable $e) {
+                $this->stderr('space_url failed: ' . $e->getMessage() . "\n", Console::FG_RED);
+                return ExitCode::DATAERR;
+            }
+            if ($spaceIndex === '' || $spaceFolder === '' || $spaceCreate === '' || $spaceHelp === '') {
+                $this->stderr("space_url empty\n", Console::FG_RED);
+                return ExitCode::DATAERR;
+            }
+            $this->stdout("space_url=ok\n", Console::FG_GREEN);
         }
 
         $versioning = class_exists(\humhub\modules\thiscoveryPageBuilder\services\PageVersionService::class)

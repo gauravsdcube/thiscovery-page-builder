@@ -178,7 +178,7 @@ class Url
         if ($container === null) {
             return BaseUrl::to(array_merge(['/thiscovery-page-builder/global/index'], $params));
         }
-        return $container->createUrl(array_merge(['/thiscovery-page-builder/page/index'], $params));
+        return $container->createUrl('/thiscovery-page-builder/page/index', $params);
     }
 
     public static function toSaveTemplate(EngagementPage $page): string
@@ -194,7 +194,7 @@ class Url
         if ($container === null) {
             return self::toGlobalCreate($templateId, $parentId, $asCollection, $folderId);
         }
-        $params = ['/thiscovery-page-builder/page/create'];
+        $params = [];
         if ($templateId) {
             $params['template_id'] = $templateId;
         }
@@ -207,7 +207,7 @@ class Url
         if ($folderId) {
             $params['folder_id'] = $folderId;
         }
-        return $container->createUrl($params);
+        return $container->createUrl('/thiscovery-page-builder/page/create', $params);
     }
 
     public static function toFolderEdit($container = null, $folderId = null, array $params = []): string
@@ -218,7 +218,7 @@ class Url
         if ($container === null) {
             return BaseUrl::to(array_merge(['/thiscovery-page-builder/global/folder-edit'], $params));
         }
-        return $container->createUrl(array_merge(['/thiscovery-page-builder/page/folder-edit'], $params));
+        return $container->createUrl('/thiscovery-page-builder/page/folder-edit', $params);
     }
 
     public static function toFolderDelete($container = null, int $folderId): string
@@ -227,7 +227,7 @@ class Url
         if ($container === null) {
             return BaseUrl::to(array_merge(['/thiscovery-page-builder/global/folder-delete'], $params));
         }
-        return $container->createUrl(array_merge(['/thiscovery-page-builder/page/folder-delete'], $params));
+        return $container->createUrl('/thiscovery-page-builder/page/folder-delete', $params);
     }
 
     public static function toHelp($container = null, ?string $page = null): string
@@ -239,7 +239,7 @@ class Url
         if ($container === null) {
             return BaseUrl::to(array_merge(['/thiscovery-page-builder/global/help'], $params));
         }
-        return $container->createUrl(array_merge(['/thiscovery-page-builder/page/help'], $params));
+        return $container->createUrl('/thiscovery-page-builder/page/help', $params);
     }
 
     public static function toDelete(EngagementPage $page): string
