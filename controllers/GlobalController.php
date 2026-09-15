@@ -419,6 +419,7 @@ class GlobalController extends Controller
         $request = Yii::$app->request;
 
         if ($request->isPost) {
+            $previousSections = $page->getSections();
             $page->load($request->post());
             if ($page->isTemplate()) {
                 $page->is_template = true;
@@ -436,7 +437,7 @@ class GlobalController extends Controller
                 $bound = $request->post('EngagementPage')['bound_space_id'] ?? '';
                 $page->bound_space_id = ($bound === '' || $bound === null) ? null : (int) $bound;
             }
-            $page->sections = $this->parseSectionsFromPost();
+            $page->sections = $this->parseSectionsFromPost($previousSections);
             $this->applyPostedAppearance($page);
             $page->content->visibility = ((int) $page->status === EngagementPage::STATUS_PUBLISHED)
                 ? Content::VISIBILITY_PUBLIC

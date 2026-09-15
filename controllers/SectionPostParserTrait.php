@@ -12,12 +12,16 @@
 namespace humhub\modules\thiscoveryPageBuilder\controllers;
 
 use humhub\modules\thiscoveryPageBuilder\blocks\CollectionBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\CustomHtml;
 use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
 use Yii;
 
 trait SectionPostParserTrait
 {
-    protected function parseSectionsFromPost(): array
+    /**
+     * @param array<int, array> $previous Stored sections before this POST (for admin-only Custom HTML).
+     */
+    protected function parseSectionsFromPost(array $previous = []): array
     {
         $raw = Yii::$app->request->post('sections', []);
         if (!is_array($raw)) {
@@ -32,7 +36,10 @@ trait SectionPostParserTrait
             }
         }
 
-        return BlockRegistry::normalizeSections($sections);
+        return CustomHtml::restrictPostedSections(
+            BlockRegistry::normalizeSections($sections),
+            $previous
+        );
     }
 
     protected function parseSectionRow($row): ?array

@@ -35,6 +35,8 @@ Site administrators can always do both.
 
 Space owners, admins, and moderators can create by default. Guests cannot.
 
+**Custom HTML** is not covered by those permissions. Only **site administrators** can add or edit that section. Other page editors can still move or remove an existing Custom HTML block.
+
 ## Space stream
 
 When Thiscovery Page Builder is enabled on a space, the **space wall stream is for space administrators only**. Ordinary members should use pages (and space widgets on those pages) instead of the default stream. That is intentional for portal-style spaces.

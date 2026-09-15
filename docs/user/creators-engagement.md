@@ -33,6 +33,14 @@ Paste the embed HubSpot gives you into a **HubSpot form** section. **Rich text s
 
 Only HubSpot form loaders (`*.hsforms.net`) are output. The page nonce is added automatically — you can leave HubSpot’s `RANDOM_NONCE_VALUE` as it is.
 
+## Custom HTML
+
+**Site administrators only.** Add a **Custom HTML** section when you need markup or JavaScript that Rich text would strip (widgets, embeds, inline scripts). The page nonce is added to `<script>` tags automatically.
+
+Space page editors who are not site administrators do not see this block in the palette. If one is already on the page they can move or remove it, but they cannot change the HTML.
+
+Prefer a dedicated section (for example HubSpot form) when the embed is a known host.
+
 ## Space widgets
 
 On **Settings**, choose a **Bound Space**. Then add:

@@ -20,5 +20,8 @@ $style = $maxCss !== null
 <div class="thiscovery-page-builder-public-shell engagement-pages-public-shell"
      data-ep-width="<?= Html::encode($widthKey) ?>"
      style="<?= Html::encode($style) ?>">
+    <?php if (class_exists(\humhub\modules\thiscoveryNavigation\widgets\SiteBreadcrumbs::class)): ?>
+        <?= \humhub\modules\thiscoveryNavigation\widgets\SiteBreadcrumbs::widget() ?>
+    <?php endif; ?>
     <?= $content ?>
 </div>

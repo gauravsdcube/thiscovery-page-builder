@@ -44,6 +44,7 @@ $titleHint = match ($type) {
     'button' => $settings['label'] ?? '',
     'poll_embed' => '',
     'hubspot_form' => $settings['title'] ?? ($settings['form_id'] ?? ''),
+    'custom_html' => $settings['title'] ?? '',
     'map_embed' => '',
     'oembed' => $settings['title'] ?? ($settings['url'] ?? ''),
     'downloads', 'container', 'phases', 'events', 'team', 'contact_card', 'contact', 'updates', 'comments', 'accordion', 'callout' => $settings['title'] ?? '',

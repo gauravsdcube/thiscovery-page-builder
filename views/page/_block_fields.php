@@ -19,6 +19,7 @@
 use humhub\helpers\Html;
 use humhub\modules\thiscoveryEditor\widgets\EditorField;
 use humhub\modules\thiscoveryPageBuilder\blocks\ButtonBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\CustomHtml;
 
 $page = $page ?? null;
 $pageOptions = $pageOptions ?? [];
@@ -458,6 +459,39 @@ if ($type === 'phases'): ?>
         </label>
         <div class="ep-hint text-muted">
             <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Shown on collection listings and the public directory. If none is selected, the hero image is used.') ?>
+        </div>
+    </div>
+
+<?php elseif ($type === 'custom_html'): ?>
+    <?php $canEditHtml = CustomHtml::canManage(); ?>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Title') ?>
+            <span class="ep-optional"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'optional') ?></span>
+        </label>
+        <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][title]"
+               value="<?= Html::encode($settings['title'] ?? '') ?>"
+               data-ep-card-title-source
+               placeholder="<?= Yii::t('ThiscoveryPageBuilderModule.base', 'Heading shown above the HTML') ?>"
+            <?= $canEditHtml ? '' : 'readonly' ?>>
+    </div>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'HTML') ?></label>
+        <textarea class="form-control ep-custom-html-field" name="<?= $namePrefix ?>[settings][html]" rows="16"
+                  spellcheck="false"
+                  <?= $canEditHtml ? '' : 'readonly' ?>
+                  placeholder="<?= Html::encode('<div>…</div>') ?>"><?= Html::encode((string) ($settings['html'] ?? '')) ?></textarea>
+        <div class="ep-hint text-muted">
+            <?php if ($canEditHtml): ?>
+                <?= Yii::t(
+                    'ThiscoveryPageBuilderModule.base',
+                    'Paste HTML, CSS, and JavaScript. Script tags get the page nonce automatically. Rich text cannot run scripts. This runs for every visitor.'
+                ) ?>
+            <?php else: ?>
+                <?= Yii::t(
+                    'ThiscoveryPageBuilderModule.base',
+                    'Only site administrators can add or edit Custom HTML. You can still move or remove this section.'
+                ) ?>
+            <?php endif; ?>
         </div>
     </div>
 

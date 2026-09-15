@@ -36,6 +36,7 @@ Use the palette on the left. Drag a block onto a region, or click it to add. Dra
 | Type | Use for |
 | --- | --- |
 | Rich text | Body copy (Thiscovery Editor: headings, tables, images, media). Scripts are removed. |
+| Custom HTML | Site administrators only. Paste HTML, CSS, and JavaScript (the page nonce is added to scripts). |
 | Video embed | A YouTube or Vimeo video (paste the watch URL or embed iframe) |
 | Accordion | Expand/collapse items (FAQs). Optional **Open one item at a time** |
 | Callout | A highlighted note or warning |

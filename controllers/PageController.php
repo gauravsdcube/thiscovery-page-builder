@@ -219,6 +219,7 @@ class PageController extends ContentContainerController
         $request = Yii::$app->request;
 
         if ($request->isPost) {
+            $previousSections = $page->getSections();
             $page->load($request->post());
             if ($page->isTemplate()) {
                 $page->is_template = true;
@@ -233,7 +234,7 @@ class PageController extends ContentContainerController
                 $bound = $request->post('EngagementPage')['bound_space_id'] ?? '';
                 $page->bound_space_id = ($bound === '' || $bound === null) ? null : (int) $bound;
             }
-            $page->sections = $this->parseSectionsFromPost();
+            $page->sections = $this->parseSectionsFromPost($previousSections);
             $this->applyPostedAppearance($page);
             if ($page->save()) {
                 $this->recordPageVersion($page);
