@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.3 (September 15, 2026)
+
+- Enh: Public layout shows Thiscovery Navigation breadcrumbs when that module has them enabled
+- Enh: Custom HTML section (site administrators only) for markup and scripts that Rich text strips
+- Fix: Studio footer Preview and Save were covered by the builder canvas, so clicks did nothing
+
 ## 1.8.2 (September 15, 2026)
 
 - Fix: Opening Page Builder from a space no longer 500s (folder/list URLs used the Yii array route with `createUrl`)

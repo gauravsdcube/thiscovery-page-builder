@@ -8,6 +8,7 @@
 use humhub\helpers\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\thiscoveryPageBuilder\assets\ThiscoveryPageBuilderAsset;
+use humhub\modules\thiscoveryPageBuilder\helpers\CustomHtml;
 use humhub\modules\thiscoveryPageBuilder\helpers\Url;
 use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
 use humhub\modules\thiscoveryPageBuilder\services\BlockRegistry;
@@ -216,11 +217,17 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
                     <div class="ep-palette__group">
                         <div class="ep-palette__group-label"><?= Html::encode($groupLabel) ?></div>
                         <?php foreach ($items as $item): ?>
+                            <?php
+                            $paletteTitle = $blockLabels[$item['type']] ?? $item['type'];
+                            if (($item['type'] ?? '') === 'custom_html') {
+                                $paletteTitle .= ' — ' . Yii::t('ThiscoveryPageBuilderModule.base', 'Site administrators only');
+                            }
+                            ?>
                             <button type="button"
                                     class="ep-palette__item"
                                     draggable="true"
                                     data-ep-palette-type="<?= Html::encode($item['type']) ?>"
-                                    title="<?= Html::encode($blockLabels[$item['type']] ?? $item['type']) ?>">
+                                    title="<?= Html::encode($paletteTitle) ?>">
                                 <span class="ep-palette__icon"><i class="fa <?= Html::encode($item['icon']) ?>"></i></span>
                                 <span class="ep-palette__label"><?= Html::encode($blockLabels[$item['type']] ?? $item['type']) ?></span>
                             </button>
@@ -361,6 +368,31 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
         ]) ?>
     </div>
 
+    <div class="ep-studio__footer">
+        <?= Button::light(Yii::t('ThiscoveryPageBuilderModule.base', 'Cancel'))
+            ->link($backUrl)
+            ->loader(false) ?>
+        <div class="ep-studio__footer-actions">
+            <?php if (!$isNew && !$isDirectory && !$isTemplate): ?>
+                <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#ep-save-template-modal">
+                    <i class="fa fa-files-o"></i>
+                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Save as template') ?>
+                </button>
+            <?php endif; ?>
+            <button type="submit" name="after_save" value="preview" form="ep-studio-form" class="btn btn-primary">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Preview') ?>
+            </button>
+            <?= Button::save($saveLabel)
+                ->submit()
+                ->icon('floppy-o')
+                ->options(['form' => 'ep-studio-form'])
+                ->loader(false) ?>
+        </div>
+    </div>
+
+    <?= Html::endForm() ?>
+
     <script type="text/template" id="ep-section-template">
         <?= $this->render('_section_card', [
             'index' => '__INDEX__',
@@ -378,6 +410,9 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
     </script>
     <?php foreach (array_keys($blockLabels) as $type): ?>
         <?php
+        if ($type === 'custom_html' && !CustomHtml::canManage()) {
+            continue;
+        }
         $templateSettings = match ($type) {
             'downloads' => ['items' => [['label' => '', 'file_guid' => '', 'alt' => '']]],
             'container' => [
@@ -404,6 +439,7 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
             'image' => [],
             'oembed' => [],
             'hubspot_form' => [],
+            'custom_html' => [],
             'directory' => [
                 'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback'),
                 'source' => 'pages',
@@ -496,26 +532,6 @@ $backUrl = Url::toIndex($contentContainer, $backParams);
         ]) ?>
     </script>
 
-    <div class="ep-studio__footer">
-        <?= Button::light(Yii::t('ThiscoveryPageBuilderModule.base', 'Cancel'))
-            ->link($backUrl)
-            ->loader(false) ?>
-        <div class="ep-studio__footer-actions">
-            <?php if (!$isNew && !$isDirectory && !$isTemplate): ?>
-                <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#ep-save-template-modal">
-                    <i class="fa fa-files-o"></i>
-                    <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Save as template') ?>
-                </button>
-            <?php endif; ?>
-            <button type="submit" name="after_save" value="preview" class="btn btn-primary">
-                <i class="fa fa-eye" aria-hidden="true"></i>
-                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Preview') ?>
-            </button>
-            <?= Button::save($saveLabel)->submit()->icon('floppy-o')->loader(false) ?>
-        </div>
-    </div>
-
-    <?= Html::endForm() ?>
 
     <?php if (!$isNew && !$isDirectory && !$isTemplate): ?>
         <div class="modal fade" id="ep-save-template-modal" tabindex="-1" aria-hidden="true">

@@ -1238,6 +1238,22 @@ a.ep-sector-card:focus {
   min-height: 120px;
 }
 
+.ep-custom-html { margin: 0; }
+.ep-custom-html__title {
+  margin: 0 0 12px;
+  color: var(--ep-t-text);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+.ep-custom-html__body {
+  min-width: 0;
+}
+.ep-custom-html-field {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .ep-repeat-item { margin-bottom: 8px; }
 
 @media (max-width: 640px) {
@@ -1549,6 +1565,10 @@ a.ep-sector-card:focus {
   flex-direction: column;
   min-height: 0;
   flex: 1;
+  overflow: hidden;
+}
+.ep-studio__form > script {
+  display: none !important;
 }
 .ep-studio__tabs {
   display: flex; gap: 0; padding: 0 1.25rem;
@@ -1957,6 +1977,9 @@ a.ep-sector-card:focus {
 .ep-studio__footer {
   display: flex; justify-content: space-between; align-items: center; gap: .75rem; flex-wrap: wrap;
   padding: .9rem 1.25rem; border-top: 1px solid #e5e7eb; background: #fff;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 6;
 }
 .ep-studio__footer-actions {
   display: flex;

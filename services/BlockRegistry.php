@@ -15,6 +15,7 @@ use humhub\modules\thiscoveryPageBuilder\blocks\CommentsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\ContactBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\ContactCardBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\ContainerBlock;
+use humhub\modules\thiscoveryPageBuilder\blocks\CustomHtmlBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\DownloadsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\EventsBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\HeroBlock;
@@ -25,6 +26,7 @@ use humhub\modules\thiscoveryPageBuilder\blocks\OembedBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\PhasesBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\PollEmbedBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\RichTextBlock;
+use humhub\modules\thiscoveryPageBuilder\helpers\CustomHtml;
 use humhub\modules\thiscoveryPageBuilder\helpers\MappingAvailability;
 use humhub\modules\thiscoveryPageBuilder\blocks\SpaceCalendarBlock;
 use humhub\modules\thiscoveryPageBuilder\blocks\SpaceFilesBlock;
@@ -66,6 +68,7 @@ class BlockRegistry
         return [
             HeroBlock::TYPE => HeroBlock::class,
             RichTextBlock::TYPE => RichTextBlock::class,
+            CustomHtmlBlock::TYPE => CustomHtmlBlock::class,
             SurveyCtaBlock::TYPE => SurveyCtaBlock::class,
             PollEmbedBlock::TYPE => PollEmbedBlock::class,
             HubspotFormBlock::TYPE => HubspotFormBlock::class,
@@ -158,7 +161,14 @@ class BlockRegistry
     public static function palette(): array
     {
         self::resolve();
-        return self::$resolvedPalette;
+        $palette = self::$resolvedPalette;
+        if (!CustomHtml::canManage()) {
+            $palette = array_values(array_filter(
+                $palette,
+                static fn(array $item): bool => ($item['type'] ?? '') !== CustomHtmlBlock::TYPE
+            ));
+        }
+        return $palette;
     }
 
     private static function corePalette(): array
@@ -168,6 +178,7 @@ class BlockRegistry
             ['type' => ContainerBlock::TYPE, 'icon' => 'fa-th', 'group' => 'layout'],
             ['type' => ImageBlock::TYPE, 'icon' => 'fa-image', 'group' => 'layout'],
             ['type' => RichTextBlock::TYPE, 'icon' => 'fa-paragraph', 'group' => 'content'],
+            ['type' => CustomHtmlBlock::TYPE, 'icon' => 'fa-code', 'group' => 'content'],
             ['type' => OembedBlock::TYPE, 'icon' => 'fa-play-circle', 'group' => 'content'],
             ['type' => AccordionBlock::TYPE, 'icon' => 'fa-list-alt', 'group' => 'content'],
             ['type' => CalloutBlock::TYPE, 'icon' => 'fa-info-circle', 'group' => 'content'],

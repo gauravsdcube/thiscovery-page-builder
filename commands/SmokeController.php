@@ -115,6 +115,60 @@ class SmokeController extends Controller
         }
         $this->stdout("hubspot_form_render=ok\n", Console::FG_GREEN);
 
+        $customHtml = '<div id="tsf-widget"><script nonce="RANDOM_NONCE_VALUE">var tsf=1;</script></div>';
+        $page->sections[] = [
+            'type' => 'custom_html',
+            'settings' => [
+                'title' => 'Topics',
+                'html' => $customHtml,
+            ],
+        ];
+        $page->sections = BlockRegistry::normalizeSections($page->sections);
+        $storedHtml = null;
+        foreach ($page->getSections() as $section) {
+            if (($section['type'] ?? '') === 'custom_html') {
+                $storedHtml = $section['settings']['html'] ?? null;
+                break;
+            }
+        }
+        if ($storedHtml !== $customHtml) {
+            $this->stderr("custom_html not persisted\n", Console::FG_RED);
+            return ExitCode::DATAERR;
+        }
+        $htmlBlock = BlockRegistry::create('custom_html', ['html' => $customHtml, 'title' => 'Topics']);
+        $htmlOut = $htmlBlock->render($page);
+        if (!str_contains($htmlOut, 'id="tsf-widget"')
+            || !str_contains($htmlOut, 'var tsf=1;')
+            || (str_contains($htmlOut, 'nonce="') && str_contains($htmlOut, 'RANDOM_NONCE_VALUE'))) {
+            $this->stderr("custom_html render unexpected\n", Console::FG_RED);
+            $this->stderr($htmlOut . "\n");
+            return ExitCode::DATAERR;
+        }
+        $this->stdout("custom_html_render=ok\n", Console::FG_GREEN);
+
+        $forged = \humhub\modules\thiscoveryPageBuilder\helpers\CustomHtml::restrictPostedSections(
+            BlockRegistry::normalizeSections([
+                ['type' => 'custom_html', 'settings' => ['html' => '<script>alert(1)</script>']],
+            ]),
+            [['type' => 'custom_html', 'settings' => ['html' => $customHtml]]]
+        );
+        $kept = \humhub\modules\thiscoveryPageBuilder\helpers\CustomHtml::restrictPostedSections(
+            BlockRegistry::normalizeSections([
+                ['type' => 'custom_html', 'settings' => ['html' => $customHtml]],
+            ]),
+            [['type' => 'custom_html', 'settings' => ['html' => $customHtml]]]
+        );
+        if (\humhub\modules\thiscoveryPageBuilder\helpers\CustomHtml::canManage()) {
+            if ($forged === []) {
+                $this->stderr("custom_html restrict dropped admin html\n", Console::FG_RED);
+                return ExitCode::DATAERR;
+            }
+        } elseif ($forged !== [] || $kept === [] || (($kept[0]['settings']['html'] ?? '') !== $customHtml)) {
+            $this->stderr("custom_html restrict unexpected\n", Console::FG_RED);
+            return ExitCode::DATAERR;
+        }
+        $this->stdout("custom_html_restrict=ok\n", Console::FG_GREEN);
+
         $hero = $page->getSections()[0]['settings'] ?? [];
         if (($hero['border_radius'] ?? null) !== 16) {
             $this->stderr("hero border_radius not persisted\n", Console::FG_RED);
