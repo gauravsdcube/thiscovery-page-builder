@@ -14,4 +14,4 @@ Suggested page tree:
    6. [Publishing and URLs](creators-publishing.md)
    7. [Comments, forms, and space widgets](creators-engagement.md)
 
-Written for Thiscovery Page Builder **1.8.1**.
+Written for Thiscovery Page Builder **1.8.2**.

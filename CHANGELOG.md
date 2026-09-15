@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.2 (September 15, 2026)
+
+- Fix: Opening Page Builder from a space no longer 500s (folder/list URLs used the Yii array route with `createUrl`)
+
 ## 1.8.1 (September 14, 2026)
 
 - Enh: HubSpot form section — paste the HubSpot embed (scripts are not allowed in rich text)
