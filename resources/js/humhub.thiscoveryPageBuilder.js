@@ -741,10 +741,12 @@ humhub.module('thiscoveryPageBuilder', function (module, require, $) {
                 var $wrap = $select.closest('[data-ep-section], .ep-section-card, form');
                 $wrap.find('[data-ep-collection-pages-only]').prop('hidden', source !== 'pages');
                 $wrap.find('[data-ep-collection-calendar-only]').prop('hidden', source !== 'calendar');
+                var scope = String($wrap.find('[data-ep-collection-scope]').first().val() || 'listed');
+                $wrap.find('[data-ep-collection-pick]').prop('hidden', source !== 'pages' || scope !== 'collection');
             });
         };
 
-        $root.on('change', '[data-ep-collection-source]', function () {
+        $root.on('change', '[data-ep-collection-source], [data-ep-collection-scope]', function () {
             syncCollectionSourceFields($(this).closest('[data-ep-section]'));
         });
 

@@ -12,6 +12,7 @@ use humhub\modules\content\models\Content;
 use humhub\modules\thiscoveryPageBuilder\assets\ThiscoveryPageBuilderAsset;
 use humhub\modules\thiscoveryPageBuilder\helpers\Url;
 use humhub\modules\thiscoveryPageBuilder\models\EngagementPage;
+use humhub\modules\thiscoveryPageBuilder\models\PageHome;
 use humhub\modules\thiscoveryPageBuilder\models\PageComment;
 use humhub\modules\thiscoveryPageBuilder\models\PageFollow;
 use humhub\modules\thiscoveryPageBuilder\permissions\CreateGlobalPage;
@@ -112,6 +113,50 @@ class GlobalController extends Controller
             'canViewHelp' => $this->canViewHelp(),
             'foldersReady' => PageFolderService::tablesReady(),
             'canManageFolders' => $canManage,
+        ]);
+    }
+
+    public function actionHomepage()
+    {
+        $this->requireManage();
+
+        $state = PageHome::formState();
+        $error = null;
+        if (Yii::$app->request->isPost) {
+            $posted = Yii::$app->request->post('SiteHome', []);
+            if (!is_array($posted)) {
+                $posted = [];
+            }
+            $error = PageHome::replaceAll($posted);
+            if ($error === null) {
+                Yii::$app->session->setFlash(
+                    'success',
+                    Yii::t('ThiscoveryPageBuilderModule.base', 'Site homepage saved.')
+                );
+                return $this->redirect(Url::toSiteHome());
+            }
+            $state['guest'] = PageHome::slotFromInput(is_array($posted['guest'] ?? null) ? $posted['guest'] : [], 100);
+            $state['registered'] = PageHome::slotFromInput(is_array($posted['registered'] ?? null) ? $posted['registered'] : [], 100);
+            $groups = [];
+            foreach ((array) ($posted['group'] ?? []) as $row) {
+                if (is_array($row)) {
+                    $groups[] = PageHome::slotFromInput($row, 50);
+                }
+            }
+            $state['groups'] = $groups;
+            $state['extraGuest'] = 0;
+            $state['extraRegistered'] = 0;
+        }
+
+        return $this->render('@thiscovery-page-builder/views/global/homepage', [
+            'guest' => $state['guest'],
+            'registered' => $state['registered'],
+            'groups' => $state['groups'],
+            'extraGuest' => (int) $state['extraGuest'],
+            'extraRegistered' => (int) $state['extraRegistered'],
+            'pageOptions' => EngagementPage::publishedPageOptions(),
+            'groupOptions' => $this->groupOptions(),
+            'error' => $error,
         ]);
     }
 
@@ -527,6 +572,7 @@ class GlobalController extends Controller
                 'settings' => [
                     'title' => Yii::t('ThiscoveryPageBuilderModule.base', 'Pages'),
                     'source' => 'pages',
+                    'page_scope' => 'children',
                 ],
             ],
         ]);

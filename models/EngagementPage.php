@@ -995,6 +995,53 @@ class EngagementPage extends ContentActiveRecord implements Searchable
         return $query->all();
     }
 
+    /**
+     * Published child pages of a collection (or any parent page).
+     * Does not require “Show in directory”, so a Blogs collection can be
+     * listed on another page without also appearing in the global directory.
+     *
+     * @return self[]
+     */
+    public static function findPublishedChildren(int $parentId): array
+    {
+        if ($parentId < 1) {
+            return [];
+        }
+
+        $query = static::find()
+            ->where([
+                'parent_id' => $parentId,
+                'status' => self::STATUS_PUBLISHED,
+                'is_template' => false,
+            ])
+            ->orderBy([
+                'featured' => SORT_DESC,
+                'updated_at' => SORT_DESC,
+                'id' => SORT_DESC,
+            ]);
+
+        if ((new static())->hasAttribute('is_collection')) {
+            $query->andWhere(['is_collection' => false]);
+        }
+        if (Yii::$app->user->isGuest && (new static())->hasAttribute('audience')) {
+            $query->andWhere(['audience' => self::AUDIENCE_PUBLIC]);
+        }
+
+        return $query->all();
+    }
+
+    /**
+     * Collections for the collection-block picker.
+     */
+    public static function collectionPickerOptions(?int $contentContainerId = null): array
+    {
+        $options = ['' => Yii::t('ThiscoveryPageBuilderModule.base', 'Select a collection…')];
+        foreach (self::findCollections($contentContainerId) as $collection) {
+            $options[(string) $collection->id] = $collection->title . ' (' . $collection->getPublicPath() . ')';
+        }
+        return $options;
+    }
+
     public static function findDirectoryHome(): ?self
     {
         if (!(new static())->hasAttribute('is_directory')) {

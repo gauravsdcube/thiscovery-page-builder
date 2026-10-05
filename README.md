@@ -1,6 +1,6 @@
 # Thiscovery Page Builder
 
-**Version 1.8.3**  
+**Version 1.8.4**  
 **Copyright (c) 2026 D Cube Consulting. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 
@@ -32,13 +32,13 @@ Repository: [github.com/gauravsdcube/thiscovery-page-builder](https://github.com
 - Configurable slugs with duplicate-slug warnings
 - Drag-and-drop sections including **Button**, Space widgets (stream / tasks / files / gallery / calendar), hero, rich text, **Custom HTML** (site administrators only), **video embed** (YouTube / Vimeo), **HubSpot form**, survey CTA, quick poll, downloads, containers, phases, events, team, **contact card** (photo), contact, updates, comments, accordion, callout, image, collections
 - Bind one **Space** per page for all space widgets
-- **Top menu** entries per page; **site homepage** for guests, logged-in users, and groups (configure here, then disable the Homepage module)
+- **Top menu** entries per page; **site homepage** for guests, logged-in users, and groups (a published page, or a path or URL)
 - Page templates, audience visibility, comments moderation, subscriptions CSV
 
 ## Retiring Homepage module
 
-1. Open a published page → Settings → Site homepage
-2. Assign guest / logged-in / group homes and save
+1. On the page list, open **Site homepage**
+2. For guests, logged-in users, and groups, choose a published page or a path/URL and save
 3. Confirm Home and post-login redirects
 4. Disable **Homepage** under Administration → Modules
 

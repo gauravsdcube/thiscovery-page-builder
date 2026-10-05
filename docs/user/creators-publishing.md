@@ -43,4 +43,4 @@ Draft and archived pages stay in the studio for managers.
 
 Use a collection when several pages should share a URL prefix and a listing. Use a standalone page when the topic is one-off (About, Contact). Use a **folder** only to organise the admin list; it never appears in the public path.
 
-Add child pages with **Add page** on the collection (from the page list sidebar). List them on the collection with a **Collection** section in the builder.
+Add child pages with **Add page** on the collection (from the page list sidebar). List them on the collection with a **Collection** section set to **Child pages of this page**. To show those pages somewhere else, such as the home page, add a Collection section there and choose **Pages from a collection**.

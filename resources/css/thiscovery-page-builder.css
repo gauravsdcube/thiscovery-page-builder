@@ -395,10 +395,15 @@
 .ep-collection-card.no-media .ep-collection-card__media {
   height: 96px;
 }
+.ep-collection-card.has-media .ep-collection-card__media {
+  /* Wide banners (logos, welcome strips) must stay whole, not cropped to the frame. */
+  background: var(--ep-t-card);
+}
 .ep-collection-card__media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   display: block;
 }
 .ep-collection-card__media-fallback {

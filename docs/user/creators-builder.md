@@ -57,7 +57,7 @@ Use the palette on the left. Drag a block onto a region, or click it to add. Dra
 | Contact | Single enquiry card (email button) |
 | Updates | “Get updates” email signup |
 | Comments | Public or member comments (moderation) |
-| Collection | List other pages, forms, or spaces as cards |
+| Collection | List pages, forms, spaces, or calendar events as cards. For pages, choose the whole directory, one collection’s child pages (for example Blogs on the home page), or this page’s own child pages. Card images show the whole picture, so wide banners are not cropped |
 
 ### Space widgets
 

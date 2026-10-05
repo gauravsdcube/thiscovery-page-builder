@@ -30,7 +30,8 @@ $renderHeading = static function (string $text) {
 <section class="ep-block ep-collection ep-directory-list" data-ep-collection-source="<?= Html::encode($source) ?>">
 <?php if ($source === CollectionBlock::SOURCE_PAGES): ?>
     <?php
-    $pages = EngagementPage::findDirectoryPages();
+    $pages = CollectionBlock::pagesFor($settings, $page);
+    $linkedCollection = CollectionBlock::linkedCollection($settings);
     $featured = [];
     $rest = $pages;
     if ($showFeaturedFirst) {
@@ -67,6 +68,14 @@ $renderHeading = static function (string $text) {
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
+    <?php endif; ?>
+    <?php if ($linkedCollection instanceof EngagementPage): ?>
+        <p class="ep-collection__more">
+            <a href="<?= Html::encode(\humhub\modules\thiscoveryPageBuilder\helpers\Url::toPublic($linkedCollection)) ?>">
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'View all') ?>
+                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </p>
     <?php endif; ?>
 
 <?php elseif ($source === CollectionBlock::SOURCE_FORMS): ?>

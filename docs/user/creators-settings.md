@@ -29,12 +29,12 @@ Set once per page. **Space stream, tasks, files, gallery, and calendar** widgets
 
 | Setting | What it does |
 | --- | --- |
-| Show in public directory | The page can appear in Collection blocks that list pages |
+| Show in public directory | The page can appear in Collection blocks set to **All pages shown in the directory** |
 | Featured on directory | Sorted first when a Collection prefers featured items |
 | Category | Optional label on cards (for example Consultation) |
 | Closes at | Optional deadline on cards |
 
-A collection homepage is never listed as a card on itself. Add a **Collection** section in the builder to list children.
+A collection homepage is never listed as a card on itself. Add a **Collection** section in the builder to list children. To show one collection on another page (for example Blogs on the home page), set that section to **Pages from a collection**. Those child pages do not need **Show in public directory**. Card images show the whole picture, including wide banners.
 
 ## Navigation (network pages)
 
@@ -53,10 +53,14 @@ Child pages only show in the live dropdown if the **collection** is also shown i
 
 ## Site homepage (network pages)
 
-Assign this **Published** page as:
+Administrators set the site home from the page list: **Site homepage**. Each audience (guests, logged-in users, and groups) can go to a published page or to a path or URL such as `/dashboard`.
+
+On this page you can still tick:
 
 - Homepage for guests
 - Default homepage for logged-in users
 - Homepage for a group
+
+That only assigns **this** page. A URL, or a different page, is set on **Site homepage**. Draft pages do not act as the homepage until they are published.
 
 After this is working, an administrator should disable the **Homepage** module so it does not override these assignments. See [Thiscovery Page Builder for administrators](admins.md).

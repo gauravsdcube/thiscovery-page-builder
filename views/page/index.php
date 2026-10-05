@@ -185,6 +185,10 @@ $folderLink = static function (array $params, bool $active, string $icon, string
                 $canThemes = Yii::$app->user->isAdmin()
                     || Yii::$app->user->can(\humhub\modules\admin\permissions\ManageModules::class);
                 ?>
+                <?= Button::light(Yii::t('ThiscoveryPageBuilderModule.base', 'Site homepage'))
+                    ->link(Url::toSiteHome())
+                    ->icon('home')
+                    ->loader(false) ?>
                 <?php if ($canThemes): ?>
                     <?= Button::light(Yii::t('ThiscoveryPageBuilderModule.base', 'Themes'))
                         ->link(Url::toThemes())
