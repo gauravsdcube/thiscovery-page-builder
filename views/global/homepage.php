@@ -43,7 +43,7 @@ $renderSlot = static function (string $name, string $legend, string $hint, array
                 <option value="url" <?= $kind === 'url' ? 'selected' : '' ?>><?= Yii::t('ThiscoveryPageBuilderModule.base', 'A path or URL') ?></option>
             </select>
         </div>
-        <div class="form-group" data-home-page <?= $kind === 'url' ? 'hidden' : '' ?>>
+        <div class="form-group" data-home-page>
             <label class="control-label" for="<?= Html::encode($id) ?>-page"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page') ?></label>
             <select class="form-control" id="<?= Html::encode($id) ?>-page" name="SiteHome[<?= Html::encode($name) ?>][page_id]" style="max-width:520px">
                 <?php foreach ($pageOptions as $value => $label): ?>
@@ -53,7 +53,7 @@ $renderSlot = static function (string $name, string $legend, string $hint, array
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="form-group" data-home-url <?= $kind === 'url' ? '' : 'hidden' ?>>
+        <div class="form-group" data-home-url>
             <label class="control-label" for="<?= Html::encode($id) ?>-url"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'URL') ?></label>
             <input type="text" class="form-control" id="<?= Html::encode($id) ?>-url"
                    name="SiteHome[<?= Html::encode($name) ?>][url]"
@@ -149,7 +149,7 @@ if ($groups === []) {
                                 <option value="url" <?= $kind === 'url' ? 'selected' : '' ?>><?= Yii::t('ThiscoveryPageBuilderModule.base', 'A path or URL') ?></option>
                             </select>
                         </div>
-                        <div class="form-group" data-home-page <?= $kind === 'url' ? 'hidden' : '' ?>>
+                        <div class="form-group" data-home-page>
                             <label class="control-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Page') ?></label>
                             <select class="form-control" name="<?= Html::encode($prefix) ?>[page_id]" style="max-width:520px">
                                 <?php foreach ($pageOptions as $value => $label): ?>
@@ -159,7 +159,7 @@ if ($groups === []) {
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group" data-home-url <?= $kind === 'url' ? '' : 'hidden' ?>>
+                        <div class="form-group" data-home-url>
                             <label class="control-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'URL') ?></label>
                             <input type="text" class="form-control" name="<?= Html::encode($prefix) ?>[url]"
                                    value="<?= Html::encode((string) ($slot['url'] ?? '')) ?>"
@@ -188,29 +188,16 @@ if ($groups === []) {
     </div>
 </div>
 
-<script>
+<style>
+[data-home-slot]:not(:has([data-home-kind] option[value="url"]:checked)) [data-home-url] {
+    display: none !important;
+}
+[data-home-slot]:has([data-home-kind] option[value="url"]:checked) [data-home-page] {
+    display: none !important;
+}
+</style>
+<script <?= Html::nonce() ?>>
 (function () {
-    function syncKind(select) {
-        var slot = select.closest('[data-home-slot]');
-        if (!slot) {
-            return;
-        }
-        var url = slot.querySelector('[data-home-url]');
-        var page = slot.querySelector('[data-home-page]');
-        var isUrl = select.value === 'url';
-        if (url) {
-            url.hidden = !isUrl;
-        }
-        if (page) {
-            page.hidden = isUrl;
-        }
-    }
-
-    document.querySelectorAll('[data-home-kind]').forEach(function (select) {
-        select.addEventListener('change', function () {
-            syncKind(select);
-        });
-    });
 
     var groups = document.querySelector('[data-home-groups]');
     var add = document.querySelector('[data-home-add]');
@@ -240,10 +227,6 @@ if ($groups === []) {
             var kind = copy.querySelector('[data-home-kind]');
             if (kind) {
                 kind.value = 'page';
-                kind.addEventListener('change', function () {
-                    syncKind(kind);
-                });
-                syncKind(kind);
             }
             groups.appendChild(copy);
         });
