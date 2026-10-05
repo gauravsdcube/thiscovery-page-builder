@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.5 (October 5, 2026)
+
+- Fix: Site homepage shows a URL field when the destination is a path or URL
+
 ## 1.8.4 (October 5, 2026)
 
 - Enh: Site homepage screen on the page list. Guests, logged-in users, and groups can be sent to a published page or to a path or URL
