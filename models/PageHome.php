@@ -21,7 +21,8 @@ use yii\web\IdentityInterface;
  * @property int $id
  * @property string $target
  * @property int|null $group_id
- * @property int $page_id
+ * @property int|null $page_id
+ * @property string|null $url
  * @property int $priority
  * @property bool $enabled
  * @property string|null $created_at
@@ -44,15 +45,17 @@ class PageHome extends ActiveRecord
     public function rules()
     {
         return [
-            [['target', 'page_id'], 'required'],
+            [['target'], 'required'],
             [['page_id', 'group_id', 'priority'], 'integer'],
             [['enabled'], 'boolean'],
+            [['url'], 'string', 'max' => 512],
             [['target'], 'in', 'range' => array_keys(self::targetOptions())],
             [['priority'], 'default', 'value' => 100],
             [['enabled'], 'default', 'value' => true],
             [['group_id'], 'required', 'when' => fn () => $this->target === self::TARGET_GROUP],
-            [['page_id'], 'exist', 'targetClass' => EngagementPage::class, 'targetAttribute' => ['page_id' => 'id']],
+            [['page_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => EngagementPage::class, 'targetAttribute' => ['page_id' => 'id']],
             [['group_id'], 'exist', 'targetClass' => Group::class, 'targetAttribute' => ['group_id' => 'id'], 'when' => fn () => $this->group_id],
+            [['url'], 'validateDestination', 'skipOnEmpty' => false],
         ];
     }
 
@@ -62,6 +65,7 @@ class PageHome extends ActiveRecord
             'target' => Yii::t('ThiscoveryPageBuilderModule.base', 'Audience'),
             'group_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Group'),
             'page_id' => Yii::t('ThiscoveryPageBuilderModule.base', 'Page'),
+            'url' => Yii::t('ThiscoveryPageBuilderModule.base', 'URL'),
             'priority' => Yii::t('ThiscoveryPageBuilderModule.base', 'Priority'),
             'enabled' => Yii::t('ThiscoveryPageBuilderModule.base', 'Enabled'),
         ];
@@ -86,10 +90,58 @@ class PageHome extends ActiveRecord
         return $this->hasOne(Group::class, ['id' => 'group_id']);
     }
 
+    public function validateDestination($attribute, $params = []): void
+    {
+        $destination = self::normalizeDestination((string) $this->url);
+        if ($destination !== null) {
+            $this->url = $destination;
+            $this->page_id = null;
+            return;
+        }
+        $this->url = null;
+        if ((int) $this->page_id < 1) {
+            $this->addError('page_id', Yii::t(
+                'ThiscoveryPageBuilderModule.base',
+                'Choose a page or enter a URL.'
+            ));
+        }
+    }
+
+    /**
+     * Site path (/dashboard) or an http(s) URL. Anything else is rejected.
+     */
+    public static function normalizeDestination(string $url): ?string
+    {
+        $url = trim($url);
+        if ($url === '' || strlen($url) > 512 || preg_match('/[\r\n\0]/', $url)) {
+            return null;
+        }
+        if (preg_match('#^https?://#i', $url)) {
+            return filter_var($url, FILTER_VALIDATE_URL) ? $url : null;
+        }
+        if ($url[0] !== '/' || str_starts_with($url, '//') || str_starts_with($url, '/\\')) {
+            return null;
+        }
+        if (preg_match('#[\s<>"\']#', $url)) {
+            return null;
+        }
+        return $url;
+    }
+
     public function beforeSave($insert)
     {
         if ($this->target !== self::TARGET_GROUP) {
             $this->group_id = null;
+        }
+        $destination = self::normalizeDestination((string) $this->url);
+        if ($destination !== null) {
+            $this->url = $destination;
+            $this->page_id = null;
+        } else {
+            $this->url = null;
+        }
+        if ((int) $this->page_id < 1) {
+            $this->page_id = null;
         }
         $now = date('Y-m-d H:i:s');
         if ($insert && empty($this->created_at)) {
@@ -201,6 +253,10 @@ class PageHome extends ActiveRecord
         if ($row === null) {
             return null;
         }
+        $destination = self::normalizeDestination((string) $row->url);
+        if ($destination !== null) {
+            return $destination;
+        }
         $page = $row->page;
         if ($page === null || !$page->isPublished() || $page->isTemplate()) {
             return null;
@@ -237,6 +293,7 @@ class PageHome extends ActiveRecord
             }
             $model = $query->one() ?: new static();
             $model->page_id = (int) $page->id;
+            $model->url = null;
             $model->target = $target;
             $model->group_id = $groupId;
             $model->priority = (int) ($row['priority'] ?? 100);
@@ -254,5 +311,160 @@ class PageHome extends ActiveRecord
             $old->delete();
         }
         self::flushCache();
+    }
+
+    /**
+     * Values for the site homepage screen. One guest row, one logged-in row
+     * (the lowest priority wins), and every group row.
+     *
+     * @return array{guest: array, registered: array, groups: array, extraGuest: int, extraRegistered: int}
+     */
+    public static function formState(): array
+    {
+        $guestRows = [];
+        $registeredRows = [];
+        $groupRows = [];
+        foreach (static::find()->orderBy(['priority' => SORT_ASC, 'id' => SORT_ASC])->all() as $row) {
+            if ($row->target === self::TARGET_GUEST) {
+                $guestRows[] = $row;
+            } elseif ($row->target === self::TARGET_REGISTERED) {
+                $registeredRows[] = $row;
+            } elseif ($row->target === self::TARGET_GROUP) {
+                $groupRows[] = $row;
+            }
+        }
+
+        return [
+            'guest' => self::slotFromRows($guestRows, 100),
+            'registered' => self::slotFromRows($registeredRows, 100),
+            'groups' => array_map(static fn (self $row) => self::slotFromRow($row), $groupRows),
+            'extraGuest' => max(0, count($guestRows) - ($guestRows === [] ? 0 : 1)),
+            'extraRegistered' => max(0, count($registeredRows) - ($registeredRows === [] ? 0 : 1)),
+        ];
+    }
+
+    /**
+     * Replace every homepage assignment with the site homepage form.
+     * Returns an error message, or null when saved.
+     */
+    public static function replaceAll(array $posted): ?string
+    {
+        $models = [];
+        foreach ([
+            'guest' => self::TARGET_GUEST,
+            'registered' => self::TARGET_REGISTERED,
+        ] as $key => $target) {
+            $row = is_array($posted[$key] ?? null) ? $posted[$key] : [];
+            if (empty($row['enabled'])) {
+                continue;
+            }
+            $model = self::modelFromInput($target, $row, null);
+            if ($model->hasErrors()) {
+                return implode(' ', $model->getFirstErrors());
+            }
+            $models[] = $model;
+        }
+
+        foreach ((array) ($posted['group'] ?? []) as $row) {
+            if (!is_array($row) || empty($row['enabled'])) {
+                continue;
+            }
+            $groupId = (int) ($row['group_id'] ?? 0);
+            if ($groupId < 1) {
+                continue;
+            }
+            $model = self::modelFromInput(self::TARGET_GROUP, $row, $groupId);
+            if ($model->hasErrors()) {
+                return implode(' ', $model->getFirstErrors());
+            }
+            $models[] = $model;
+        }
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            static::deleteAll();
+            foreach ($models as $model) {
+                if (!$model->save(false)) {
+                    $transaction->rollBack();
+                    return Yii::t('ThiscoveryPageBuilderModule.base', 'Could not save the site homepage.');
+                }
+            }
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::error($e, 'thiscovery-page-builder');
+            return Yii::t('ThiscoveryPageBuilderModule.base', 'Could not save the site homepage.');
+        }
+
+        self::flushCache();
+        return null;
+    }
+
+    /**
+     * @param self[] $rows
+     */
+    protected static function slotFromRows(array $rows, int $defaultPriority): array
+    {
+        if ($rows === []) {
+            return self::emptySlot($defaultPriority);
+        }
+        return self::slotFromRow($rows[0]);
+    }
+
+    protected static function slotFromRow(self $row): array
+    {
+        $url = trim((string) $row->url);
+        return [
+            'enabled' => (bool) $row->enabled,
+            'kind' => $url !== '' ? 'url' : 'page',
+            'page_id' => $row->page_id ? (string) $row->page_id : '',
+            'url' => $url,
+            'priority' => (int) $row->priority,
+            'group_id' => $row->group_id ? (string) $row->group_id : '',
+        ];
+    }
+
+    public static function emptySlot(int $priority = 100): array
+    {
+        return [
+            'enabled' => false,
+            'kind' => 'page',
+            'page_id' => '',
+            'url' => '',
+            'priority' => $priority,
+            'group_id' => '',
+        ];
+    }
+
+    public static function slotFromInput(array $row, int $defaultPriority = 100): array
+    {
+        $kind = ($row['kind'] ?? '') === 'url' ? 'url' : 'page';
+        return [
+            'enabled' => !empty($row['enabled']),
+            'kind' => $kind,
+            'page_id' => (string) ($row['page_id'] ?? ''),
+            'url' => trim((string) ($row['url'] ?? '')),
+            'priority' => (int) ($row['priority'] ?? $defaultPriority),
+            'group_id' => (string) ($row['group_id'] ?? ''),
+        ];
+    }
+
+    protected static function modelFromInput(string $target, array $row, ?int $groupId): self
+    {
+        $model = new static();
+        $model->target = $target;
+        $model->group_id = $groupId;
+        $model->priority = (int) ($row['priority'] ?? ($target === self::TARGET_GROUP ? 50 : 100));
+        $model->enabled = true;
+        if (($row['kind'] ?? 'page') === 'url') {
+            $model->url = trim((string) ($row['url'] ?? ''));
+            $model->page_id = null;
+        } else {
+            $model->url = null;
+            $pageId = (int) ($row['page_id'] ?? 0);
+            $model->page_id = $pageId > 0 ? $pageId : null;
+        }
+        $model->validate();
+        return $model;
     }
 }

@@ -590,7 +590,47 @@ if ($type === 'phases'): ?>
         <input type="text" class="form-control" name="<?= $namePrefix ?>[settings][empty_message]"
                value="<?= Html::encode($settings['empty_message'] ?? Yii::t('ThiscoveryPageBuilderModule.base', 'Nothing to show yet.')) ?>">
     </div>
-    <div class="form-check mb-2" data-ep-collection-pages-only<?= ($settings['source'] ?? 'pages') === 'pages' ? '' : ' hidden' ?>>
+    <?php
+    $pageScope = (string) ($settings['page_scope'] ?? 'listed');
+    if (!isset(\humhub\modules\thiscoveryPageBuilder\blocks\CollectionBlock::pageScopeOptions()[$pageScope])) {
+        $pageScope = 'listed';
+    }
+    $collectionContainerId = null;
+    if ($page && !$page->isGlobal()) {
+        try {
+            $collectionContainerId = (int) ($page->content->contentcontainer_id ?? 0) ?: null;
+        } catch (\Throwable $e) {
+            $collectionContainerId = null;
+        }
+    }
+    $collectionPicker = \humhub\modules\thiscoveryPageBuilder\models\EngagementPage::collectionPickerOptions($collectionContainerId);
+    ?>
+    <div data-ep-collection-pages-only<?= ($settings['source'] ?? 'pages') === 'pages' ? '' : ' hidden' ?>>
+    <div class="form-group">
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Which pages') ?></label>
+        <select class="form-control" name="<?= $namePrefix ?>[settings][page_scope]" style="max-width:360px"
+                data-ep-collection-scope>
+            <?php foreach (\humhub\modules\thiscoveryPageBuilder\blocks\CollectionBlock::pageScopeOptions() as $value => $label): ?>
+                <option value="<?= Html::encode($value) ?>" <?= $pageScope === $value ? 'selected' : '' ?>>
+                    <?= Html::encode($label) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <div class="ep-hint text-muted">
+            <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Directory lists every page marked “Show in directory”. A collection lists that collection’s published child pages, for example Blogs on the home page. Child pages lists pages nested under this page.') ?>
+        </div>
+    </div>
+    <div class="form-group" data-ep-collection-pick<?= $pageScope === 'collection' ? '' : ' hidden' ?>>
+        <label class="ep-label"><?= Yii::t('ThiscoveryPageBuilderModule.base', 'Collection') ?></label>
+        <select class="form-control" name="<?= $namePrefix ?>[settings][collection_id]" style="max-width:420px">
+            <?php foreach ($collectionPicker as $value => $label): ?>
+                <option value="<?= Html::encode((string) $value) ?>" <?= (string) ($settings['collection_id'] ?? '') === (string) $value ? 'selected' : '' ?>>
+                    <?= Html::encode($label) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="form-check mb-2">
         <input type="hidden" name="<?= $namePrefix ?>[settings][show_featured_first]" value="0">
         <input class="form-check-input" type="checkbox" value="1"
                name="<?= $namePrefix ?>[settings][show_featured_first]"
@@ -599,6 +639,7 @@ if ($type === 'phases'): ?>
         <label class="form-check-label" for="ep-dir-feat-<?= Html::encode($safeIndex) ?>">
             <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Show featured pages first') ?>
         </label>
+    </div>
     </div>
     <div data-ep-collection-calendar-only<?= ($settings['source'] ?? 'pages') === 'calendar' ? '' : ' hidden' ?>>
         <div class="form-group">
@@ -621,7 +662,7 @@ if ($type === 'phases'): ?>
         </div>
     </div>
     <p class="ep-hint text-muted">
-        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Pages: published items with “Show in public directory”. Forms: open global Thiscovery Forms. Spaces: visible spaces. Calendar: upcoming events (requires the Calendar module).') ?>
+        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Pages can be the whole directory, one collection’s child pages, or this page’s child pages. Forms: open global Thiscovery Forms. Spaces: visible spaces. Calendar: upcoming events (requires the Calendar module).') ?>
     </p>
 
 <?php elseif ($type === 'button'): ?>

@@ -26,6 +26,13 @@ class CollectionBlock extends BaseBlock
     public const SOURCE_SPACES = 'spaces';
     public const SOURCE_CALENDAR = 'calendar';
 
+    /** Every published page marked “Show in directory”. */
+    public const SCOPE_LISTED = 'listed';
+    /** Published child pages of a chosen collection. */
+    public const SCOPE_COLLECTION = 'collection';
+    /** Published child pages of the page that holds this block. */
+    public const SCOPE_CHILDREN = 'children';
+
     public const EVENT_LIMIT_MIN = 1;
     public const EVENT_LIMIT_MAX = 30;
     public const EVENT_LIMIT_DEFAULT = 5;
@@ -70,6 +77,46 @@ class CollectionBlock extends BaseBlock
             $options[self::SOURCE_CALENDAR] = Yii::t('ThiscoveryPageBuilderModule.base', 'Calendar');
         }
         return $options;
+    }
+
+    public static function pageScopeOptions(): array
+    {
+        return [
+            self::SCOPE_LISTED => Yii::t('ThiscoveryPageBuilderModule.base', 'All pages shown in the directory'),
+            self::SCOPE_COLLECTION => Yii::t('ThiscoveryPageBuilderModule.base', 'Pages from a collection'),
+            self::SCOPE_CHILDREN => Yii::t('ThiscoveryPageBuilderModule.base', 'Child pages of this page'),
+        ];
+    }
+
+    /**
+     * @return EngagementPage[]
+     */
+    public static function pagesFor(array $settings, ?EngagementPage $host): array
+    {
+        $scope = (string) ($settings['page_scope'] ?? self::SCOPE_LISTED);
+        if ($scope === self::SCOPE_COLLECTION) {
+            return EngagementPage::findPublishedChildren((int) ($settings['collection_id'] ?? 0));
+        }
+        if ($scope === self::SCOPE_CHILDREN && $host !== null) {
+            return EngagementPage::findPublishedChildren((int) $host->id);
+        }
+        return EngagementPage::findDirectoryPages();
+    }
+
+    public static function linkedCollection(array $settings): ?EngagementPage
+    {
+        if (($settings['page_scope'] ?? '') !== self::SCOPE_COLLECTION) {
+            return null;
+        }
+        $id = (int) ($settings['collection_id'] ?? 0);
+        if ($id < 1) {
+            return null;
+        }
+        $page = EngagementPage::findOne($id);
+        if (!$page instanceof EngagementPage || !$page->isCollection() || !$page->isPublished() || $page->isTemplate()) {
+            return null;
+        }
+        return $page;
     }
 
     public static function clampEventLimit($value): int
@@ -157,6 +204,11 @@ class CollectionBlock extends BaseBlock
         if (!isset(self::sourceOptions()[$source])) {
             $source = self::SOURCE_PAGES;
         }
+        $scope = (string) ($this->settings['page_scope'] ?? self::SCOPE_LISTED);
+        if (!isset(self::pageScopeOptions()[$scope])) {
+            $scope = self::SCOPE_LISTED;
+        }
+        $collectionId = (int) ($this->settings['collection_id'] ?? 0);
 
         return [
             'title' => $this->string(
@@ -164,6 +216,8 @@ class CollectionBlock extends BaseBlock
                 Yii::t('ThiscoveryPageBuilderModule.base', 'Open for feedback')
             ),
             'source' => $source,
+            'page_scope' => $scope,
+            'collection_id' => $collectionId > 0 ? $collectionId : '',
             'empty_message' => $this->string(
                 'empty_message',
                 Yii::t('ThiscoveryPageBuilderModule.base', 'Nothing to show yet.')

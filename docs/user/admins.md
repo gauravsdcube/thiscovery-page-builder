@@ -43,14 +43,16 @@ When Thiscovery Page Builder is enabled on a space, the **space wall stream is f
 
 ## Site homepage (replace the Homepage module)
 
-Network pages can become the site home:
+Open **Site homepage** on the page list (next to Themes). For guests, logged-in users, and each group, choose either:
 
-1. Open a **Published** page in the studio → **Settings → Site homepage**.
-2. Assign **Homepage for guests**, **Default homepage for logged-in users**, and optional **group** homes.
-3. Save, then confirm Home and post-login redirects.
-4. Disable the **Homepage** module under **Administration → Modules** so it does not compete.
+- a **published page**, or
+- a **path or URL** (for example `/dashboard` or `https://…`)
 
-Draft pages do not act as the homepage until they are published.
+Lower priority numbers win when several homes match. Saving this screen replaces homepage assignments, including ones set on an individual page.
+
+You can still open a published page → **Settings → Site homepage** and tick that page as a home. Draft pages do not act as the homepage until they are published.
+
+Disable the **Homepage** module under **Administration → Modules** so it does not compete.
 
 ## Appearance themes
 

@@ -360,8 +360,15 @@ $pane = static function (string $section, string $title) use ($activeSection): s
 
 <?= $pane('homepage', Yii::t('ThiscoveryPageBuilderModule.base', 'Site homepage')) ?>
             <p class="ep-set-acc__intro">
-                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Use these assignments instead of the Homepage module. Disable Homepage after configuring here.') ?>
+                <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Assign this page as a homepage. To send people to a URL, or to a different page, use Site homepage on the page list.') ?>
             </p>
+            <?php if ($page->isGlobal()): ?>
+                <p class="ep-hint">
+                    <a href="<?= Html::encode(Url::toSiteHome()) ?>">
+                        <?= Yii::t('ThiscoveryPageBuilderModule.base', 'Open site homepage settings') ?>
+                    </a>
+                </p>
+            <?php endif; ?>
             <?php if (!$page->isPublished()): ?>
                 <div class="alert alert-warning">
                     <?= Yii::t('ThiscoveryPageBuilderModule.base', 'This page is a draft. Publish it before homepage assignments can redirect users here.') ?>

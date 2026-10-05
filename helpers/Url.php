@@ -62,6 +62,11 @@ class Url
         return BaseUrl::to(['/thiscovery-page-builder/global/themes']);
     }
 
+    public static function toSiteHome(): string
+    {
+        return BaseUrl::to(['/thiscovery-page-builder/global/homepage']);
+    }
+
     public static function toThemeEdit(?int $id = null): string
     {
         $params = ['/thiscovery-page-builder/global/theme-edit'];

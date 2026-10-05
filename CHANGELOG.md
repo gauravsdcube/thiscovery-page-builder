@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.4 (October 5, 2026)
+
+- Enh: Site homepage screen on the page list. Guests, logged-in users, and groups can be sent to a published page or to a path or URL
+- Enh: A Collection section can list another collection’s child pages (for example Blogs on the home page), or only the child pages of the page it sits on
+- Fix: Collection card images show the whole picture instead of cropping wide banners
+
 ## 1.8.3 (September 15, 2026)
 
 - Enh: Public layout shows Thiscovery Navigation breadcrumbs when that module has them enabled
